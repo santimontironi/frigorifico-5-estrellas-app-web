@@ -7,5 +7,4 @@ export const router = Router()
 
 router.post('/register/admin', adminController.registerAdmin)
 router.post('/login/admin', adminController.loginAdmin)
-router.post('/logout/admin', adminController.logout)
 router.get('/dashboard/admin', verifyAuth, verifyRole('admin'), adminController.dashboard)

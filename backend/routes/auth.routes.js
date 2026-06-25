@@ -5,3 +5,4 @@ import verifyAuth from '../middlewares/verifyAuth.js'
 export const router = Router()
 
 router.get('/me', verifyAuth, authController.me)
+router.post('/logout', authController.logout)

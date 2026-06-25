@@ -2,7 +2,7 @@ import { createContext, useState, useEffect } from 'react'
 
 import type { AuthInterface, LoginResponse, UserLoginCredentials, AdminLoginCredentials, UserRegisterCredentials, AuthLoadingState } from '../types/auth.types'
 
-import { authMeService, loginUserService, loginAdminService, logoutUserService, logoutAdminService, registerUserService } from '../services/auth.service'
+import { authMeService, loginUserService, loginAdminService, logoutService, registerUserService } from '../services/auth.service'
 
 interface AuthContextType {
   loading: AuthLoadingState
@@ -10,8 +10,7 @@ interface AuthContextType {
   isAdmin: boolean
   loginUser: (credentials: UserLoginCredentials) => Promise<LoginResponse>
   loginAdmin: (credentials: AdminLoginCredentials) => Promise<LoginResponse>
-  logoutUser: () => Promise<void>
-  logoutAdmin: () => Promise<void>
+  logout: () => Promise<void>
   registerUser: (credentials: UserRegisterCredentials) => Promise<void>
 }
 
@@ -24,21 +23,19 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     me: true,
     loginUser: false,
     loginAdmin: false,
-    logoutUser: false,
-    logoutAdmin: false,
+    logout: false,
     registerUser: false
   })
 
   useEffect(() => {
     async function me() {
       try {
-        setLoading({ ...loading, me: true })
         const res = await authMeService()
         setAuth(res.data)
-      } catch (error: any) {
+      } catch {
         setAuth(null)
       } finally {
-        setLoading({ ...loading, me: false })
+        setLoading(prev => ({ ...prev, me: false }))
       }
     }
     me()
@@ -46,62 +43,50 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
   async function loginUser(credentials: UserLoginCredentials) {
     try {
-      setLoading({ ...loading, loginUser: true })
+      setLoading(prev => ({ ...prev, loginUser: true }))
       const res = await loginUserService(credentials)
       setAuth(res.data)
       return res.data
     } catch (error: any) {
       throw error
     } finally {
-      setLoading({ ...loading, loginUser: false })
+      setLoading(prev => ({ ...prev, loginUser: false }))
     }
   }
 
   async function loginAdmin(credentials: AdminLoginCredentials) {
     try {
-      setLoading({ ...loading, loginAdmin: true })
+      setLoading(prev => ({ ...prev, loginAdmin: true }))
       const res = await loginAdminService(credentials)
       setAuth(res.data)
       return res.data
     } catch (error: any) {
       throw error
     } finally {
-      setLoading({ ...loading, loginAdmin: false })
+      setLoading(prev => ({ ...prev, loginAdmin: false }))
     }
   }
 
-  async function logoutUser() {
+  async function logout() {
     try {
-      setLoading({ ...loading, logoutUser: true })
-      await logoutUserService()
+      setLoading(prev => ({ ...prev, logout: true }))
+      await logoutService()
       setAuth(null)
     } catch (error: any) {
       throw error
     } finally {
-      setLoading({ ...loading, logoutUser: false })
-    }
-  }
-
-  async function logoutAdmin() {
-    try {
-      setLoading({ ...loading, logoutAdmin: true })
-      await logoutAdminService()
-      setAuth(null)
-    } catch (error: any) {
-      throw error
-    } finally {
-      setLoading({ ...loading, logoutAdmin: false })
+      setLoading(prev => ({ ...prev, logout: false }))
     }
   }
 
   async function registerUser(credentials: UserRegisterCredentials) {
     try {
-      setLoading({ ...loading, registerUser: true })
+      setLoading(prev => ({ ...prev, registerUser: true }))
       await registerUserService(credentials)
     } catch (error: any) {
       throw error
     } finally {
-      setLoading({ ...loading, registerUser: false })
+      setLoading(prev => ({ ...prev, registerUser: false }))
     }
   }
 
@@ -112,8 +97,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       isAdmin: auth?.role === 'admin',
       loginUser,
       loginAdmin,
-      logoutUser,
-      logoutAdmin,
+      logout,
       registerUser,
     }}>
       {children}

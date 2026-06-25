@@ -1,16 +1,7 @@
 import adminRepository from '../repository/admin.repository.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
-
-dotenv.config()
-
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  maxAge: 3 * 24 * 60 * 60 * 1000
-}
+import cookieOptions from '../config/cookie.js'
 
 class AdminController {
   async registerAdmin(req, res) {
@@ -41,7 +32,7 @@ class AdminController {
       if (!passwordMatch) return res.status(401).json({ message: 'Contraseña incorrecta' })
 
       const role = 'admin'
-      const token = jwt.sign({ id: admin._id, role }, process.env.JWT_SECRET)
+      const token = jwt.sign({ id: admin._id, role }, process.env.JWT_SECRET, { expiresIn: '3d' })
 
       res.cookie('token', token, cookieOptions)
       return res.status(200).json({ id: admin._id, role })
@@ -55,15 +46,6 @@ class AdminController {
       const admin = await adminRepository.findAdminById(req.auth.id)
       if (!admin) return res.status(404).json({ message: 'Admin no encontrado' })
       return res.status(200).json(admin)
-    } catch (error) {
-      return res.status(500).json({ message: error.message })
-    }
-  }
-
-  async logout(req, res) {
-    try {
-      res.clearCookie('token', cookieOptions)
-      return res.status(200).json({ message: 'Logout exitoso' })
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }
