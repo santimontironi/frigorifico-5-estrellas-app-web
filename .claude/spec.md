@@ -53,21 +53,22 @@ frigorifico-5-estrellas/
 │   ├── app.js                 # configura Express: middlewares globales + monta rutas
 │   ├── .env
 │   ├── models/
-│   │   ├── User.js
-│   │   ├── Admin.js
-│   │   ├── Category.js
-│   │   ├── Product.js
-│   │   ├── Offer.js
-│   │   └── Order.js
+│   │   ├── user.model.js
+│   │   ├── admin.model.js
+│   │   ├── category.model.js
+│   │   ├── product.model.js
+│   │   ├── offer.model.js
+│   │   ├── orderItem.model.js
+│   │   └── order.model.js
 │   ├── controllers/
-│   │   ├── auth.controller.js
-│   │   ├── user.controller.js
-│   │   ├── admin.controller.js
+│   │   ├── auth.controller.js     # GET /auth/me
+│   │   ├── user.controller.js     # register, login, logout, dashboard
+│   │   ├── admin.controller.js    # register, login, logout, dashboard
 │   │   ├── product.controller.js
 │   │   ├── category.controller.js
 │   │   ├── offer.controller.js
 │   │   ├── order.controller.js
-│   │   └── payment.controller.js  # crea preferencias MP y procesa webhook
+│   │   └── payment.controller.js
 │   ├── repository/
 │   │   ├── user.repository.js
 │   │   ├── admin.repository.js
@@ -83,24 +84,24 @@ frigorifico-5-estrellas/
 │   │   ├── category.routes.js
 │   │   ├── offer.routes.js
 │   │   ├── order.routes.js
-│   │   └── payment.routes.js      # /api/payments
+│   │   └── payment.routes.js
 │   └── middlewares/
 │       ├── verifyAuth.js      # valida JWT e inyecta req.auth con { id, role }
-│       └── verifyRole.js      # comprueba que req.auth.role === 'admin'
+│       └── verifyRole.js      # factory: verifyRole('admin') | verifyRole('user')
 │
 └── frontend/
     ├── index.html
     ├── vite.config.ts
     └── src/
         ├── main.tsx
-        ├── App.tsx            # router principal
+        ├── App.tsx
         ├── index.css
         ├── context/
-        │   ├── AuthContext.tsx     # sesión unificada (user + admin por role)
-        │   ├── CartContext.tsx     # carrito de compras
-        │   ├── ProductsContext.tsx # catálogo de productos
-        │   ├── OffersContext.tsx   # ofertas vigentes
-        │   └── OrderContext.tsx    # pedidos del usuario autenticado
+        │   ├── AuthContext.tsx
+        │   ├── CartContext.tsx
+        │   ├── ProductsContext.tsx
+        │   ├── OffersContext.tsx
+        │   └── OrderContext.tsx
         ├── pages/
         │   ├── Home.tsx
         │   ├── Register.tsx
@@ -108,7 +109,7 @@ frigorifico-5-estrellas/
         │   ├── Catalog.tsx
         │   ├── ProductDetail.tsx
         │   ├── Cart.tsx
-        │   ├── Orders.tsx         # historial de pedidos del usuario
+        │   ├── Orders.tsx
         │   └── admin/
         │       ├── AdminLogin.tsx
         │       ├── AdminDashboard.tsx
@@ -122,12 +123,12 @@ frigorifico-5-estrellas/
         │   ├── CartItem.tsx
         │   └── ProtectedRoute.tsx
         ├── services/
-        │   ├── api.ts             # instancia axios con baseURL y withCredentials
-        │   ├── userService.ts
+        │   ├── api.ts
+        │   ├── authService.ts
         │   ├── productService.ts
         │   └── orderService.ts
         └── types/
-            └── index.ts           # interfaces TypeScript compartidas
+            └── auth.types.ts
 ```
 
 ---
@@ -146,7 +147,7 @@ Representa a un cliente registrado.
   dni:        { type: String, required: true, unique: true, trim: true },
   phone:      { type: String, required: true, trim: true },
   email:      { type: String, required: true, unique: true, lowercase: true, trim: true },
-  password:   { type: String, required: true },   // bcrypt hash
+  password:   { type: String, required: true },
   address: {
     street:    { type: String, required: true },
     number:    { type: String, required: true },
@@ -155,7 +156,7 @@ Representa a un cliente registrado.
     city:      { type: String, required: true },
     province:  { type: String, required: true }
   },
-  createdAt:  { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now }
 }
 ```
 
@@ -169,11 +170,11 @@ Autenticación separada para el panel de administración.
 // models/admin.model.js
 {
   username: { type: String, required: true, unique: true, trim: true },
-  password: { type: String, required: true }   // bcrypt hash
+  password: { type: String, required: true }
 }
 ```
 
-> Los admins se crean manualmente (o mediante un script seed). No hay registro público de admins.
+> Los admins se crean mediante el endpoint `POST /admin/register`. No hay registro público.
 
 ---
 
@@ -303,19 +304,25 @@ Base URL: `http://localhost:3001/api`
 
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
-| GET | `/auth/me` | token | Devuelve el payload del JWT activo (user o admin) |
+| GET | `/api/auth/me` | token | Devuelve `{ id, role }` del JWT activo — no consulta la BD |
 
-`GET /auth/me` es manejado por `auth.controller.js`. El middleware `verifyAuth` valida la cookie y adjunta el payload en `req.auth`; el controlador lo devuelve directamente sin consultar la base de datos. Respuesta: `{ auth: { id, role } }`. Usado por `AuthContext` al montar la app para restaurar la sesión.
-
-### Usuarios (`/api/users`)
+### Usuarios
 
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
-| POST | `/users/register` | — | Registrar nuevo usuario |
-| POST | `/users/login` | — | Login; devuelve JWT en cookie httpOnly |
-| POST | `/users/logout` | usuario | Elimina la cookie |
-| GET | `/users/me` | usuario | Perfil completo del usuario autenticado |
-| PUT | `/users/me` | usuario | Actualizar datos personales |
+| POST | `/api/register/user` | — | Registrar nuevo usuario |
+| POST | `/api/login/user` | — | Login; devuelve `{ id, role }` y cookie httpOnly |
+| POST | `/api/logout/user` | — | Elimina la cookie |
+| GET | `/api/dashboard/user` | user | Perfil completo del usuario autenticado |
+
+### Administración
+
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| POST | `/api/register/admin` | — | Crear admin |
+| POST | `/api/login/admin` | — | Login; devuelve `{ id, role }` y cookie httpOnly |
+| POST | `/api/logout/admin` | — | Elimina la cookie |
+| GET | `/api/dashboard/admin` | admin | Datos del admin autenticado |
 
 ### Productos (`/api/products`)
 
@@ -365,42 +372,43 @@ Base URL: `http://localhost:3001/api`
 | POST | `/payments/create-preference/:orderId` | usuario | Crea una Preference en MP con `montoFinal`; devuelve `{ init_point }` |
 | POST | `/payments/webhook` | — (pública) | Webhook de MP; verifica firma y actualiza el pedido a `pagado` |
 
-### Administración (`/api/admin`)
-
-| Método | Ruta | Auth | Descripción |
-|---|---|---|---|
-| POST | `/admin/login` | — | Login del administrador; devuelve JWT en cookie |
-| POST | `/admin/logout` | admin | Elimina la cookie de sesión admin |
-
 ---
 
 ## Middlewares
 
 ### `verifyAuth.js`
 
-Extrae el JWT de la cookie httpOnly, lo verifica con `jsonwebtoken`, e inyecta el payload en `req.user` (o `req.admin` según el token). Retorna `401` si el token no existe o es inválido.
+Extrae el JWT de la cookie httpOnly, lo verifica con `jsonwebtoken` e inyecta el payload en `req.auth = { id, role }`. Retorna `401` si el token no existe o es inválido.
 
 ### `verifyRole.js`
 
-Se usa después de `verifyAuth`. Comprueba que `req.admin` exista (rol administrador). Retorna `403` si el usuario autenticado no es admin.
+Factory que recibe el rol esperado y retorna un middleware. Comprueba que `req.auth.role` coincida. Retorna `403` si no.
+
+```js
+// uso en rutas
+router.put('/orders/:id/accept', verifyAuth, verifyRole('admin'), ...)
+router.get('/orders/my',         verifyAuth, verifyRole('user'),  ...)
+```
 
 ---
 
 ## Autenticación y autorización
 
-- **Mecanismo:** JWT almacenado en cookie `httpOnly; SameSite=Strict; Secure` (en producción).
-- **Token unificado:** una sola cookie `token`. El payload incluye `role: 'user' | 'admin'`, con el que el backend decide permisos y el frontend decide qué renderizar.
-- **Expiración:** configurable por variable de entorno (ej. `7d` para usuarios, `1d` para admin).
-- **Endpoint de verificación de sesión:** `GET /auth/me` — devuelve el payload del token activo; usado por `AuthContext` al montar la app.
+- **Mecanismo:** JWT almacenado en cookie `httpOnly`, `secure` en producción, `sameSite: none` en producción / `lax` en desarrollo. Duración: 3 días.
+- **Token unificado:** una sola cookie `token`. El payload es `{ id, role: 'user' | 'admin' }`.
+- **Endpoint de verificación de sesión:** `GET /auth/me` — devuelve `{ id, role }` sin consultar la BD; usado por `AuthContext` al montar la app.
 - **Flujo login usuario:**
-  1. POST `/users/login` con `email` + `password`.
-  2. Backend verifica hash con bcrypt.
-  3. Genera JWT con payload `{ id, email, role: 'user' }`.
-  4. Envía cookie httpOnly `token`.
+  1. `POST /api/login/user` con `{ email, password }`.
+  2. Backend busca en colección `User` por email, verifica hash con bcrypt.
+  3. Genera JWT `{ id, role: 'user' }` y envía cookie httpOnly.
+  4. Respuesta: `{ id, role }`.
 - **Flujo login admin:**
-  1. POST `/admin/login` con `username` + `password`.
-  2. Genera JWT con payload `{ id, username, role: 'admin' }`.
-  3. Envía la misma cookie httpOnly `token` (sobreescribe si había sesión de usuario).
+  1. `POST /api/login/admin` con `{ username, password }`.
+  2. Backend busca en colección `Admin` por username, verifica hash con bcrypt.
+  3. Genera JWT `{ id, role: 'admin' }` y envía cookie httpOnly.
+  4. Respuesta: `{ id, role }`.
+- **Logout:** `POST /api/logout/user` o `POST /api/logout/admin` — ambos limpian la misma cookie.
+- **Sesiones simultáneas:** no soportadas — una sola cookie `token` por navegador.
 
 ---
 
@@ -410,34 +418,26 @@ Se usan seis contextos React para manejar el estado global de la aplicación sin
 
 ### `AuthContext`
 
-Sesión unificada para usuarios y administradores. Un único contexto distingue el rol mediante el campo `role`.
+Sesión unificada para usuarios y administradores. El estado guarda solo `{ id, role }` — los datos de perfil se fetchean en cada página con `GET /users/dashboard` o `GET /admin/dashboard`.
 
 ```ts
-// context/AuthContext.tsx
-interface AuthUser {
-  id: string
-  role: 'user' | 'admin'
-  email?: string      // solo role: 'user'
-  username?: string   // solo role: 'admin'
-  nombre?: string     // solo role: 'user'
-}
-
+// context/AuthContext.tsx — tipos en src/types/auth.types.ts
 interface AuthContextType {
-  auth: AuthUser | null
+  auth: AuthInterface | null   // { id, role }
   isAuthenticated: boolean
-  isAdmin: boolean                                           // auth?.role === 'admin'
-  login: (email: string, password: string) => Promise<void>
-  loginAdmin: (username: string, password: string) => Promise<void>
+  isAdmin: boolean             // auth?.role === 'admin'
+  loading: boolean
+  loginUser:  (credentials: UserLoginCredentials)  => Promise<void>
+  loginAdmin: (credentials: AdminLoginCredentials) => Promise<void>
   logout: () => Promise<void>
-  loading: boolean   // true mientras se verifica la sesión al cargar la app
 }
 ```
 
 - Al montar la app llama a `GET /auth/me` para restaurar la sesión desde la cookie.
-- `login()` llama a `POST /users/login`; `loginAdmin()` llama a `POST /admin/login`.
-- Ambos setean `auth` con el payload del JWT devuelto.
-- `logout()` llama al endpoint correspondiente según `auth.role` y limpia el estado.
-- `isAdmin` es un shorthand derivado usado por `ProtectedRoute` para proteger el panel admin.
+- `loginUser()` llama a `POST /api/login/user`; `loginAdmin()` llama a `POST /api/login/admin`.
+- Ambos setean `auth` con la respuesta `{ id, role }` (tipo `LoginResponse`).
+- `logoutUser()` llama a `POST /api/logout/user`; `logoutAdmin()` llama a `POST /api/logout/admin`.
+- `isAdmin` es un shorthand derivado usado por `ProtectedRoute`.
 
 ### `CartContext`
 
@@ -619,9 +619,7 @@ type OrderStatus = 'pending' | 'accepted' | 'rejected' | 'paid' | 'in_preparatio
 PORT=3001
 MONGO_URI=mongodb://localhost:27017/frigorifico5estrellas
 JWT_SECRET=supersecretkey
-JWT_EXPIRES_IN=7d
-JWT_ADMIN_SECRET=adminsecretkey
-JWT_ADMIN_EXPIRES_IN=1d
+NODE_ENV=development
 NODEMAILER_USER=correo@ejemplo.com
 NODEMAILER_PASS=password_de_correo
 CLIENT_URL=http://localhost:5173

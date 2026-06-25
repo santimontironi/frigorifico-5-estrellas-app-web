@@ -1,6 +1,8 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import {router as authRouter} from './routes/auth.routes.js'
+import {router as userRouter} from './routes/user.routes.js'
 import {router as adminRouter} from './routes/admin.routes.js'
 import cookieParser from 'cookie-parser'
 
@@ -17,6 +19,8 @@ app.use(cors({
 
 app.use(cookieParser()) // para poder usar req.cookies
 
+app.use('/api', authRouter)
+app.use('/api', userRouter)
 app.use('/api', adminRouter)
 
 export default app

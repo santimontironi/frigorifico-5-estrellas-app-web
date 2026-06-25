@@ -1,6 +1,6 @@
 class AuthController {
   me(req, res) {
-    return res.status(200).json({ auth: req.auth })
+    return res.status(200).json(req.auth)
   }
 }
 
