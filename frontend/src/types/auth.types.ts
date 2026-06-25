@@ -64,4 +64,5 @@ export interface AuthLoadingState {
   loginAdmin: boolean
   logout: boolean
   registerUser: boolean
+  confirmUser: boolean
 }

@@ -12,6 +12,10 @@ class UserRepository {
   async findUserById(id) {
     return await User.findById(id).select('-password')
   }
+
+  async confirmUser(id) {
+    return await User.findByIdAndUpdate(id, { confirmed: true }, { new: true })
+  }
 }
 
 const userRepository = new UserRepository()

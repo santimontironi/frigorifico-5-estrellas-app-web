@@ -2,14 +2,15 @@ import { createContext, useState, useEffect } from 'react'
 
 import type { AuthInterface, LoginResponse, UserLoginCredentials, AdminLoginCredentials, UserRegisterCredentials, AuthLoadingState } from '../types/auth.types'
 
-import { authMeService, loginUserService, loginAdminService, logoutService, registerUserService } from '../services/auth.service'
+import { authMeService, loginUserService, loginAdminService, logoutService, registerUserService, confirmUserService } from '../services/auth.service'
 
 interface AuthContextType {
   loading: AuthLoadingState
   auth: AuthInterface | null
-  isAdmin: boolean
+  isUser: boolean
   loginUser: (credentials: UserLoginCredentials) => Promise<LoginResponse>
   loginAdmin: (credentials: AdminLoginCredentials) => Promise<LoginResponse>
+  confirmUser: (token: string) => Promise<void>
   logout: () => Promise<void>
   registerUser: (credentials: UserRegisterCredentials) => Promise<void>
 }
@@ -24,6 +25,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     loginUser: false,
     loginAdmin: false,
     logout: false,
+    confirmUser: false,
     registerUser: false
   })
 
@@ -90,14 +92,28 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     }
   }
 
+  async function confirmUser(token: string){
+    try{
+      setLoading(prev => ({ ...prev, confirmUser: true }))
+      await confirmUserService(token)
+    }
+    catch(error: any){
+      throw error
+    }
+    finally{
+      setLoading(prev => ({ ...prev, confirmUser: false }))
+    }
+  }
+
   return (
     <AuthContext.Provider value={{
       auth,
       loading,
-      isAdmin: auth?.role === 'admin',
+      isUser: auth?.role === 'user',
       loginUser,
       loginAdmin,
       logout,
+      confirmUser,
       registerUser,
     }}>
       {children}

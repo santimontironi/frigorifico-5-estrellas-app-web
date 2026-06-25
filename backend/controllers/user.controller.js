@@ -2,6 +2,7 @@ import userRepository from '../repository/user.repository.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import cookieOptions from '../config/cookie.js'
+import transporter from '../config/mail.config.js'
 
 class UserController {
   async register(req, res) {
@@ -16,9 +17,25 @@ class UserController {
       if (existing) return res.status(409).json({ message: 'El email ya está registrado' })
 
       const passwordHash = await bcrypt.hash(password, 10)
-      await userRepository.createUser({ firstName, lastName, dni, phone, email, password: passwordHash, address })
 
-      return res.status(201).json({ message: 'Usuario creado' })
+      const user = await userRepository.createUser({ firstName, lastName, dni, phone, email, password: passwordHash, address })
+
+      const verificationToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' })
+      const verificationUrl = `${process.env.FRONTEND_URL}/verificar/${verificationToken}`
+
+      await transporter.sendMail({
+        from: `"Frigorífico 5 Estrellas" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Confirmá tu cuenta — Frigorífico 5 Estrellas',
+        html: `
+          <h2>Hola, ${firstName}.</h2>
+          <p>Gracias por registrarte. Hacé click en el botón para confirmar tu cuenta:</p>
+          <a href="${verificationUrl}" style="display:inline-block;padding:12px 24px;background:#dc2626;color:#fff;text-decoration:none;border-radius:6px;">Confirmar cuenta</a>
+          <p>El enlace expira en 2 horas.</p>
+        `,
+      })
+
+      return res.status(201).json({ message: 'Usuario creado. Revisá tu correo para confirmar la cuenta.' })
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }
@@ -36,11 +53,37 @@ class UserController {
       const passwordMatch = await bcrypt.compare(password, user.password)
       if (!passwordMatch) return res.status(401).json({ message: 'Contraseña incorrecta' })
 
+      if (!user.confirmed) return res.status(403).json({ message: 'Cuenta no confirmada. Revisá tu correo.' })
+
       const role = 'user'
       const token = jwt.sign({ id: user._id, role }, process.env.JWT_SECRET, { expiresIn: '3d' })
 
       res.cookie('token', token, cookieOptions)
       return res.status(200).json({ id: user._id, role })
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  }
+
+  async confirmUser(req, res) {
+    try {
+      const { token } = req.params
+
+      let decoded
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET)
+      } catch {
+        return res.status(400).json({ message: 'El enlace es inválido o ya expiró.' })
+      }
+
+      const user = await userRepository.findUserById(decoded.id)
+      if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' })
+
+      if (user.confirmed) return res.status(200).json({ message: 'La cuenta ya estaba confirmada.' })
+
+      await userRepository.confirmUser(decoded.id)
+
+      return res.status(200).json({ message: 'Cuenta confirmada. Ya podés iniciar sesión.' })
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }

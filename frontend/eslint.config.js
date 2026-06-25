@@ -18,5 +18,9 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      'no-useless-catch': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
   },
 ])

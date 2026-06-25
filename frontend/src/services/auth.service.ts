@@ -14,3 +14,5 @@ export const registerUserService = (credentials: UserRegisterCredentials) => api
 export const getUserDashboardService = () => api.get<UserDashboardResponse>('/dashboard/user')
 
 export const getAdminDashboardService = () => api.get<AdminDashboardResponse>('/dashboard/admin')
+
+export const confirmUserService = (token: string) => api.get(`/verificar/${token}`)

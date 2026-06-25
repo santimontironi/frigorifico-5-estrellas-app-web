@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     city:      { type: String, required: true },
     province:  { type: String, required: true }
   },
+  confirmed: {type: Boolean, default: false},
   createdAt: { type: Date, default: Date.now }
 })
 
