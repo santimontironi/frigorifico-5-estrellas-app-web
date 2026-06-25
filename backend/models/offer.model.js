@@ -1,10 +1,10 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 const offerSchema = new mongoose.Schema({
   product:   { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  discount:  { type: Number, required: true, min: 1, max: 100 },
+  newPrice:  { type: Number, required: true },
   active:    { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 })
 
-module.exports = mongoose.model('Offer', offerSchema)
+export default mongoose.model('Offer', offerSchema)

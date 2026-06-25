@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 const productSchema = new mongoose.Schema({
   name:      { type: String, required: true, trim: true },
@@ -7,13 +7,8 @@ const productSchema = new mongoose.Schema({
   unit:      { type: String, enum: ['kg', 'unit'], required: true },
   image:     { type: String, default: '' },
   active:    { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-})
-
-productSchema.pre('save', function (next) {
-  this.updatedAt = new Date()
-  next()
+},{
+  timestamps: true
 })
 
 module.exports = mongoose.model('Product', productSchema)

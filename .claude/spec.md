@@ -139,21 +139,21 @@ frigorifico-5-estrellas/
 Representa a un cliente registrado.
 
 ```js
-// models/User.js
+// models/user.model.js
 {
   firstName:  { type: String, required: true, trim: true },
   lastName:   { type: String, required: true, trim: true },
   dni:        { type: String, required: true, unique: true, trim: true },
   phone:      { type: String, required: true, trim: true },
   email:      { type: String, required: true, unique: true, lowercase: true, trim: true },
-  password:   { type: String, required: true },          // bcrypt hash
+  password:   { type: String, required: true },   // bcrypt hash
   address: {
-    street:     { type: String, required: true },
-    number:     { type: String, required: true },
-    floor:      { type: String, default: '' },
-    apartment:  { type: String, default: '' },
-    city:       { type: String, required: true },
-    province:   { type: String, required: true }
+    street:    { type: String, required: true },
+    number:    { type: String, required: true },
+    floor:     { type: String, default: '' },
+    apartment: { type: String, default: '' },
+    city:      { type: String, required: true },
+    province:  { type: String, required: true }
   },
   createdAt:  { type: Date, default: Date.now }
 }
@@ -166,11 +166,10 @@ Representa a un cliente registrado.
 Autenticación separada para el panel de administración.
 
 ```js
-// models/Admin.js
+// models/admin.model.js
 {
   username: { type: String, required: true, unique: true, trim: true },
-  password: { type: String, required: true },   // bcrypt hash
-  createdAt: { type: Date, default: Date.now }
+  password: { type: String, required: true }   // bcrypt hash
 }
 ```
 
@@ -183,7 +182,7 @@ Autenticación separada para el panel de administración.
 Categorías que agrupan productos.
 
 ```js
-// models/Category.js
+// models/category.model.js
 {
   name:   { type: String, required: true, unique: true, trim: true },
   active: { type: Boolean, default: true }
@@ -197,64 +196,72 @@ Categorías que agrupan productos.
 Ítem del catálogo. El precio es por kilo o por unidad.
 
 ```js
-// models/Product.js
+// models/product.model.js
 {
   name:      { type: String, required: true, trim: true },
   category:  { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
-  price:     { type: Number, required: true, min: 0 },   // base price
+  price:     { type: Number, required: true, min: 0 },
   unit:      { type: String, enum: ['kg', 'unit'], required: true },
-  image:     { type: String, default: '' },               // URL or path
+  image:     { type: String, default: '' },
   active:    { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  // timestamps: true → agrega createdAt y updatedAt automáticamente
 }
 ```
 
-> `unit: 'kg'` indicates the price is an estimate until the cut is weighed.  
-> `updatedAt` is updated via a pre-save hook to track price change history.
+> `unit: 'kg'` indica que el precio es estimado hasta que se pesa el corte.
 
 ---
 
 ### Offer
 
-Descuento porcentual sobre un producto con vigencia por fechas.
+Precio especial sobre un producto.
 
 ```js
-// models/Offer.js
+// models/offer.model.js
 {
-  product:   { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  discount:  { type: Number, required: true, min: 1, max: 100 },  // percentage
-  active:    { type: Boolean, default: true },
+  product:  { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  newPrice: { type: Number, required: true },
+  active:   { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 }
 ```
 
-> The discounted price is calculated at runtime: `finalPrice = price * (1 - discount / 100)`.  
+> `newPrice` reemplaza al precio base del producto cuando la oferta está activa. El frontend muestra el precio original tachado y `newPrice` como precio vigente.
+
+---
+
+### OrderItem
+
+Ítem de un pedido. Colección separada con referencia a Product y snapshots de precio.
+
+```js
+// models/orderItem.model.js
+{
+  product:       { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  nameSnapshot:  { type: String, required: true },
+  priceSnapshot: { type: Number, required: true },
+  unitSnapshot:  { type: String, enum: ['kg', 'unit'], required: true },
+  quantity:      { type: Number, required: true, min: 0.1 },
+  subtotal:      { type: Number, required: true }
+}
+```
+
+> Los snapshots preservan el historial ante futuros cambios de precio o eliminación del producto.
 
 ---
 
 ### Order
 
-Pedido realizado por un usuario. Los precios se guardan como snapshot.
+Pedido realizado por un usuario. Los ítems son referencias a documentos `OrderItem`.
 
 ```js
-// models/Order.js
+// models/order.model.js
 {
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  user:  { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem' }],
 
-  items: [
-    {
-      product:       { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-      nameSnapshot:  { type: String, required: true },   // product name at order time
-      priceSnapshot: { type: Number, required: true },   // unit price at order time
-      unitSnapshot:  { type: String, enum: ['kg', 'unit'], required: true },
-      quantity:      { type: Number, required: true, min: 0.1 },  // kg or units
-      subtotal:      { type: Number, required: true }    // priceSnapshot * quantity
-    }
-  ],
-
-  approximateTotal: { type: Number, required: true },  // sum of subtotals (approx. for kg items)
-  finalAmount:      { type: Number, default: null },   // set by admin on accept (after weighing)
+  approximateTotal: { type: Number, required: true },  // suma de subtotales (aprox. para ítems por kg)
+  finalAmount:      { type: Number, default: null },   // cargado por el admin al aceptar (tras el pesaje)
 
   status: {
     type: String,
@@ -262,30 +269,29 @@ Pedido realizado por un usuario. Los precios se guardan como snapshot.
     default: 'pending'
   },
 
-  rejectionReason: { type: String, default: '' },  // optional, set by admin on reject
+  rejectionReason: { type: String, default: '' },
 
   mercadoPagoPayment: {
-    preferenceId: { type: String, default: '' },  // MP Preference ID
-    paymentId:    { type: String, default: '' },  // payment ID confirmed by webhook
+    preferenceId: { type: String, default: '' },
+    paymentId:    { type: String, default: '' },
     status:       { type: String, default: '' }   // 'approved' | 'pending' | 'rejected'
   },
 
-  deliveryAddress: {             // snapshot of address at order time
-    street:     String,
-    number:     String,
-    floor:      String,
-    apartment:  String,
-    city:       String,
-    province:   String
+  deliveryAddress: {   // snapshot del domicilio al momento del pedido
+    street:    String,
+    number:    String,
+    floor:     String,
+    apartment: String,
+    city:      String,
+    province:  String
   },
 
-  notes:     { type: String, default: '' },   // customer notes
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  notes: { type: String, default: '' },
+  // timestamps: true → agrega createdAt y updatedAt automáticamente
 }
 ```
 
-> Name, price and unit snapshots preserve order history against future price changes or product deletion.
+> Al consultar un pedido se debe usar `.populate('items')` para obtener los ítems completos.
 
 ---
 
@@ -298,6 +304,8 @@ Base URL: `http://localhost:3001/api`
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
 | GET | `/auth/me` | token | Devuelve el payload del JWT activo (user o admin) |
+
+`GET /auth/me` es manejado por `auth.controller.js`. El middleware `verifyAuth` valida la cookie y adjunta el payload en `req.auth`; el controlador lo devuelve directamente sin consultar la base de datos. Respuesta: `{ auth: { id, role } }`. Usado por `AuthContext` al montar la app para restaurar la sesión.
 
 ### Usuarios (`/api/users`)
 

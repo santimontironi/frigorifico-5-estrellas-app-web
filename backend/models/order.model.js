@@ -1,18 +1,9 @@
 const mongoose = require('mongoose')
 
-const orderItemSchema = new mongoose.Schema({
-  product:       { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  nameSnapshot:  { type: String, required: true },
-  priceSnapshot: { type: Number, required: true },
-  unitSnapshot:  { type: String, enum: ['kg', 'unit'], required: true },
-  quantity:      { type: Number, required: true, min: 0.1 },
-  subtotal:      { type: Number, required: true }
-}, { _id: false })
-
 const orderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 
-  items: [orderItemSchema],
+  items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem' }],
 
   approximateTotal: { type: Number, required: true },
   finalAmount:      { type: Number, default: null },
@@ -41,13 +32,9 @@ const orderSchema = new mongoose.Schema({
   },
 
   notes:     { type: String, default: '' },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+},{
+  timestamps: true
 })
 
-orderSchema.pre('save', function (next) {
-  this.updatedAt = new Date()
-  next()
-})
 
 module.exports = mongoose.model('Order', orderSchema)
