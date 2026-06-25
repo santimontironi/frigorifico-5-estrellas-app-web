@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect } from 'react'
 
-import type { AuthInterface, LoginResponse, UserLoginCredentials, AdminLoginCredentials, UserRegisterCredentials, UserDashboardResponse, AdminDashboardResponse, AuthLoadingState } from '../types/auth.types'
+import type { AuthInterface, LoginResponse, UserLoginCredentials, AdminLoginCredentials, UserRegisterCredentials, AuthLoadingState } from '../types/auth.types'
 
-import { authMeService, loginUserService, loginAdminService, logoutUserService, logoutAdminService, registerUserService, getUserDashboardService, getAdminDashboardService } from '../services/auth.service'
+import { authMeService, loginUserService, loginAdminService, logoutUserService, logoutAdminService, registerUserService } from '../services/auth.service'
 
 interface AuthContextType {
   loading: AuthLoadingState
@@ -13,8 +13,6 @@ interface AuthContextType {
   logoutUser: () => Promise<void>
   logoutAdmin: () => Promise<void>
   registerUser: (credentials: UserRegisterCredentials) => Promise<void>
-  dashboardUser: () => Promise<UserDashboardResponse>
-  dashboardAdmin: () => Promise<AdminDashboardResponse>
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null)
@@ -28,9 +26,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     loginAdmin: false,
     logoutUser: false,
     logoutAdmin: false,
-    registerUser: false,
-    dashboardUser: false,
-    dashboardAdmin: false
+    registerUser: false
   })
 
   useEffect(() => {
@@ -109,30 +105,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     }
   }
 
-  async function dashboardUser() {
-    try {
-      setLoading({ ...loading, dashboardUser: true })
-      const res = await getUserDashboardService()
-      return res.data
-    } catch (error: any) {
-      throw error
-    } finally {
-      setLoading({ ...loading, dashboardUser: false })
-    }
-  }
-
-  async function dashboardAdmin() {
-    try {
-      setLoading({ ...loading, dashboardAdmin: true })
-      const res = await getAdminDashboardService()
-      return res.data
-    } catch (error: any) {
-      throw error
-    } finally {
-      setLoading({ ...loading, dashboardAdmin: false })
-    }
-  }
-
   return (
     <AuthContext.Provider value={{
       auth,
@@ -143,8 +115,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       logoutUser,
       logoutAdmin,
       registerUser,
-      dashboardUser,
-      dashboardAdmin
     }}>
       {children}
     </AuthContext.Provider>
