@@ -1,0 +1,1 @@
+- [Proyecto Frigorífico 5 Estrellas](project-frigorifico.md) — stack, estado de implementación al 2026-06-25, decisiones de documentación y fuentes de verdad
