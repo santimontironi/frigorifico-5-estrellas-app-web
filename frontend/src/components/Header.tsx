@@ -19,16 +19,12 @@ const Header = () => {
   const close = () => setIsOpen(false)
 
   return (
-    <header className="bg-[#1C1714] border-b border-[#9B2335] sticky top-0 z-50">
+    <header className="bg-[#121212] border-b border-[#9B2335] sticky top-0 z-50">
 
-      <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
 
-        <Link to="/" onClick={close} className="flex items-center gap-2">
-          <span className="text-[#9B2335] text-2xl leading-none" aria-hidden="true">★</span>
-          <div className="flex flex-col">
-            <span className="text-[#B8A898] text-[9px] tracking-[0.3em] uppercase font-light leading-none">Frigorífico</span>
-            <span className="text-[#F2EDE6] text-sm tracking-[0.2em] uppercase font-bold leading-tight">5 Estrellas</span>
-          </div>
+        <Link to="/" onClick={close} className="flex items-center">
+          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-30 h-30 object-contain" />
         </Link>
 
         <ul className="hidden md:flex items-center gap-8">
