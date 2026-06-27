@@ -20,6 +20,7 @@ export const AuthContext = createContext<AuthContextType | null>(null)
 export const AuthContextProvider = ({ children }: { children: any }) => {
 
   const [auth, setAuth] = useState<AuthInterface | null>(null)
+  
   const [loading, setLoading] = useState<AuthLoadingState>({
     me: true,
     loginUser: false,

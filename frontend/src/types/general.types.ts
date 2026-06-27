@@ -1,0 +1,1 @@
+export type viewDashboardAdmin = 'addProduct' | 'orders' | 'products' | 'importProducts' | 'welcome'

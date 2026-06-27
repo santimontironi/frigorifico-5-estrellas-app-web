@@ -1,0 +1,3 @@
+- [Paleta de color del proyecto](project-color-palette.md) — tokens reales del proyecto (chamber, carmine, bone, parchment, ash, ember) que tienen precedencia sobre la paleta genérica del agente
+- [Header.tsx — decisiones visuales](component-header.md) — concepto, clases aplicadas y patrón de subrayado "corte de cuchillo" para nav links
+- [AdminLogin.tsx — decisiones visuales](component-admin-login.md) — sello carmín borde izquierdo, bg chamber→negro sin rojo, inputs empotrados, sin #F7EA79
