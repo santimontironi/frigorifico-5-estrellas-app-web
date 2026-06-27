@@ -27,7 +27,7 @@ const AdminPanel = () => {
     return (
         <div className="flex min-h-screen">
             <SideNavAdmin viewAdmin={viewAdmin} setViewAdmin={setViewAdmin} />
-            <main className="flex-1 bg-[#F5F0EB] p-8">
+            <main className="flex-1 overflow-auto bg-[#010101]">
                 {viewAdmin === 'welcome' && <WelcomeAdmin />}
                 {viewAdmin === 'products' && <ProductsAdmin />}
                 {viewAdmin === 'addProduct' && <AddProduct />}

@@ -6,4 +6,5 @@ import verifyRole from '../middlewares/verifyRole.js'
 
 export const router = Router()
 
+router.get('/products', productController.getAllProducts)
 router.post('/products/import', verifyAuth, verifyRole('admin'), uploadExcel.single('file'), productController.importFromExcel)

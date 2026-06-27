@@ -1,8 +1,26 @@
 import * as xlsx from 'xlsx'                      // librería para leer archivos Excel
 import Product from '../models/product.model.js'   // modelo de producto en MongoDB
 import Category from '../models/category.model.js' // modelo de categoría en MongoDB
+import productRepository from '../repository/product.repository.js'
 
 class ProductController {
+
+  async getAllProducts(req,res){
+    try{
+      const allProducts = await productRepository.getAllProducts()
+
+      if(!allProducts) return res.status(404).json({ message: 'Productos no encontrados' })
+
+      return res.status(200).json(allProducts)
+    }
+    catch(error){
+      return res.status(500).json({ message: error.message })
+    }
+  }
+
+
+
+
 
   // Recibe un archivo Excel y carga los productos en la base de datos.
   // Columnas requeridas: name, unit (kg | unit), category, price.
@@ -23,7 +41,7 @@ class ProductController {
     const errors = []   // filas que fallaron la validación
     const toInsert = [] // documentos listos para insertar en MongoDB
 
-    for (let i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) { //este for recorre todas las filas del excel
       const row = rows[i]           // fila actual como objeto { name, unit, category, price }
       const rowNum = i + 2          // +2 porque la fila 1 es el encabezado
 
@@ -53,8 +71,8 @@ class ProductController {
       toInsert.push({ name, unit, category: category._id, price }) // agrega el documento al lote
     }
 
-    if (toInsert.length === 0) {                                                                              // todas las filas fallaron la validación
-      return res.status(400).json({ message: 'No se pudo importar ningún producto', errors })
+    if (toInsert.length === 0) {  // todas las filas fallaron la validación
+      return res.status(400).json({ message: errors })
     }
 
     // Inserción masiva en una sola operación
