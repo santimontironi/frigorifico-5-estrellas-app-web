@@ -1,5 +1,5 @@
 import api from './api'
-import type { ImportProductsResponse } from '../types/products.types'
+import type { ImportProductsResponse, ProductResponse } from '../types/products.types'
 
 export const importProductsService = (file: File) => {
   const formData = new FormData()
@@ -7,4 +7,8 @@ export const importProductsService = (file: File) => {
   return api.post<ImportProductsResponse>('/products/import', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
+}
+
+export const getProductsService = () => {
+  return api.get<ProductResponse>('/products')
 }
