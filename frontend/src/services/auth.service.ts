@@ -15,4 +15,4 @@ export const getUserDashboardService = () => api.get<UserDashboardResponse>('/da
 
 export const getAdminDashboardService = () => api.get<AdminDashboardResponse>('/dashboard/admin')
 
-export const confirmUserService = (token: string) => api.get(`/verificar/${token}`)
+export const confirmUserService = (token: string) => api.get(`/confirm/${token}`)

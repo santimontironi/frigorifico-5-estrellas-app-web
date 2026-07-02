@@ -5,7 +5,6 @@ const productSchema = new mongoose.Schema({
   category:  { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
   price:     { type: Number, required: true, min: 0 },
   unit:      { type: String, enum: ['kg', 'unit'], required: true },
-  image:     { type: String, default: '' },
   active:    { type: Boolean, default: true },
 },{
   timestamps: true

@@ -1,0 +1,5 @@
+- [Paleta de color del proyecto](project-color-palette.md) — tokens reales del proyecto (chamber, carmine, bone, parchment, ash, ember) que tienen precedencia sobre la paleta genérica del agente
+- [Header.tsx — decisiones visuales](component-header.md) — concepto, clases aplicadas y patrón de subrayado "corte de cuchillo" para nav links
+- [AdminLogin.tsx — decisiones visuales](component-admin-login.md) — sello carmín borde izquierdo, bg chamber→negro sin rojo, inputs empotrados, sin #F7EA79
+- [ImportProducts.tsx — decisiones visuales](component-import-products.md) — drop zone dashed dorada, estados condicionales con fileName, borde lateral dorado/carmesí para resultado
+- [ProductList.tsx + Home.tsx grid](component-product-list.md) — card tipográfica sin imagen, precio dorado ancla, grid md/xl/2xl (resolvió conflicto lg: vs breakpoints permitidos)
