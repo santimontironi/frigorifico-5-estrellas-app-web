@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import UseAuth from '../../hooks/UseAuth'
 
 const NAV_LINKS = [
   { label: 'Inicio', to: '/' },
@@ -13,10 +14,32 @@ const navLinkClass =
   'after:absolute after:bottom-[-2px] after:left-0 after:h-px after:w-0 ' +
   'after:bg-[#9B2335] after:transition-[width] after:duration-300 hover:after:w-full'
 
+const primaryBtnClass =
+  'bg-[#8B1A2F] text-[#F2EDE6] text-xs tracking-[0.12em] uppercase ' +
+  'hover:bg-[#A82640] transition-colors duration-200'
+
+const ghostBtnClass =
+  'text-[#C9BFB5] text-xs tracking-[0.12em] uppercase border border-[#C9BFB5]/25 ' +
+  'hover:border-[#9B2335] hover:text-[#F2EDE6] transition-colors duration-200 ' +
+  'disabled:opacity-50 disabled:cursor-not-allowed'
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const { auth, isAdmin, loading, logout } = UseAuth()
+  const navigate = useNavigate()
 
   const close = () => setIsOpen(false)
+
+  const panelPath = isAdmin ? '/panel-admin' : '/panel-usuario'
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } finally {
+      close()
+      navigate('/')
+    }
+  }
 
   return (
     <header className="bg-[#121212] border-b border-[#9B2335] sticky top-0 z-50">
@@ -35,9 +58,25 @@ const Header = () => {
           ))}
         </ul>
 
-        <div className="hidden md:flex items-center gap-3 pl-6 border-l border-[#F7EA79]/40">
-          <Link to="/ingreso" className="bg-[#8B1A2F] text-[#F2EDE6] text-xs tracking-[0.12em] uppercase px-4 py-2 hover:bg-[#A82640] transition-colors duration-200">Ingresar</Link>
-        </div>
+        {!loading.me && (
+          <div className="hidden md:flex items-center gap-3 pl-6 border-l border-[#F7EA79]/40">
+            {auth ? (
+              <>
+                <Link to={panelPath} className={`${primaryBtnClass} px-4 py-2`}>Mi panel</Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loading.logout}
+                  className={`${ghostBtnClass} px-4 py-2 cursor-pointer`}
+                >
+                  {loading.logout ? 'Saliendo...' : 'Cerrar sesión'}
+                </button>
+              </>
+            ) : (
+              <Link to="/ingreso" className={`${primaryBtnClass} px-4 py-2`}>Ingresar</Link>
+            )}
+          </div>
+        )}
 
         <button
           className="md:hidden flex flex-col justify-center items-center gap-1.25 w-8 h-8 cursor-pointer"
@@ -66,9 +105,25 @@ const Header = () => {
               ))}
             </ul>
 
-            <div className="flex gap-3 pt-4 border-t border-[#F7EA79]/40">
-              <Link to="/ingreso" onClick={close} className="flex-1 text-center bg-[#8B1A2F] text-[#F2EDE6] text-xs tracking-[0.12em] uppercase px-4 py-2.5 hover:bg-[#A82640] transition-colors duration-200">Ingresar</Link>
-            </div>
+            {!loading.me && (
+              <div className="flex gap-3 pt-4 border-t border-[#F7EA79]/40">
+                {auth ? (
+                  <>
+                    <Link to={panelPath} onClick={close} className={`${primaryBtnClass} flex-1 text-center px-4 py-2.5`}>Mi panel</Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      disabled={loading.logout}
+                      className={`${ghostBtnClass} flex-1 text-center px-4 py-2.5 cursor-pointer`}
+                    >
+                      {loading.logout ? 'Saliendo...' : 'Cerrar sesión'}
+                    </button>
+                  </>
+                ) : (
+                  <Link to="/ingreso" onClick={close} className={`${primaryBtnClass} flex-1 text-center px-4 py-2.5`}>Ingresar</Link>
+                )}
+              </div>
+            )}
 
           </div>
         </div>
