@@ -21,3 +21,7 @@ export interface ImportProductsResponse {
   inserted: number
   errors: string[]
 }
+
+export interface ProductsLoading {
+  get: boolean
+}

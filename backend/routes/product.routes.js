@@ -8,3 +8,4 @@ export const router = Router()
 
 router.get('/products', productController.getAllProducts)
 router.post('/products/import', verifyAuth, verifyRole('admin'), uploadExcel.single('file'), productController.importFromExcel)
+router.delete('/products/:id', verifyAuth, verifyRole('admin'), productController.deleteProductById)

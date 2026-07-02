@@ -4,7 +4,9 @@ import { ProductContextProvider } from "./context/ProductContext";
 import AdminPanel from "./pages/AdminPanel";
 import UserPanel from "./pages/UserPanel";
 import AdminLogin from "./pages/AdminLogin";
-import VerifyAuth from "./components/VerifyAuth";
+import VerifyAuth from "./components/auth/VerifyAuth";
+import Contact from "./pages/Contact";
+import AboutUs from "./pages/AboutUs";
 import Home from "./pages/Home";
 
 const App = () => {
@@ -22,6 +24,9 @@ const App = () => {
             <Route path="/panel-usuario" element={<VerifyAuth role="user">
               <UserPanel />
             </VerifyAuth>} />
+
+            <Route path="/contacto" element={<Contact />} />
+            <Route path="/sobre-nosotros" element={<AboutUs />} />
           </Routes>
         </BrowserRouter>
       </ProductContextProvider>

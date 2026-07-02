@@ -1,5 +1,5 @@
-import type { viewDashboardAdmin } from '../types/general.types'
-import UseAuth from '../hooks/UseAuth'
+import type { viewDashboardAdmin } from '../../types/general.types'
+import UseAuth from '../../hooks/UseAuth'
 import { useNavigate } from 'react-router-dom'
 
 interface Props {

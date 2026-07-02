@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import useDashboardAdmin from "../hooks/UseDashboardAdmin"
 import type { viewDashboardAdmin } from "../types/general.types"
-import SideNavAdmin from "../components/SideNavAdmin"
-import WelcomeAdmin from "../components/WelcomeAdmin"
-import ProductsAdmin from "../components/ProductsAdmin"
-import AddProduct from "../components/AddProduct"
-import ImportProducts from "../components/ImportProducts"
+import SideNavAdmin from "../components/admin/SideNavAdmin"
+import WelcomeAdmin from "../components/admin/WelcomeAdmin"
+import ProductsAdmin from "../components/admin/ProductsAdmin"
+import AddProduct from "../components/admin/AddProduct"
+import ImportProducts from "../components/admin/ImportProducts"
 
 const AdminPanel = () => {
 

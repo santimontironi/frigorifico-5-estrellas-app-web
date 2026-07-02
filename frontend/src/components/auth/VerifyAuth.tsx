@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import UseAuth from "../hooks/UseAuth";
+import UseAuth from "../../hooks/UseAuth";
+import Loader from "../ui/Loader";
 import { Navigate } from "react-router-dom"
 
 interface VerifyAuthProps {
@@ -12,7 +13,11 @@ const VerifyAuth = ({ children, role }: VerifyAuthProps) => {
     const { auth, loading } = UseAuth()
 
     if(loading.me){
-        return <div>Loading...</div>
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A]">
+                <Loader />
+            </div>
+        )
     }
 
     if(!auth){

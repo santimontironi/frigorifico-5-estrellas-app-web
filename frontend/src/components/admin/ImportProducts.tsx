@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { importProductsService } from '../services/product.service'
-import type { ImportProductsResponse } from '../types/products.types'
+import { importProductsService } from '../../services/product.service'
+import type { ImportProductsResponse } from '../../types/products.types'
+import DiagonalLines from '../ui/DiagonalLines'
 
 const ImportProducts = () => {
   const [file, setFile] = useState<File | null>(null)
@@ -41,22 +42,7 @@ const ImportProducts = () => {
   return (
     <div className="w-full min-h-full bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A] flex flex-col relative overflow-hidden">
 
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `repeating-linear-gradient(
-            -35deg,
-            transparent,
-            transparent 50px,
-            rgba(155, 35, 53, 0.07) 50px,
-            rgba(155, 35, 53, 0.07) 51px
-          )`
-        }}
-      />
-
-      <div className="absolute -top-20 left-[15%] w-px h-[140%] bg-linear-to-b from-transparent via-[#9B2335]/15 to-transparent rotate-[-25deg]" />
-      <div className="absolute -top-20 left-[45%] w-0.5 h-[140%] bg-linear-to-b from-transparent via-[#9B2335]/10 to-transparent rotate-20" />
-      <div className="absolute -top-20 right-[20%] w-px h-[140%] bg-linear-to-b from-transparent via-[#9B2335]/12 to-transparent rotate-[-15deg]" />
+      <DiagonalLines />
 
       <div className="relative z-10 px-6 py-7 md:px-10 md:py-9 border-b border-white/8">
         <div className="flex items-center gap-2 mb-4">
