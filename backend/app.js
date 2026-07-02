@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import {router as authRouter} from './routes/auth.routes.js'
 import {router as userRouter} from './routes/user.routes.js'
-import {router as adminRouter} from './routes/admin.routes.js'
 import {router as productRouter} from './routes/product.routes.js'
 import {router as contactRouter} from './routes/contact.routes.js'
 import cookieParser from 'cookie-parser'
@@ -20,7 +19,6 @@ app.use(cookieParser()) // para poder usar req.cookies
 
 app.use('/api', authRouter)
 app.use('/api', userRouter)
-app.use('/api', adminRouter)
 app.use('/api', productRouter)
 app.use('/api', contactRouter)
 
