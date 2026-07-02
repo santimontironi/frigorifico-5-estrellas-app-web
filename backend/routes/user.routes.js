@@ -1,6 +1,7 @@
 import { Router } from 'express'
+import userController from '../controllers/user.controller.js'
 
 export const router = Router()
 
-// Rutas de gestión de la cuenta del usuario (editar perfil, cambiar contraseña, etc.)
-// Pendiente de implementar.
+router.post('/change-password', userController.changePassword)
+router.post('/change-password/:token', userController.changePasswordConfirm)

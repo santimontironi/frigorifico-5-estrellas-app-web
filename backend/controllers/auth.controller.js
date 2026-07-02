@@ -26,7 +26,7 @@ class AuthController {
 
       const user = await userRepository.create({ firstName, lastName, dni, phone, email, password: passwordHash, address, role: 'user' })
 
-      const verificationToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' })
+      const verificationToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '2h' })
       const verificationUrl = `${process.env.FRONTEND_URL}/verificar/${verificationToken}`
 
       await transporter.sendMail({
@@ -84,7 +84,7 @@ class AuthController {
         return res.status(403).json({ message: 'Cuenta no confirmada. Revisá tu correo.' })
       }
 
-      const token = jwt.sign({ id: account._id, role: account.role }, process.env.JWT_SECRET, { expiresIn: '3d' })
+      const token = jwt.sign({ id: account._id, role: account.role }, process.env.JWT_SECRET_KEY, { expiresIn: '3d' })
 
       res.cookie('token', token, cookieOptions)
       return res.status(200).json({ id: account._id, role: account.role })
@@ -99,7 +99,7 @@ class AuthController {
 
       let decoded
       try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET)
+        decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
       } catch {
         return res.status(400).json({ message: 'El enlace es inválido o ya expiró.' })
       }

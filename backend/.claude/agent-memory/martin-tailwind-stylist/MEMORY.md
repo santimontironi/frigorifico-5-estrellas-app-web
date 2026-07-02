@@ -1,3 +1,0 @@
-- [Admin Layout Context](project-admin-layout.md) — sidebar `#1C1714`, content area `#F5F0EB`; admin content components need their own dark panel treatment
-- [ImportProducts Visual Concept](component-importproducts-concept.md) — dark panel, gold dashed drop zone, carmesí CTA, left-border result cards
-- [Success/Error Card Pattern](feedback-result-cards.md) — `border-l-2` left-border differentiator; no green/red; error text uses `#CFAE68` not `#872F31` for contrast

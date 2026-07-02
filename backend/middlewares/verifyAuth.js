@@ -5,7 +5,7 @@ const verifyAuth = (req, res, next) => {
   if (!token) return res.status(401).json({ message: 'No autenticado' })
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET)
+    const payload = jwt.verify(token, process.env.JWT_SECRET_KEY)
     req.auth = payload  // { id, role: 'user' | 'admin' }
     next()
   } catch {
