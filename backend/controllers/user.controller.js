@@ -1,7 +1,6 @@
 import userRepository from '../repository/user.repository.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import cookieOptions from '../config/cookie.js'
 import transporter from '../config/mail.config.js'
 
 class UserController {
@@ -13,12 +12,18 @@ class UserController {
         return res.status(400).json({ message: 'Todos los campos son obligatorios' })
       }
 
-      const existing = await userRepository.findUserByEmail(email)
-      if (existing) return res.status(409).json({ message: 'El email ya está registrado' })
+      const { street, number, city, province } = address
+      if (!street || !number || !city || !province) {
+        return res.status(400).json({ message: 'La dirección está incompleta' })
+      }
+
+      if (await userRepository.findByEmail(email)) {
+        return res.status(409).json({ message: 'El email ya está registrado' })
+      }
 
       const passwordHash = await bcrypt.hash(password, 10)
 
-      const user = await userRepository.createUser({ firstName, lastName, dni, phone, email, password: passwordHash, address })
+      const user = await userRepository.create({ firstName, lastName, dni, phone, email, password: passwordHash, address, role: 'user' })
 
       const verificationToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' })
       const verificationUrl = `${process.env.FRONTEND_URL}/verificar/${verificationToken}`
@@ -41,30 +46,6 @@ class UserController {
     }
   }
 
-  async login(req, res) {
-    try {
-      const { email, password } = req.body
-
-      if (!email || !password) return res.status(400).json({ message: 'Todos los campos son obligatorios' })
-
-      const user = await userRepository.findUserByEmail(email)
-      if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
-
-      const passwordMatch = await bcrypt.compare(password, user.password)
-      if (!passwordMatch) return res.status(401).json({ message: 'Contraseña incorrecta' })
-
-      if (!user.confirmed) return res.status(403).json({ message: 'Cuenta no confirmada. Revisá tu correo.' })
-
-      const role = 'user'
-      const token = jwt.sign({ id: user._id, role }, process.env.JWT_SECRET, { expiresIn: '3d' })
-
-      res.cookie('token', token, cookieOptions)
-      return res.status(200).json({ id: user._id, role })
-    } catch (error) {
-      return res.status(500).json({ message: error.message })
-    }
-  }
-
   async confirmUser(req, res) {
     try {
       const { token } = req.params
@@ -76,7 +57,7 @@ class UserController {
         return res.status(400).json({ message: 'El enlace es inválido o ya expiró.' })
       }
 
-      const user = await userRepository.findUserById(decoded.id)
+      const user = await userRepository.findById(decoded.id)
       if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' })
 
       if (user.confirmed) return res.status(200).json({ message: 'La cuenta ya estaba confirmada.' })
@@ -84,16 +65,6 @@ class UserController {
       await userRepository.confirmUser(decoded.id)
 
       return res.status(200).json({ message: 'Cuenta confirmada. Ya podés iniciar sesión.' })
-    } catch (error) {
-      return res.status(500).json({ message: error.message })
-    }
-  }
-
-  async dashboard(req, res) {
-    try {
-      const user = await userRepository.findUserById(req.auth.id)
-      if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
-      return res.status(200).json(user)
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }

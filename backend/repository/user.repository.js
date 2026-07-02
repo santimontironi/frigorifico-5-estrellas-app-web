@@ -1,15 +1,15 @@
 import User from '../models/user.model.js'
 
 class UserRepository {
-  async createUser(data) {
+  async create(data) {
     return await User.create(data)
   }
 
-  async findUserByEmail(email) {
+  async findByEmail(email) {
     return await User.findOne({ email })
   }
 
-  async findUserById(id) {
+  async findById(id) {
     return await User.findById(id).select('-password')
   }
 

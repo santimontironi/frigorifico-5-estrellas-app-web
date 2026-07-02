@@ -3,7 +3,7 @@ import { AuthContextProvider } from "./context/AuthContext";
 import { ProductContextProvider } from "./context/ProductContext";
 import AdminPanel from "./pages/AdminPanel";
 import UserPanel from "./pages/UserPanel";
-import AdminLogin from "./pages/AdminLogin";
+import Login from "./pages/Login";
 import VerifyAuth from "./components/auth/VerifyAuth";
 import Contact from "./pages/Contact";
 import AboutUs from "./pages/AboutUs";
@@ -16,7 +16,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/ingreso-admin" element={<AdminLogin />} />
+            <Route path="/ingreso" element={<Login />} />
             <Route path="/panel-admin" element={<VerifyAuth role="admin">
               <AdminPanel />
             </VerifyAuth>} />

@@ -17,11 +17,10 @@ export interface UserAddress {
   province: string
 }
 
-export interface UserLoginCredentials {
+export interface LoginCredentials {
   email: string
   password: string
 }
-
 export interface UserRegisterCredentials {
   firstName: string
   lastName: string
@@ -30,16 +29,6 @@ export interface UserRegisterCredentials {
   email: string
   password: string
   address: UserAddress
-}
-
-export interface AdminLoginCredentials {
-  username: string
-  password: string
-}
-
-export interface AdminRegisterCredentials {
-  username: string
-  password: string
 }
 
 export interface UserDashboardResponse {
@@ -55,13 +44,14 @@ export interface UserDashboardResponse {
 
 export interface AdminDashboardResponse {
   _id: string
-  username: string
+  email: string
 }
+
+export type ProfileResponse = UserDashboardResponse | AdminDashboardResponse
 
 export interface AuthLoadingState {
   me: boolean
-  loginUser: boolean
-  loginAdmin: boolean
+  login: boolean
   logout: boolean
   registerUser: boolean
   confirmUser: boolean

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import useDashboardAdmin from "../hooks/UseDashboardAdmin"
+import useProfile from "../hooks/UseProfile"
 import type { viewDashboardAdmin } from "../types/general.types"
 import SideNavAdmin from "../components/admin/SideNavAdmin"
 import WelcomeAdmin from "../components/admin/WelcomeAdmin"
@@ -9,12 +9,12 @@ import ImportProducts from "../components/admin/ImportProducts"
 
 const AdminPanel = () => {
 
-    const { fetchAdmin, loading } = useDashboardAdmin()
+    const { fetchProfile, loading } = useProfile()
     const [viewAdmin, setViewAdmin] = useState<viewDashboardAdmin>('welcome')
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     useEffect(() => {
-        fetchAdmin()
+        fetchProfile()
     }, [])
 
     if (loading) {

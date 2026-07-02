@@ -1,15 +1,15 @@
 import { createContext, useState, useEffect } from 'react'
 
-import type { AuthInterface, LoginResponse, UserLoginCredentials, AdminLoginCredentials, UserRegisterCredentials, AuthLoadingState } from '../types/auth.types'
+import type { AuthInterface, LoginResponse, LoginCredentials, UserRegisterCredentials, AuthLoadingState } from '../types/auth.types'
 
-import { authMeService, loginUserService, loginAdminService, logoutService, registerUserService, confirmUserService } from '../services/auth.service'
+import { authMeService, loginService, logoutService, registerUserService, confirmUserService } from '../services/auth.service'
 
 interface AuthContextType {
   loading: AuthLoadingState
   auth: AuthInterface | null
   isUser: boolean
-  loginUser: (credentials: UserLoginCredentials) => Promise<LoginResponse>
-  loginAdmin: (credentials: AdminLoginCredentials) => Promise<LoginResponse>
+  isAdmin: boolean
+  login: (credentials: LoginCredentials) => Promise<LoginResponse>
   confirmUser: (token: string) => Promise<void>
   logout: () => Promise<void>
   registerUser: (credentials: UserRegisterCredentials) => Promise<void>
@@ -20,11 +20,10 @@ export const AuthContext = createContext<AuthContextType | null>(null)
 export const AuthContextProvider = ({ children }: { children: any }) => {
 
   const [auth, setAuth] = useState<AuthInterface | null>(null)
-  
+
   const [loading, setLoading] = useState<AuthLoadingState>({
     me: true,
-    loginUser: false,
-    loginAdmin: false,
+    login: false,
     logout: false,
     confirmUser: false,
     registerUser: false
@@ -44,29 +43,16 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     me()
   }, [])
 
-  async function loginUser(credentials: UserLoginCredentials) {
+  async function login(credentials: LoginCredentials) {
     try {
-      setLoading(prev => ({ ...prev, loginUser: true }))
-      const res = await loginUserService(credentials)
+      setLoading(prev => ({ ...prev, login: true }))
+      const res = await loginService(credentials)
       setAuth(res.data)
       return res.data
     } catch (error: any) {
       throw error
     } finally {
-      setLoading(prev => ({ ...prev, loginUser: false }))
-    }
-  }
-
-  async function loginAdmin(credentials: AdminLoginCredentials) {
-    try {
-      setLoading(prev => ({ ...prev, loginAdmin: true }))
-      const res = await loginAdminService(credentials)
-      setAuth(res.data)
-      return res.data
-    } catch (error: any) {
-      throw error
-    } finally {
-      setLoading(prev => ({ ...prev, loginAdmin: false }))
+      setLoading(prev => ({ ...prev, login: false }))
     }
   }
 
@@ -111,8 +97,8 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       auth,
       loading,
       isUser: auth?.role === 'user',
-      loginUser,
-      loginAdmin,
+      isAdmin: auth?.role === 'admin',
+      login,
       logout,
       confirmUser,
       registerUser,

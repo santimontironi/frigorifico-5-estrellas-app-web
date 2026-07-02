@@ -2,22 +2,22 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import UseAuth from '../hooks/UseAuth'
-import type { AdminLoginCredentials } from '../types/auth.types'
+import type { LoginCredentials } from '../types/auth.types'
 
-const AdminLogin = () => {
-  const { loginAdmin, loading } = UseAuth()
+const Login = () => {
+  const { login, loading } = UseAuth()
   const navigate = useNavigate()
   const [error, setError] = useState<any>(null)
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<AdminLoginCredentials>()
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginCredentials>()
 
-  const onSubmit = async (data: AdminLoginCredentials) => {
+  const onSubmit = async (data: LoginCredentials) => {
     try {
       setError(null)
-      await loginAdmin(data)
-      navigate('/panel-admin')
+      const { role } = await login(data)
+      navigate(role === 'admin' ? '/panel-admin' : '/panel-usuario')
     } catch (err: any) {
-      setError(err?.response?.data.message)
+      setError(err?.response?.data?.message)
       reset()
     }
   }
@@ -66,10 +66,10 @@ const AdminLogin = () => {
               </svg>
             </div>
             <h1 className="text-[#1C1714] text-xl xl:text-2xl 2xl:text-3xl font-bold tracking-wide">
-              Panel de administración
+              Ingresá a tu cuenta
             </h1>
             <p className="text-[#9B2335] text-[10px] xl:text-xs 2xl:text-sm tracking-[0.3em] mt-2">
-              Acceso restringido
+              Frigorífico 5 Estrellas
             </p>
           </div>
 
@@ -91,23 +91,23 @@ const AdminLogin = () => {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[#7A6B63] text-xs xl:text-sm 2xl:text-base font-medium ml-1">
-                  Usuario
+                  Email
                 </label>
                 <div className="relative">
                   <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#B8A898]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                   </svg>
                   <input
-                    type="text"
-                    {...register('username', { required: 'El usuario es obligatorio' })}
+                    type="email"
+                    {...register('email', { required: 'Ingresá tu email' })}
                     className="w-full bg-[#F7F4F1] rounded-xl text-[#1C1714] text-sm xl:text-base 2xl:text-lg pl-12 pr-4 py-3.5 xl:py-4 outline-none border-2 border-transparent focus:border-[#9B2335]/30 focus:bg-white transition-all duration-200 placeholder:text-[#B8A898]/60"
-                    placeholder="nombre de usuario"
-                    autoComplete="username"
+                    placeholder="tu@email.com"
+                    autoComplete="email"
                   />
                 </div>
-                {errors.username && (
+                {errors.email && (
                   <span className="text-[#9B2335] text-xs ml-1">
-                    {errors.username.message}
+                    {errors.email.message}
                   </span>
                 )}
               </div>
@@ -137,10 +137,10 @@ const AdminLogin = () => {
 
               <button
                 type="submit"
-                disabled={loading.loginAdmin}
+                disabled={loading.login}
                 className="w-full cursor-pointer bg-linear-to-r from-[#9B2335] to-[#7A1C2A] text-white text-sm xl:text-base 2xl:text-lg font-bold tracking-[0.12em] py-4 xl:py-5 mt-3 rounded-xl shadow-lg hover:shadow-xl hover:from-[#B82A40] hover:to-[#9B2335] active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {loading.loginAdmin ? 'Verificando...' : 'Ingresar al panel'}
+                {loading.login ? 'Verificando...' : 'Ingresar'}
               </button>
 
             </form>
@@ -153,4 +153,4 @@ const AdminLogin = () => {
   )
 }
 
-export default AdminLogin
+export default Login

@@ -36,8 +36,7 @@ const Header = () => {
         </ul>
 
         <div className="hidden md:flex items-center gap-3 pl-6 border-l border-[#F7EA79]/40">
-          <Link to="/ingreso-usuario" className="border border-[#C9BFB5]/40 text-[#C9BFB5] text-xs tracking-[0.12em] uppercase px-4 py-2 hover:bg-[#C9BFB5]/10 hover:border-[#C9BFB5] transition-all duration-200">Mi panel</Link>
-          <Link to="/ingreso-admin" className="bg-[#8B1A2F] text-[#F2EDE6] text-xs tracking-[0.12em] uppercase px-4 py-2 hover:bg-[#A82640] transition-colors duration-200">Admin</Link>
+          <Link to="/ingreso" className="bg-[#8B1A2F] text-[#F2EDE6] text-xs tracking-[0.12em] uppercase px-4 py-2 hover:bg-[#A82640] transition-colors duration-200">Ingresar</Link>
         </div>
 
         <button
@@ -68,8 +67,7 @@ const Header = () => {
             </ul>
 
             <div className="flex gap-3 pt-4 border-t border-[#F7EA79]/40">
-              <Link to="/ingreso-usuario" onClick={close} className="flex-1 text-center border border-[#C9BFB5]/40 text-[#C9BFB5] text-xs tracking-[0.12em] uppercase px-4 py-2.5 hover:bg-[#C9BFB5]/10 hover:border-[#C9BFB5] transition-all duration-200">Mi panel</Link>
-              <Link to="/ingreso-admin" onClick={close} className="flex-1 text-center bg-[#8B1A2F] text-[#F2EDE6] text-xs tracking-[0.12em] uppercase px-4 py-2.5 hover:bg-[#A82640] transition-colors duration-200">Admin</Link>
+              <Link to="/ingreso" onClick={close} className="flex-1 text-center bg-[#8B1A2F] text-[#F2EDE6] text-xs tracking-[0.12em] uppercase px-4 py-2.5 hover:bg-[#A82640] transition-colors duration-200">Ingresar</Link>
             </div>
 
           </div>
