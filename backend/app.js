@@ -5,8 +5,11 @@ import {router as userRouter} from './routes/user.routes.js'
 import {router as productRouter} from './routes/product.routes.js'
 import {router as contactRouter} from './routes/contact.routes.js'
 import cookieParser from 'cookie-parser'
+import { apiLimiter } from './middlewares/rateLimiters.js'
 
 const app = express()
+
+app.set('trust proxy', 1) // confiar en el proxy (Render/Railway/etc) para leer bien la IP del cliente
 
 app.use(express.json()) // para poder usar req.body
 
@@ -16,6 +19,8 @@ app.use(cors({
 }))
 
 app.use(cookieParser()) // para poder usar req.cookies
+
+app.use('/api', apiLimiter) // rate limit general para toda la API
 
 app.use('/api', authRouter)
 app.use('/api', userRouter)

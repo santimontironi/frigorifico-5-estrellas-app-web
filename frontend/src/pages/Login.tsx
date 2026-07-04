@@ -14,8 +14,8 @@ const Login = () => {
   const onSubmit = async (data: LoginCredentials) => {
     try {
       setError(null)
-      const { role } = await login(data)
-      navigate(role === 'admin' ? '/panel-admin' : '/panel-usuario')
+      const res = await login(data)
+      navigate(res.role === 'admin' ? '/panel-admin' : '/panel-usuario')
     } catch (err: any) {
       setError(err?.response?.data?.message)
       reset()
