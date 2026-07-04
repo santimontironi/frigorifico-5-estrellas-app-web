@@ -7,12 +7,13 @@
 4. [Modelos de base de datos](#modelos-de-base-de-datos)
 5. [API — Rutas y endpoints](#api--rutas-y-endpoints)
 6. [Middlewares](#middlewares)
-7. [Autenticación y autorización](#autenticación-y-autorización)
-8. [Estado global en el frontend (Context + Hooks)](#estado-global-en-el-frontend-context--hooks)
-9. [Flujo principal de negocio](#flujo-principal-de-negocio)
-10. [Reglas de negocio](#reglas-de-negocio)
-11. [Variables de entorno](#variables-de-entorno)
-12. [Estado de implementación](#estado-de-implementación)
+7. [Validación (Zod + schemas compartidos)](#validación-zod--schemas-compartidos)
+8. [Autenticación y autorización](#autenticación-y-autorización)
+9. [Estado global en el frontend (Context + Hooks)](#estado-global-en-el-frontend-context--hooks)
+10. [Flujo principal de negocio](#flujo-principal-de-negocio)
+11. [Reglas de negocio](#reglas-de-negocio)
+12. [Variables de entorno](#variables-de-entorno)
+13. [Estado de implementación](#estado-de-implementación)
 
 ---
 
@@ -98,7 +99,16 @@ frigorifico-5-estrellas/
 │   └── middlewares/
 │       ├── verifyAuth.js      # valida JWT e inyecta req.auth con { id, role }
 │       ├── verifyRole.js      # factory: verifyRole('admin') | verifyRole('user')
+│       ├── validate.js        # validate(schema): valida req.body con un schema de Zod (shared)
+│       ├── rateLimiters.js    # rate limiting: authLimiter (estricto) + limitador general
 │       └── multer.js          # (pendiente — upload de imágenes)
+│
+├── shared/                    # schemas de Zod compartidos back ↔ front (standalone, sin workspaces)
+│   ├── package.json           # "type": module + dep zod; node_modules propio
+│   ├── index.js               # re-exporta todos los schemas
+│   └── schemas/
+│       ├── auth.schema.js     # loginSchema, userRegisterSchema, adminRegisterSchema, authResponseSchema
+│       └── contact.schema.js  # contactSchema
 │
 └── frontend/
     ├── index.html
@@ -376,9 +386,65 @@ router.get('/dashboard/admin', verifyAuth, verifyRole('admin'), ...)
 router.get('/dashboard/user',  verifyAuth, verifyRole('user'),  ...)
 ```
 
+### `validate.js`
+
+Middleware genérico `validate(schema)`. Ejecuta `schema.safeParse(req.body)`; si falla responde `400` con `error.flatten().fieldErrors` y **no llega al controller**; si pasa, reemplaza `req.body` con los datos parseados. Solo aplica a requests con body (POST). Ver [Validación (Zod + schemas compartidos)](#validación-zod--schemas-compartidos).
+
+### `rateLimiters.js`
+
+Rate limiting de dos niveles (`express-rate-limit`): `authLimiter` estricto para endpoints de autenticación (anti brute-force / spam de registro) y un limitador general aplicado en `app.js`. Requiere `trust proxy` configurado.
+
 ### `multer.js` (pendiente)
 
 Upload de imágenes de productos hacia Cloudinary.
+
+---
+
+## Validación (Zod + schemas compartidos)
+
+La validación se centraliza en **schemas de Zod** compartidos entre backend y frontend, en una carpeta `shared/` **standalone** (sin npm workspaces).
+
+### Estructura de `shared/`
+
+- `shared/package.json` (`"type": "module"`, dep `zod` 4.x) con su propio `node_modules`.
+- `shared/schemas/*.schema.js` — schemas en **JS plano (ESM)**, re-exportados desde `shared/index.js`.
+- Se importa con **ruta relativa**: en el back `'../../shared/index.js'`; en el front `'../../../shared/index.js'` (un nivel más por el `src/`).
+
+### Schemas definidos
+
+| Schema | Archivo | Uso |
+|---|---|---|
+| `loginSchema` | `auth.schema.js` | request `POST /login` |
+| `userRegisterSchema` | `auth.schema.js` | request `POST /register/user` (incluye `address` anidado) |
+| `adminRegisterSchema` | `auth.schema.js` | request `POST /register/admin` |
+| `authResponseSchema` | `auth.schema.js` | **response** de `/login` y `/me` (`{ id, role }`) |
+| `contactSchema` | `contact.schema.js` | request `POST /contact` |
+
+### Backend — validación de requests
+
+`validate(schema)` se cablea en las rutas antes del controller:
+
+```js
+router.post('/login',         authLimiter, validate(loginSchema),         authController.login)
+router.post('/register/user', authLimiter, validate(userRegisterSchema),  authController.register)
+router.post('/register/admin',authLimiter, validate(adminRegisterSchema), authController.registerAdmin)
+router.post('/contact',                    validate(contactSchema),       contactController.sendContactEmail)
+```
+
+Valida `req.body`, por lo que **solo aplica a POST**. Los GET (`/me`, `/profile`) no llevan body y no lo usan; su "input" es la cookie JWT (la valida `verifyAuth`).
+
+### Frontend — forms y responses
+
+- **Forms:** react-hook-form + `zodResolver`. `useForm({ resolver: zodResolver(schema) })` y `register('campo')` sin reglas inline. Aplicado en `Login.tsx` (`loginSchema`) y `Contact.tsx` (`contactSchema`). Para campos anidados: `register('address.street')`.
+- **Tipos:** derivados con `z.infer<typeof schema>` — única fuente de verdad; reemplazan las interfaces manuales de request/response de auth.
+- **Responses:** validados en la capa de service con `schema.parse(data)`; el service devuelve el dato ya parseado (no el `AxiosResponse`). Ej.: `authMeService` / `loginService` con `authResponseSchema`.
+- **Config:** `zod` (4.4.3, igual que `shared`) y `@hookform/resolvers` como deps del front; `"allowJs": true` en `tsconfig.app.json` para que TS lea los schemas `.js` e infiera tipos. **No requiere config de Vite** (el `.git` de la raíz hace que Vite considere `shared/` dentro del workspace root).
+
+### Decisiones
+
+- **`shared/` en `.js`, no `.ts`:** el back corre con Node plano (`nodemon index.js`, Node 22.17); el type-stripping nativo recién es default en Node ≥22.18. Mantener `.js` evita depender de flags experimentales en el back.
+- **Sin npm workspaces:** estructura mínima con imports relativos; no hay `package.json`/`node_modules` en la raíz.
+- **Responses de dashboard/profile sin schema (por ahora):** son GET de solo-display y el panel aún no está construido; el `z.infer` + `.parse()` se agregarán al construirlo.
 
 ---
 
@@ -610,7 +676,8 @@ VITE_API_URL=http://localhost:3001/api
 - Auth: `GET /api/me`, `POST /api/logout` (unificado)
 - Usuarios: registro, login, dashboard
 - Admin: registro, login, dashboard
-- Middlewares: `verifyAuth`, `verifyRole`
+- Middlewares: `verifyAuth`, `verifyRole`, `validate` (Zod), `rateLimiters`
+- Validación con Zod: schemas compartidos en `shared/` aplicados en auth (login, register user/admin) y contact
 - Config: `cookie.js`, `db.config.js`
 
 **Frontend:**
@@ -618,7 +685,8 @@ VITE_API_URL=http://localhost:3001/api
 - Hooks: `UseAuth`, `UseDashboardUser`, `UseDashboardAdmin`
 - Componente `VerifyAuth` para proteger rutas
 - `auth.service.ts` con todas las llamadas HTTP de auth y dashboards
-- Tipos TypeScript completos en `auth.types.ts`
+- Tipos TypeScript completos en `auth.types.ts` (request/response de auth derivados de Zod con `z.infer`)
+- Validación de forms con react-hook-form + `zodResolver` (`Login`, `Contact`) y de responses con `schema.parse()` en los services
 - Instancia Axios en `api.ts`
 
 ### Pendiente ❌
