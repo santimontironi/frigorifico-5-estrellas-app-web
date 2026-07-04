@@ -1,12 +1,12 @@
-export interface AuthInterface {
-  id: string
-  role: 'user' | 'admin'
-}
+import type { z } from 'zod'
+import type { loginSchema, userRegisterSchema, authResponseSchema } from '../../../shared/index.js'
 
-export interface LoginResponse {
-  id: string
-  role: 'user' | 'admin'
-}
+// Derivados de los schemas de `shared` — única fuente de verdad con el back.
+export type AuthInterface = z.infer<typeof authResponseSchema>
+export type LoginResponse = AuthInterface
+
+export type LoginCredentials = z.infer<typeof loginSchema>
+export type UserRegisterCredentials = z.infer<typeof userRegisterSchema>
 
 export interface UserAddress {
   street: string
@@ -15,20 +15,6 @@ export interface UserAddress {
   apartment?: string
   city: string
   province: string
-}
-
-export interface LoginCredentials {
-  email: string
-  password: string
-}
-export interface UserRegisterCredentials {
-  firstName: string
-  lastName: string
-  dni: string
-  phone: string
-  email: string
-  password: string
-  address: UserAddress
 }
 
 export interface UserDashboardResponse {

@@ -1,9 +1,6 @@
+import type { z } from 'zod'
+import type { contactSchema } from '../../../shared/index.js'
+
 export type viewDashboardAdmin = 'addProduct' | 'orders' | 'products' | 'importProducts' | 'welcome'
 
-export interface ContactData {
-    name: string
-    surname: string
-    email: string
-    message: string
-    number: string
-}
+export type ContactData = z.infer<typeof contactSchema>

@@ -33,3 +33,9 @@ export const adminRegisterSchema = z.object({
   email:    z.string().trim().toLowerCase().email('Email inválido'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
 })
+
+// Respuesta de sesión: la devuelven GET /api/me y POST /api/login.
+export const authResponseSchema = z.object({
+  id:   z.string(),
+  role: z.enum(['user', 'admin']),
+})

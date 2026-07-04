@@ -1,9 +1,16 @@
 import api from './api'
-import type { AuthInterface, LoginResponse, LoginCredentials, UserRegisterCredentials, ProfileResponse } from '../types/auth.types'
+import { authResponseSchema } from '../../../shared/index.js'
+import type { LoginCredentials, UserRegisterCredentials, ProfileResponse } from '../types/auth.types'
 
-export const authMeService = () => api.get<AuthInterface>('/me')
+export const authMeService = async () => {
+  const res = await api.get('/me')
+  return authResponseSchema.parse(res.data)
+}
 
-export const loginService = (credentials: LoginCredentials) => api.post<LoginResponse>('/login', credentials)
+export const loginService = async (credentials: LoginCredentials) => {
+  const res = await api.post('/login', credentials)
+  return authResponseSchema.parse(res.data)
+}
 
 export const logoutService = () => api.post('/logout')
 
