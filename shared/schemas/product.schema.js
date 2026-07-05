@@ -15,3 +15,15 @@ export const productSchema = z.object({
 export const deleteProductResponseSchema = z.object({
     product: productSchema
 })
+
+// GET /api/products
+export const getProductsResponseSchema = z.object({
+    products: z.array(productSchema)
+})
+
+// POST /api/products/import
+export const importProductsResponseSchema = z.object({
+    message: z.string(),
+    inserted: z.number(),
+    errors: z.array(z.string()),
+})

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { importProductsService } from '../../services/product.service'
-import type { ImportProductsResponse } from '../../types/products.types'
+import type { ImportProductsResponse } from '../../types/product.types'
 import DiagonalLines from '../ui/DiagonalLines'
 
 const ImportProducts = () => {
@@ -24,7 +24,7 @@ const ImportProducts = () => {
 
     try {
       const res = await importProductsService(file)
-      setResult(res.data)
+      setResult(res)
     } catch (err: any) {
       const arrayErrors: string[] = err.response?.data?.message
       setError(arrayErrors[0])

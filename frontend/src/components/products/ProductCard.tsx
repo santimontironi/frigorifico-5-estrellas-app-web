@@ -1,11 +1,11 @@
-interface ProductListProps {
+interface ProductCardProps {
   name: string
   category: string
   price: number
   unit: 'kg' | 'unit'
 }
 
-const ProductList = ({ name, category, price, unit }: ProductListProps) => {
+const ProductCard = ({ name, category, price, unit }: ProductCardProps) => {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#0F0507] border border-white/8 transition-all duration-300 hover:border-[#9B2335]/60 hover:shadow-[0_18px_50px_-18px_rgba(155,35,53,0.6)] hover:-translate-y-1.5">
 
@@ -64,4 +64,4 @@ const ProductList = ({ name, category, price, unit }: ProductListProps) => {
   )
 }
 
-export default ProductList
+export default ProductCard

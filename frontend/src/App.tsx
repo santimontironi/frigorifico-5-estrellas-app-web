@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./context/AuthContext";
 import { ProductContextProvider } from "./context/ProductContext";
+import { CategoryContextProvider } from "./context/CategoryContext";
 import AdminPanel from "./pages/AdminPanel";
 import UserPanel from "./pages/UserPanel";
 import Login from "./pages/Login";
@@ -13,6 +14,7 @@ const App = () => {
   return (
     <AuthContextProvider>
       <ProductContextProvider>
+        <CategoryContextProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -29,6 +31,7 @@ const App = () => {
             <Route path="/sobre-nosotros" element={<AboutUs />} />
           </Routes>
         </BrowserRouter>
+        </CategoryContextProvider>
       </ProductContextProvider>
     </AuthContextProvider>
   )
