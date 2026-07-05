@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 // Dirección: reutilizada por el registro de usuario.
 // Los campos opcionales (floor/apartment) coinciden con el modelo de Mongoose.
-const addressSchema = z.object({
+export const addressSchema = z.object({
   street:    z.string().trim().min(1, 'La calle es obligatoria'),
   number:    z.string().trim().min(1, 'El número es obligatorio'),
   floor:     z.string().trim().optional(),
@@ -39,3 +39,25 @@ export const authResponseSchema = z.object({
   id:   z.string(),
   role: z.enum(['user', 'admin']),
 })
+
+export const userDashboardResponseSchema = z.object({
+  _id:       z.string(),
+  firstName: z.string(),
+  lastName:  z.string(),
+  dni:       z.string(),
+  phone:     z.string(),
+  email:     z.string(),
+  address:   addressSchema,
+  createdAt: z.string(),
+})
+
+export const adminDashboardResponseSchema = z.object({
+  _id:   z.string(),
+  email: z.string(),
+})
+
+// Respuesta de GET /api/profile: puede ser un usuario o un admin.
+export const profileResponseSchema = z.union([
+  userDashboardResponseSchema,
+  adminDashboardResponseSchema,
+])

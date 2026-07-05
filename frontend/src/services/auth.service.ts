@@ -1,6 +1,6 @@
 import api from './api'
-import { authResponseSchema } from '../../../shared/index.js'
-import type { LoginCredentials, UserRegisterCredentials, ProfileResponse } from '../types/auth.types'
+import { authResponseSchema, profileResponseSchema } from '../../../shared/index.js'
+import type { LoginCredentials, UserRegisterCredentials } from '../types/auth.types'
 
 export const authMeService = async () => {
   const res = await api.get('/me')
@@ -16,6 +16,9 @@ export const logoutService = () => api.post('/logout')
 
 export const registerUserService = (credentials: UserRegisterCredentials) => api.post('/register/user', credentials)
 
-export const getProfileService = () => api.get<ProfileResponse>('/profile')
+export const getProfileService = async () => {
+  const res = await api.get('/profile')
+  return profileResponseSchema.parse(res.data)
+}
 
 export const confirmUserService = (token: string) => api.get(`/confirm/${token}`)
