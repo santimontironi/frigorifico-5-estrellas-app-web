@@ -50,6 +50,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       setAuth(res)
       return res
     } catch (error: any) {
+      console.log(error)
       throw error
     } finally {
       setLoading(prev => ({ ...prev, login: false }))
