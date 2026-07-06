@@ -1,6 +1,7 @@
 import type { viewDashboardAdmin } from '../../types/general.types'
 import UseAuth from '../../hooks/UseAuth'
 import { useNavigate } from 'react-router-dom'
+import GoBack from '../ui/GoBack'
 
 interface Props {
   viewAdmin: viewDashboardAdmin
@@ -35,7 +36,7 @@ const SideNavAdmin = ({ viewAdmin, setViewAdmin, isOpen, onClose }: Props) => {
   return (
     <aside className={`
       fixed md:static inset-y-0 left-0 z-50
-      w-64 min-h-screen bg-[#121212] border-r border-white/8 flex flex-col
+      w-64 h-screen bg-[#121212] border-r border-white/8 flex flex-col
       transform transition-transform duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
     `}>
@@ -74,7 +75,8 @@ const SideNavAdmin = ({ viewAdmin, setViewAdmin, isOpen, onClose }: Props) => {
         })}
       </nav>
 
-      <div className="px-3 pb-5 border-t border-white/8 pt-3">
+      <div className="px-3 pb-5 border-t border-white/8 pt-3 flex flex-col gap-0.5">
+        <GoBack href="/" />
         <button
           onClick={handleLogout}
           disabled={loading.logout}
