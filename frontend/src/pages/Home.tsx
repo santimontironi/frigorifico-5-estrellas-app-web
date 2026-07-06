@@ -5,9 +5,11 @@ import Loader from "../components/ui/Loader"
 import Features from "../components/products/Features"
 import DiagonalLines from "../components/ui/DiagonalLines"
 import UseProducts from "../hooks/useProducts"
+import useCart from "../hooks/useCart"
 
 const Home = () => {
   const { products, getProducts, loading } = UseProducts()
+  const { addToCart } = useCart()
 
   useEffect(() => {
     getProducts()
@@ -71,10 +73,8 @@ const Home = () => {
             {products?.map((product) => (
               <ProductCard
                 key={product._id}
-                name={product.name}
-                category={product.category.name}
-                price={product.price}
-                unit={product.unit}
+                product={product}
+                onAddToCart={(product) => addToCart(product, 1)}
               />
             ))}
           </div>
