@@ -4,17 +4,17 @@ import { UserContextProvider } from "./context/UserContext";
 import { ProductContextProvider } from "./context/ProductContext";
 import { CategoryContextProvider } from "./context/CategoryContext";
 import { CartContextProvider } from "./context/CartContext";
-import AdminPanel from "./pages/AdminPanel";
-import UserPanel from "./pages/UserPanel";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Confirm from "./pages/Confirm";
-import ChangePassword from "./pages/ChangePassword";
+import AdminPanel from "./pages/admin/AdminPanel";
+import UserPanel from "./pages/user/UserPanel";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Confirm from "./pages/auth/Confirm";
+import ChangePassword from "./pages/auth/ChangePassword";
 import VerifyAuth from "./components/auth/VerifyAuth";
-import Contact from "./pages/Contact";
-import AboutUs from "./pages/AboutUs";
-import Home from "./pages/Home";
-import Cart from "./pages/Cart";
+import Contact from "./pages/public/Contact";
+import AboutUs from "./pages/public/AboutUs";
+import Home from "./pages/public/Home";
+import Cart from "./pages/public/Cart";
 
 const App = () => {
   return (

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
-import useProfile from "../hooks/UseProfile"
-import type { viewDashboardUser } from "../types/general.types"
-import SideNavUser from "../components/user/SideNavUser"
-import WelcomeUser from "../components/user/WelcomeUser"
-import MyProfile from "../components/user/MyProfile"
-import MyOrders from "../components/user/MyOrders"
+import useProfile from "../../hooks/UseProfile"
+import type { viewDashboardUser } from "../../types/general.types"
+import SideNavUser from "../../components/user/SideNavUser"
+import WelcomeUser from "../../components/user/WelcomeUser"
+import MyProfile from "../../components/user/MyProfile"
+import MyOrders from "../../components/user/MyOrders"
 
 const UserPanel = () => {
 

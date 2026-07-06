@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Header from "../components/ui/Header";
-import DiagonalLines from "../components/ui/DiagonalLines";
-import ContactItem from "../components/ui/ContactItem";
-import { sendContactEmailService } from "../services/contact.service";
-import { contactSchema } from "../../../shared/index.js";
-import type { ContactData } from "../types/general.types";
+import Header from "../../components/ui/Header";
+import DiagonalLines from "../../components/ui/DiagonalLines";
+import ContactItem from "../../components/ui/ContactItem";
+import { sendContactEmailService } from "../../services/contact.service";
+import { contactSchema } from "../../../../shared/index.js";
+import type { ContactData } from "../../types/general.types";
 import Swal from "sweetalert2";
 
 const Contact = () => {

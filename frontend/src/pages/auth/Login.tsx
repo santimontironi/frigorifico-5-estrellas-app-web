@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
-import UseAuth from '../hooks/UseAuth'
-import { loginSchema } from '../../../shared/index.js'
-import type { LoginCredentials } from '../types/auth.types'
-import InputMailModal from '../components/user/InputMailModal'
+import UseAuth from '../../hooks/UseAuth'
+import { loginSchema } from '../../../../shared/index.js'
+import type { LoginCredentials } from '../../types/auth.types'
+import InputMailModal from '../../components/user/InputMailModal'
 
 const Login = () => {
   const { login, loading } = UseAuth()

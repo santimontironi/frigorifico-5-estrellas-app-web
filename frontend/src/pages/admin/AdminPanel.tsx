@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
-import useProfile from "../hooks/UseProfile"
-import type { viewDashboardAdmin } from "../types/general.types"
-import SideNavAdmin from "../components/admin/SideNavAdmin"
-import WelcomeAdmin from "../components/admin/WelcomeAdmin"
-import ProductsAdmin from "../components/admin/ProductsAdmin"
-import AddProduct from "../components/admin/AddProduct"
-import ImportProducts from "../components/admin/ImportProducts"
-import Categories from "../components/admin/Categories"
-import AddCategory from "../components/admin/AddCategory"
+import useProfile from "../../hooks/UseProfile"
+import type { viewDashboardAdmin } from "../../types/general.types"
+import SideNavAdmin from "../../components/admin/SideNavAdmin"
+import WelcomeAdmin from "../../components/admin/WelcomeAdmin"
+import ProductsAdmin from "../../components/admin/ProductsAdmin"
+import AddProduct from "../../components/admin/AddProduct"
+import ImportProducts from "../../components/admin/ImportProducts"
+import Categories from "../../components/admin/Categories"
+import AddCategory from "../../components/admin/AddCategory"
 
 const AdminPanel = () => {
 

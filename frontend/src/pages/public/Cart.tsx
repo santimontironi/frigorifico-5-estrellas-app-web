@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import Header from '../components/ui/Header'
-import DiagonalLines from '../components/ui/DiagonalLines'
-import useCart from '../hooks/useCart'
+import Header from '../../components/ui/Header'
+import DiagonalLines from '../../components/ui/DiagonalLines'
+import useCart from '../../hooks/useCart'
 
 const formatPrice = (value: number) => `$${value.toLocaleString('es-AR')}`
 

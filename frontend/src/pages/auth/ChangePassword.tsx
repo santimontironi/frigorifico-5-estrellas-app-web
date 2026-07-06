@@ -2,10 +2,10 @@ import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ResetPasswordSchema } from "../../../shared/index.js"
-import type { ResetPasswordCredentials } from "../types/user.types"
-import UseUser from "../hooks/UseUser"
-import DiagonalLines from "../components/ui/DiagonalLines"
+import { ResetPasswordSchema } from "../../../../shared/index.js"
+import type { ResetPasswordCredentials } from "../../types/user.types"
+import UseUser from "../../hooks/UseUser"
+import DiagonalLines from "../../components/ui/DiagonalLines"
 
 const ChangePassword = () => {
 

@@ -1,11 +1,11 @@
 import { useEffect } from "react"
-import Header from "../components/ui/Header"
-import ProductCard from "../components/products/ProductCard"
-import Loader from "../components/ui/Loader"
-import Features from "../components/products/Features"
-import DiagonalLines from "../components/ui/DiagonalLines"
-import UseProducts from "../hooks/useProducts"
-import useCart from "../hooks/useCart"
+import Header from "../../components/ui/Header"
+import ProductCard from "../../components/products/ProductCard"
+import Loader from "../../components/ui/Loader"
+import Features from "../../components/products/Features"
+import DiagonalLines from "../../components/ui/DiagonalLines"
+import UseProducts from "../../hooks/useProducts"
+import useCart from "../../hooks/useCart"
 
 const Home = () => {
   const { products, getProducts, loading } = UseProducts()

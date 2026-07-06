@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom"
-import UseAuth from "../hooks/UseAuth"
+import UseAuth from "../../hooks/UseAuth"
 import { useEffect, useState } from "react"
-import DiagonalLines from "../components/ui/DiagonalLines"
+import DiagonalLines from "../../components/ui/DiagonalLines"
 
 const Confirm = () => {
 

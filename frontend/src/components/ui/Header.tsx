@@ -90,7 +90,6 @@ const Header = () => {
           ))}
         </ul>
 
-        {/* grupo derecho — auth (solo desktop) + carrito (siempre visible) + hamburguesa (solo mobile) */}
         <div className="flex items-center gap-4">
 
           {!loading.me && (
@@ -113,7 +112,6 @@ const Header = () => {
             </div>
           )}
 
-          {/* carrito — ícono con burbuja carmín, visible en todas las resoluciones */}
           <Link
             to="/carrito"
             onClick={close}
