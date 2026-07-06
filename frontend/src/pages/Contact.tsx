@@ -1,14 +1,18 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Header from "../components/ui/Header";
 import DiagonalLines from "../components/ui/DiagonalLines";
 import ContactItem from "../components/ui/ContactItem";
 import { sendContactEmailService } from "../services/contact.service";
+import { contactSchema } from "../../../shared/index.js";
 import type { ContactData } from "../types/general.types";
 import Swal from "sweetalert2";
 
 const Contact = () => {
 
-    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ContactData>();
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ContactData>({
+        resolver: zodResolver(contactSchema),
+    });
 
     async function formSubmit(data: ContactData) {
         try {
@@ -103,7 +107,7 @@ const Contact = () => {
                                             type="text"
                                             placeholder="Tu nombre"
                                             className={fieldClasses}
-                                            {...register("name", { required: "El nombre es obligatorio" })}
+                                            {...register("name")}
                                         />
                                         {errors.name && (
                                             <p className={errorClasses}>
@@ -120,7 +124,7 @@ const Contact = () => {
                                             type="text"
                                             placeholder="Tu apellido"
                                             className={fieldClasses}
-                                            {...register("surname", { required: "El apellido es obligatorio" })}
+                                            {...register("surname")}
                                         />
                                         {errors.surname && (
                                             <p className={errorClasses}>
@@ -139,13 +143,7 @@ const Contact = () => {
                                             type="email"
                                             placeholder="tucorreo@ejemplo.com"
                                             className={fieldClasses}
-                                            {...register("email", {
-                                                required: "El email es obligatorio",
-                                                pattern: {
-                                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                                    message: "Ingresá un email válido"
-                                                }
-                                            })}
+                                            {...register("email")}
                                         />
                                         {errors.email && (
                                             <p className={errorClasses}>
@@ -162,7 +160,7 @@ const Contact = () => {
                                             type="tel"
                                             placeholder="+54 9 000 000 0000"
                                             className={fieldClasses}
-                                            {...register("number", { required: "El teléfono es obligatorio" })}
+                                            {...register("number")}
                                         />
                                         {errors.number && (
                                             <p className={errorClasses}>
@@ -180,7 +178,7 @@ const Contact = () => {
                                         rows={5}
                                         placeholder="Contanos en qué podemos ayudarte..."
                                         className={`${fieldClasses} resize-none`}
-                                        {...register("message", { required: "El mensaje es obligatorio" })}
+                                        {...register("message")}
                                     />
                                     {errors.message && (
                                         <p className={errorClasses}>

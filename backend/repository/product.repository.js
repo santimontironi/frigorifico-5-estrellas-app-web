@@ -13,6 +13,7 @@ class ProductRepository {
     return products.filter((p) => p.category !== null);
   }
 
+<<<<<<< HEAD
   async deleteProductById(id) {
     const product = await Product.findByIdAndUpdate(
       id,
@@ -36,6 +37,22 @@ class ProductRepository {
     const product = await Product.findByIdAndUpdate(id, data, { new: true });
     return product;
   }
+=======
+    async getProductById(id){
+        const product = await Product.findOne({_id: id, active: true}).populate({
+            path: 'category',
+            match: {active: true},
+            select: 'name'
+        })
+
+        return product
+    }
+
+    async deleteProductById(id){
+        const product = await Product.findByIdAndUpdate(id, {active: false}, {new: true})
+        return product
+    }
+>>>>>>> c989c36e4eb27b57dd9f9cecb70de75dcc8dd54c
 }
 
 const productRepository = new ProductRepository();

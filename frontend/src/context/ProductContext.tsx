@@ -1,4 +1,4 @@
-import type { Product, ProductsLoading } from '../types/products.types'
+import type { Product, ProductsLoading } from '../types/product.types'
 import {getProductsService} from '../services/product.service'
 import { createContext, useState } from 'react'
 
@@ -19,7 +19,7 @@ export const ProductContextProvider = ({children}: any) => {
     const getProducts = async () => {
         try{
             const res = await getProductsService()
-            setProducts(res.data.products)
+            setProducts(res.products)
         }
         catch(err){
             console.error(err)

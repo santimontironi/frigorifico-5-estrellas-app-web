@@ -1,3 +1,0 @@
-- [Real project color palette](project-color-palette.md) — actual palette is #0A0A0A/#9B2335/#872F31/#F7EA79/#F2EDE6/#C9BFB5, overrides generic system-prompt palette
-- [WelcomeAdmin visual concept](component-welcomeadmin.md) — dashboard welcome view, gradient+DiagonalLines header, presentational quick-action cards mirroring sidebar
-- [ProductList / Home grid concept](component-product-list.md) — typographic price-list card, no product photo, gold price anchor

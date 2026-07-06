@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import Header from "../components/ui/Header"
-import ProductList from "../components/products/ProductList"
+import ProductCard from "../components/products/ProductCard"
 import Loader from "../components/ui/Loader"
 import Features from "../components/products/Features"
 import DiagonalLines from "../components/ui/DiagonalLines"
@@ -69,7 +69,7 @@ const Home = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 md:gap-8">
             {products?.map((product) => (
-              <ProductList
+              <ProductCard
                 key={product._id}
                 name={product.name}
                 category={product.category.name}

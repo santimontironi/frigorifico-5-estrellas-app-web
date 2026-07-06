@@ -3,3 +3,4 @@
 - [AdminLogin.tsx — decisiones visuales](component-admin-login.md) — sello carmín borde izquierdo, bg chamber→negro sin rojo, inputs empotrados, sin #F7EA79
 - [ImportProducts.tsx — decisiones visuales](component-import-products.md) — drop zone dashed dorada, estados condicionales con fileName, borde lateral dorado/carmesí para resultado
 - [ProductList.tsx + Home.tsx grid](component-product-list.md) — card tipográfica sin imagen, precio dorado ancla, grid md/xl/2xl (resolvió conflicto lg: vs breakpoints permitidos)
+- [Categories.tsx + CategoryCard.tsx](component-categories.md) — chrome estándar de vista admin (gradiente+header border-b), card tipográfica sin precio, precedente lógica-antes-que-estilo

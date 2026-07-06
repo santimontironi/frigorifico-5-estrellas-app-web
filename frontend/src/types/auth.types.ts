@@ -1,54 +1,24 @@
-export interface AuthInterface {
-  id: string
-  role: 'user' | 'admin'
-}
+import type { z } from 'zod'
+import type { loginSchema, userRegisterSchema, authResponseSchema, addressSchema, userDashboardResponseSchema, adminDashboardResponseSchema, profileResponseSchema } from '../../../shared/index.js'
 
-export interface LoginResponse {
-  id: string
-  role: 'user' | 'admin'
-}
+// Estos son los tipos derivados de los schemas de `shared` — única fuente de verdad con el back.
+export type AuthInterface = z.infer<typeof authResponseSchema>
 
-export interface UserAddress {
-  street: string
-  number: string
-  floor?: string
-  apartment?: string
-  city: string
-  province: string
-}
+export type LoginResponse = AuthInterface
 
-export interface LoginCredentials {
-  email: string
-  password: string
-}
-export interface UserRegisterCredentials {
-  firstName: string
-  lastName: string
-  dni: string
-  phone: string
-  email: string
-  password: string
-  address: UserAddress
-}
+export type LoginCredentials = z.infer<typeof loginSchema>
 
-export interface UserDashboardResponse {
-  _id: string
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  dni: string
-  address: UserAddress
-  createdAt: string
-}
+export type UserRegisterCredentials = z.infer<typeof userRegisterSchema>
 
-export interface AdminDashboardResponse {
-  _id: string
-  email: string
-}
+export type UserAddress = z.infer<typeof addressSchema>
 
-export type ProfileResponse = UserDashboardResponse | AdminDashboardResponse
+export type UserDashboardResponse = z.infer<typeof userDashboardResponseSchema>
 
+export type AdminDashboardResponse = z.infer<typeof adminDashboardResponseSchema>
+
+export type ProfileResponse = z.infer<typeof profileResponseSchema>
+
+// Este tipo es creado manualmente, no viene de shared
 export interface AuthLoadingState {
   me: boolean
   login: boolean

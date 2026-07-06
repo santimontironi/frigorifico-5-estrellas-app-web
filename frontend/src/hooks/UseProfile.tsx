@@ -9,8 +9,8 @@ const useProfile = () => {
 
   async function fetchProfile() {
     try {
-      const res = await getProfileService()
-      setProfile(res.data)
+      const profile = await getProfileService()
+      setProfile(profile)
     } catch (error: any) {
       setError(error?.response?.data?.message)
     } finally {

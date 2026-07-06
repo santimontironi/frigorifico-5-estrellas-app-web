@@ -1,12 +1,15 @@
 import { Router } from 'express'
 import authController from '../controllers/auth.controller.js'
 import verifyAuth from '../middlewares/verifyAuth.js'
+import { authLimiter } from '../middlewares/rateLimiters.js'
+import { validate } from '../middlewares/validate.js'
+import { loginSchema, userRegisterSchema, adminRegisterSchema } from '../../shared/index.js'
 
 export const router = Router()
 
-router.post('/register/user', authController.register)
-router.post('/register/admin', authController.registerAdmin)
-router.post('/login', authController.login)
+router.post('/register/user', authLimiter, validate(userRegisterSchema), authController.register)
+router.post('/register/admin', authLimiter, validate(adminRegisterSchema), authController.registerAdmin)
+router.post('/login', authLimiter, validate(loginSchema), authController.login)
 router.post('/logout', authController.logout)
 router.get('/confirm/:token', authController.confirmUser)
 router.get('/me', verifyAuth, authController.me)

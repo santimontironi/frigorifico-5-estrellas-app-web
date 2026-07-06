@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
 
   // Comunes a user y admin
   email:     { type: String, required: true, unique: true, lowercase: true, trim: true },
-  password:  { type: String, required: true },
+  password:  { type: String, required: true, min: 8 },
 
   // Solo para role 'user'
   firstName: { type: String, trim: true, required: onlyUser },

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import UseAuth from '../hooks/UseAuth'
+import { loginSchema } from '../../../shared/index.js'
 import type { LoginCredentials } from '../types/auth.types'
 
 const Login = () => {
@@ -9,13 +11,15 @@ const Login = () => {
   const navigate = useNavigate()
   const [error, setError] = useState<any>(null)
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginCredentials>()
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginCredentials>({
+    resolver: zodResolver(loginSchema),
+  })
 
   const onSubmit = async (data: LoginCredentials) => {
     try {
       setError(null)
-      const { role } = await login(data)
-      navigate(role === 'admin' ? '/panel-admin' : '/panel-usuario')
+      const res = await login(data)
+      navigate(res.role === 'admin' ? '/panel-admin' : '/panel-usuario')
     } catch (err: any) {
       setError(err?.response?.data?.message)
       reset()
@@ -99,7 +103,7 @@ const Login = () => {
                   </svg>
                   <input
                     type="email"
-                    {...register('email', { required: 'Ingresá tu email' })}
+                    {...register('email')}
                     className="w-full bg-[#F7F4F1] rounded-xl text-[#1C1714] text-sm xl:text-base 2xl:text-lg pl-12 pr-4 py-3.5 xl:py-4 outline-none border-2 border-transparent focus:border-[#9B2335]/30 focus:bg-white transition-all duration-200 placeholder:text-[#B8A898]/60"
                     placeholder="tu@email.com"
                     autoComplete="email"
@@ -122,7 +126,7 @@ const Login = () => {
                   </svg>
                   <input
                     type="password"
-                    {...register('password', { required: 'La contraseña es obligatoria' })}
+                    {...register('password')}
                     className="w-full bg-[#F7F4F1] rounded-xl text-[#1C1714] text-sm xl:text-base 2xl:text-lg pl-12 pr-4 py-3.5 xl:py-4 outline-none border-2 border-transparent focus:border-[#9B2335]/30 focus:bg-white transition-all duration-200 placeholder:text-[#B8A898]/60"
                     placeholder="••••••••"
                     autoComplete="current-password"

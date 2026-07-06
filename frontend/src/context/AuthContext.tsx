@@ -33,7 +33,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     async function me() {
       try {
         const res = await authMeService()
-        setAuth(res.data)
+        setAuth(res)
       } catch {
         setAuth(null)
       } finally {
@@ -47,9 +47,10 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     try {
       setLoading(prev => ({ ...prev, login: true }))
       const res = await loginService(credentials)
-      setAuth(res.data)
-      return res.data
+      setAuth(res)
+      return res
     } catch (error: any) {
+      console.log(error)
       throw error
     } finally {
       setLoading(prev => ({ ...prev, login: false }))

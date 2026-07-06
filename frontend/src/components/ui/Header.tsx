@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import UseAuth from '../../hooks/UseAuth'
+import Swal from 'sweetalert2'
 
 const NAV_LINKS = [
   { label: 'Inicio', to: '/' },
@@ -34,7 +35,28 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await logout()
+      await Swal.fire({
+        title: 'Cerrar sesión',
+        html: 'Estás a punto de salir de tu cuenta.<br/>¿Querés continuar?',
+        icon: 'warning',
+        showCancelButton: true,
+        reverseButtons: true,
+        focusCancel: true,
+        confirmButtonColor: '#8B1A2F',
+        cancelButtonColor: '#8A8078',
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar',
+        background: '#F5F0E8',
+        color: '#1A1416',
+        iconColor: '#9B2335',
+        backdrop: 'rgba(15, 5, 7, 0.55)',
+        width: 420,
+        padding: '2rem 1.5rem',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await logout()
+        }
+      })
     } finally {
       close()
       navigate('/')

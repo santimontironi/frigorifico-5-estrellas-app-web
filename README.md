@@ -14,6 +14,7 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 - Pago con Mercado Pago Checkout Pro (redirect) confirmado por webhook
 - Sesión persistente con JWT en cookie httpOnly
 - Historial de pedidos con precios y domicilio guardados como snapshot
+- Validación de datos con schemas de Zod compartidos entre frontend y backend
 
 ---
 
@@ -27,9 +28,11 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 | Build | Vite | 8 |
 | Router | React Router DOM | 7 |
 | HTTP client | Axios | 1.x |
+| Forms | react-hook-form + @hookform/resolvers | 7.x / 5.x |
 | Backend | Node.js + Express | 5.x |
 | Base de datos | MongoDB + Mongoose | 9.x |
 | Autenticación | JWT + bcrypt | 9.x / 6.x |
+| Validación | Zod (schemas compartidos en `shared/`) | 4.x |
 | Dev server | Nodemon | 3.x |
 | Imágenes | Cloudinary | 2.x |
 | Email | Nodemailer | 9.x |
@@ -50,7 +53,12 @@ frigorifico-5-estrellas/
 │   ├── controllers/           # auth, user, admin (+ pendientes: product, order, payment...)
 │   ├── repository/            # user, admin (+ pendientes: product, order...)
 │   ├── routes/                # auth, user, admin (+ pendientes)
-│   └── middlewares/           # verifyAuth.js, verifyRole.js, multer.js
+│   └── middlewares/           # verifyAuth.js, verifyRole.js, validate.js (Zod), rateLimiters.js, multer.js
+│
+├── shared/                    # Schemas de Zod compartidos entre backend y frontend (standalone)
+│   ├── package.json
+│   ├── index.js               # Re-exporta todos los schemas
+│   └── schemas/                # auth.schema.js, contact.schema.js
 │
 └── frontend/
     └── src/
@@ -121,6 +129,16 @@ VITE_API_URL=http://localhost:3001/api
 
 ---
 
+## 🧪 Validación de datos
+
+Los schemas de validación viven en `shared/`, una carpeta standalone (con su propio `package.json` y sin npm workspaces) compartida entre backend y frontend mediante rutas relativas.
+
+- **Backend:** middleware genérico `validate(schema)` que corre `safeParse` sobre `req.body` antes del controller. Si falla, corta con `400` y los errores por campo. Aplicado en login, registro de usuarios/admins y en `POST /contact`.
+- **Frontend:** los formularios (`Login`, `Contact`) usan react-hook-form con `zodResolver`, y los tipos se derivan de los schemas con `z.infer` en vez de interfaces manuales. Las respuestas de la API también se validan con `schema.parse()` en la capa de servicios.
+- **Por qué:** la validación del frontend es una mejora de UX (feedback inmediato); la seguridad real siempre la garantiza el backend, que valida en todos los casos.
+
+---
+
 ## 🔐 Autenticación
 
 La sesión se maneja con un JWT almacenado en cookie httpOnly. Hay dos flujos independientes:
@@ -162,6 +180,7 @@ Base URL: `http://localhost:3001/api`
 - `auth.service.ts` con todas las llamadas HTTP de autenticación
 - Instancia Axios configurada con `baseURL` y `withCredentials`
 - Tipos TypeScript completos para el módulo de auth
+- Validación con Zod (schemas compartidos en `shared/`) en auth, registro y contacto
 
 ### Pendiente
 

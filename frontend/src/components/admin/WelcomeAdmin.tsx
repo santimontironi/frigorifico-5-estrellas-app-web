@@ -13,8 +13,8 @@ const WelcomeAdmin = () => {
           <span className="text-white text-xs font-mono uppercase tracking-[0.2em]">Panel admin</span>
         </div>
         <h1 className="text-white text-2xl md:text-4xl font-bold mb-2 tracking-tight">Hola, administrador</h1>
-        <p className="text-white/70 text-sm md:text-base max-w-xl">
-          Este es el panel de gestión del frigorífico. Usá el menú lateral para moverte entre las secciones; acá abajo te contamos qué podés hacer en cada una.
+        <p className="text-white/70 text-sm md:text-base max-w-2xl">
+          Este es el panel de gestión del frigorífico. Desde acá administrás el catálogo completo: agregá, editá y eliminá tanto productos como categorías. Usá el menú lateral para moverte entre las secciones; abajo te contamos qué podés hacer en cada una.
         </p>
       </div>
 
@@ -26,11 +26,11 @@ const WelcomeAdmin = () => {
             <span className="text-white/70 text-xs uppercase tracking-[0.18em] font-medium">Qué podés hacer en el panel</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             <InfoCard
               icon="bi bi-box-seam"
               title="Productos"
-              description="Consultá y administrá el catálogo completo de productos cargados."
+              description="Consultá, editá y eliminá los productos del catálogo."
             />
             <InfoCard
               icon="bi bi-plus-circle"
@@ -41,6 +41,17 @@ const WelcomeAdmin = () => {
               icon="bi bi-upload"
               title="Importar productos"
               description="Cargá productos en masa desde un archivo Excel estructurado."
+            />
+            <InfoCard
+              icon="bi bi-collection"
+              title="Categorías"
+              description="Consultá y organizá las categorías con las que clasificás tus productos."
+            />
+            <InfoCard
+              icon="bi bi-folder-plus"
+              title="Agregar categoría"
+              description="Vas a poder crear nuevas categorías para ordenar el catálogo."
+              comingSoon
             />
             <InfoCard
               icon="bi bi-receipt"
