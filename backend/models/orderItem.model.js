@@ -9,4 +9,4 @@ const orderItemSchema = new mongoose.Schema({
   subtotal:      { type: Number, required: true }
 })
 
-module.exports = mongoose.model('OrderItem', orderItemSchema)
+export default mongoose.model('OrderItem', orderItemSchema)
