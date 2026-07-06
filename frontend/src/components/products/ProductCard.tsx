@@ -1,11 +1,12 @@
+import type { Product } from '../../types/product.types'
+
 interface ProductCardProps {
-  name: string
-  category: string
-  price: number
-  unit: 'kg' | 'unit'
+  product: Product
+  onAddToCart: (product: Product) => void
 }
 
-const ProductCard = ({ name, category, price, unit }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+  const { name, price, unit, category } = product
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#0F0507] border border-white/8 transition-all duration-300 hover:border-[#9B2335]/60 hover:shadow-[0_18px_50px_-18px_rgba(155,35,53,0.6)] hover:-translate-y-1.5">
 
@@ -34,7 +35,7 @@ const ProductCard = ({ name, category, price, unit }: ProductCardProps) => {
 
         <span className="absolute bottom-3 left-4 z-10 text-[#F2EDE6] text-[10px] tracking-[0.25em] uppercase font-mono flex items-center gap-1.5">
           <i className="bi bi-tag-fill text-[#9B2335]" aria-hidden="true" />
-          {category}
+          {category.name}
         </span>
 
         <div className="absolute bottom-3 right-3 z-10 flex items-baseline gap-1 rounded-xl bg-[#F7EA79] px-3.5 py-2 shadow-[0_10px_24px_-8px_rgba(0,0,0,0.7)] group-hover:scale-105 group-hover:-rotate-2 transition-transform duration-300">
@@ -54,6 +55,7 @@ const ProductCard = ({ name, category, price, unit }: ProductCardProps) => {
 
         <button
           type="button"
+          onClick={() => onAddToCart(product)}
           className="mt-auto flex items-center justify-center gap-2 w-full rounded-xl bg-[#872F31] text-[#F2EDE6] text-sm font-semibold tracking-wide py-3 cursor-pointer transition-all duration-200 hover:bg-[#9B2335] hover:shadow-[0_0_24px_-4px_rgba(155,35,53,0.7)] active:scale-[0.98]"
         >
           <i className="bi bi-cart-plus text-base transition-transform duration-200 group-hover:scale-110" aria-hidden="true" />

@@ -3,6 +3,7 @@ import { AuthContextProvider } from "./context/AuthContext";
 import { UserContextProvider } from "./context/UserContext";
 import { ProductContextProvider } from "./context/ProductContext";
 import { CategoryContextProvider } from "./context/CategoryContext";
+import { CartContextProvider } from "./context/CartContext";
 import AdminPanel from "./pages/AdminPanel";
 import UserPanel from "./pages/UserPanel";
 import Login from "./pages/Login";
@@ -20,6 +21,7 @@ const App = () => {
       <UserContextProvider>
       <ProductContextProvider>
         <CategoryContextProvider>
+        <CartContextProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -39,6 +41,7 @@ const App = () => {
             <Route path="/sobre-nosotros" element={<AboutUs />} />
           </Routes>
         </BrowserRouter>
+        </CartContextProvider>
         </CategoryContextProvider>
       </ProductContextProvider>
       </UserContextProvider>
