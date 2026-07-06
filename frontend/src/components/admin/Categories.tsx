@@ -48,6 +48,7 @@ const Categories = () => {
             {categories.map((category) => (
               <CategoryCard
                 key={category._id}
+                id={category._id}
                 name={category.name}
               />
             ))}

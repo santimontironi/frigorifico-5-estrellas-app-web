@@ -11,6 +11,16 @@ class ProductRepository{
         return products.filter(p => p.category !== null)
     }
 
+    async getProductById(id){
+        const product = await Product.findOne({_id: id, active: true}).populate({
+            path: 'category',
+            match: {active: true},
+            select: 'name'
+        })
+
+        return product
+    }
+
     async deleteProductById(id){
         const product = await Product.findByIdAndUpdate(id, {active: false}, {new: true})
         return product
