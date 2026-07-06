@@ -51,6 +51,7 @@ class ProductController {
   async updateProductById(req, res) {
     try {
       const { id } = req.params;
+      
       const updatedProduct = await productRepository.updateProductById(
         id,
         req.body,

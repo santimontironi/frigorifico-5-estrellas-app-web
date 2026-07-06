@@ -1,6 +1,8 @@
 import userRepository from '../repository/user.repository.js'
 import jwt from 'jsonwebtoken'
 import transporter from '../config/mail.config.js'
+import bcrypt from 'bcrypt'
+
 class UserController {
   async changePassword(req, res){
     try {
