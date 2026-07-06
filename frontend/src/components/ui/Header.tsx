@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import UseAuth from '../../hooks/UseAuth'
+import useCart from '../../hooks/useCart'
 import Swal from 'sweetalert2'
 
 const NAV_LINKS = [
@@ -24,10 +25,19 @@ const ghostBtnClass =
   'hover:border-[#9B2335] hover:text-[#F2EDE6] transition-colors duration-200 ' +
   'disabled:opacity-50 disabled:cursor-not-allowed'
 
+// botón ícono del carrito — misma familia visual que ghostBtnClass, huella cuadrada para el ícono
+const cartBtnClass =
+  'relative flex items-center justify-center w-9 h-9 shrink-0 text-[#C9BFB5] ' +
+  'border border-[#C9BFB5]/25 hover:border-[#9B2335] hover:text-[#F2EDE6] ' +
+  'transition-colors duration-200'
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
   const { auth, isAdmin, loading, logout } = UseAuth()
+  const { items } = useCart()
   const navigate = useNavigate()
+
+  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0)
 
   const close = () => setIsOpen(false)
 
@@ -80,36 +90,56 @@ const Header = () => {
           ))}
         </ul>
 
-        {!loading.me && (
-          <div className="hidden md:flex items-center gap-3 pl-6 border-l border-[#F7EA79]/40">
-            {auth ? (
-              <>
-                <Link to={panelPath} className={`${primaryBtnClass} px-4 py-2`}>Mi panel</Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  disabled={loading.logout}
-                  className={`${ghostBtnClass} px-4 py-2 cursor-pointer`}
-                >
-                  {loading.logout ? 'Saliendo...' : 'Cerrar sesión'}
-                </button>
-              </>
-            ) : (
-              <Link to="/ingreso" className={`${primaryBtnClass} px-4 py-2`}>Ingresar</Link>
-            )}
-          </div>
-        )}
+        {/* grupo derecho — auth (solo desktop) + carrito (siempre visible) + hamburguesa (solo mobile) */}
+        <div className="flex items-center gap-4">
 
-        <button
-          className="md:hidden flex flex-col justify-center items-center gap-1.25 w-8 h-8 cursor-pointer"
-          onClick={() => setIsOpen(prev => !prev)}
-          aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
-          aria-expanded={isOpen}
-        >
-          <span className={`block h-px w-5 bg-[#C9BFB5] transition-all duration-300 origin-center ${isOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
-          <span className={`block h-px w-5 bg-[#C9BFB5] transition-all duration-300 ${isOpen ? 'opacity-0 scale-x-0' : ''}`} />
-          <span className={`block h-px w-5 bg-[#C9BFB5] transition-all duration-300 origin-center ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
-        </button>
+          {!loading.me && (
+            <div className="hidden md:flex items-center gap-3 pl-6 border-l border-[#F7EA79]/40">
+              {auth ? (
+                <>
+                  <Link to={panelPath} className={`${primaryBtnClass} px-4 py-2`}>Mi panel</Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={loading.logout}
+                    className={`${ghostBtnClass} px-4 py-2 cursor-pointer`}
+                  >
+                    {loading.logout ? 'Saliendo...' : 'Cerrar sesión'}
+                  </button>
+                </>
+              ) : (
+                <Link to="/ingreso" className={`${primaryBtnClass} px-4 py-2`}>Ingresar</Link>
+              )}
+            </div>
+          )}
+
+          {/* carrito — ícono con burbuja carmín, visible en todas las resoluciones */}
+          <Link
+            to="/carrito"
+            onClick={close}
+            className={cartBtnClass}
+            aria-label={itemCount > 0 ? `Carrito de compras, ${itemCount} ${itemCount === 1 ? 'artículo' : 'artículos'}` : 'Carrito de compras, vacío'}
+          >
+            <i className="bi bi-cart3 text-base" aria-hidden="true" />
+            {itemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center rounded-full bg-[#8B1A2F] text-[#F2EDE6] text-[10px] font-semibold leading-none border border-[#F7EA79]/50">
+                {itemCount}
+              </span>
+            )}
+          </Link>
+
+          <button
+            className="md:hidden flex flex-col justify-center items-center gap-1.25 w-8 h-8 cursor-pointer"
+            onClick={() => setIsOpen(prev => !prev)}
+            aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={isOpen}
+          >
+            <span className={`block h-px w-5 bg-[#C9BFB5] transition-all duration-300 origin-center ${isOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+            <span className={`block h-px w-5 bg-[#C9BFB5] transition-all duration-300 ${isOpen ? 'opacity-0 scale-x-0' : ''}`} />
+            <span className={`block h-px w-5 bg-[#C9BFB5] transition-all duration-300 origin-center ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
+          </button>
+
+        </div>
 
       </nav>
 

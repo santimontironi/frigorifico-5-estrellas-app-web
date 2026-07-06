@@ -22,6 +22,14 @@ Componente Header ya estilizado. Concepto: header premium oscuro con firma carm�
 **Patrón hover de nav link completo:**
 `relative text-[#C9BFB5] text-xs tracking-[0.15em] uppercase font-medium hover:text-[#F2EDE6] transition-colors duration-200 after:absolute after:bottom-[-2px] after:left-0 after:h-px after:w-0 after:bg-[#9B2335] after:transition-[width] after:duration-300 hover:after:w-full`
 
+**Ícono de carrito (agregado 2026-07-06):**
+- El bloque derecho del `nav` (auth-div + hamburguesa) se envolvió en un único `div flex items-center gap-4` para poder insertar el ícono de carrito como hijo siempre visible entre ambos, sin romper el `justify-between` del `nav` en ningún breakpoint.
+- Botón: `Link to="/carrito"` (ruta placeholder, no existe la página todavía) con clase `cartBtnClass` = `relative flex items-center justify-center w-9 h-9 shrink-0 text-[#C9BFB5] border border-[#C9BFB5]/25 hover:border-[#9B2335] hover:text-[#F2EDE6] transition-colors duration-200` — misma familia visual que `ghostBtnClass` pero cuadrado, para ícono.
+- Ícono: `<i className="bi bi-cart3 text-base" aria-hidden="true" />`
+- Badge de cantidad: `rounded-full bg-[#8B1A2F] text-[#F2EDE6] text-[10px] border border-[#F7EA79]/50`, posicionado `absolute -top-1.5 -right-1.5`, condicional a `itemCount > 0`. Es la única excepción a "esquinas rectas" del proyecto — se aceptó `rounded-full` porque es una burbuja numérica, no un botón/CTA.
+- `aria-label` dinámico en el `Link` (ícono funcional) con cantidad de artículos; el `<i>` queda `aria-hidden`.
+- Fuente de datos: hook `useCart` (`frontend/src/hooks/useCart.tsx`), `itemCount = items.reduce((acc, item) => acc + item.quantity, 0)`.
+
 **Why:** Diseño aprobado por el cliente para el lanzamiento del sitio web del frigorífico.
 
 **How to apply:** Si se necesita reutilizar el patrón de subrayado "corte de cuchillo" en otros nav links del proyecto, copiar el patrón `after:` de arriba. Si se modifica el Header, preservar el borde carmín como firma visual inamovible. Ver [[project-color-palette]] para los tokens.

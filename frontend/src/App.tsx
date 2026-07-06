@@ -14,6 +14,7 @@ import VerifyAuth from "./components/auth/VerifyAuth";
 import Contact from "./pages/Contact";
 import AboutUs from "./pages/AboutUs";
 import Home from "./pages/Home";
+import Cart from "./pages/Cart";
 
 const App = () => {
   return (
@@ -39,6 +40,7 @@ const App = () => {
 
             <Route path="/contacto" element={<Contact />} />
             <Route path="/sobre-nosotros" element={<AboutUs />} />
+            <Route path="/carrito" element={<Cart />} />
           </Routes>
         </BrowserRouter>
         </CartContextProvider>
