@@ -32,7 +32,7 @@ const Confirm = () => {
         }
 
         handleConfirm()
-    }, [token, confirmUser])
+    }, [token])
 
     const isLoading = loading.confirmUser && !success && !errorResponse
 

@@ -10,7 +10,7 @@ class CategoryRepository {
     }
 
     async deleteCategoryById(id) {
-        return await Category.findByIdAndUpdate(id, { active: false }, { new: true })
+        return await Category.findByIdAndUpdate(id, { active: false }, { returnDocument: 'after' })
     }
 }
 

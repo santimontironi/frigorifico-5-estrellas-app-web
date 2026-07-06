@@ -14,11 +14,11 @@ class UserRepository {
   }
 
   async confirmUser(id) {
-    return await User.findByIdAndUpdate(id, { confirmed: true }, { new: true })
+    return await User.findByIdAndUpdate(id, { confirmed: true }, { returnDocument: 'after' })
   }
 
   async updatePassword(id, newPassword) {
-    return await User.findByIdAndUpdate(id, { password: newPassword }, { new: true })
+    return await User.findByIdAndUpdate(id, { password: newPassword }, { returnDocument: 'after' })
   }
 
   async findConfirmedUser(email){

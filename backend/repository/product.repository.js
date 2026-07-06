@@ -17,7 +17,7 @@ class ProductRepository {
     const product = await Product.findByIdAndUpdate(
       id,
       { active: false },
-      { new: true },
+      { returnDocument: 'after' },
     );
     return product;
   }
@@ -33,7 +33,7 @@ class ProductRepository {
   }
 
   async updateProductById(id, data) {
-    const product = await Product.findByIdAndUpdate(id, data, { new: true });
+    const product = await Product.findByIdAndUpdate(id, data, { returnDocument: 'after' });
     return product;
   }
 }
