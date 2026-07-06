@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import UseAuth from '../hooks/UseAuth'
 import { loginSchema } from '../../../shared/index.js'
 import type { LoginCredentials } from '../types/auth.types'
+import InputMailModal from '../components/user/InputMailModal'
 
 const Login = () => {
   const { login, loading } = UseAuth()
   const navigate = useNavigate()
   const [error, setError] = useState<any>(null)
+  const [showResetModal, setShowResetModal] = useState(false)
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginCredentials>({
     resolver: zodResolver(loginSchema),
@@ -137,6 +139,13 @@ const Login = () => {
                     {errors.password.message}
                   </span>
                 )}
+                <button
+                  type="button"
+                  onClick={() => setShowResetModal(true)}
+                  className="self-end text-[#9B2335] text-xs font-medium mt-1 mr-1 hover:text-[#7A1C2A] hover:underline transition-colors duration-200 cursor-pointer"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
               </div>
 
               <button
@@ -147,12 +156,24 @@ const Login = () => {
                 {loading.login ? 'Verificando...' : 'Ingresar'}
               </button>
 
+              <p className="text-center text-[#7A6B63] text-sm mt-1">
+                ¿No tenés cuenta?{' '}
+                <Link
+                  to="/registro"
+                  className="text-[#9B2335] font-semibold hover:text-[#7A1C2A] transition-colors duration-200"
+                >
+                  Registrate
+                </Link>
+              </p>
+
             </form>
           </div>
 
         </div>
 
       </div>
+
+      <InputMailModal open={showResetModal} onClose={() => setShowResetModal(false)} />
     </main>
   )
 }

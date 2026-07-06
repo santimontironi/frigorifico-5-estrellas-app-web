@@ -12,6 +12,12 @@ class UserController {
 
       if(!user) return res.status(404).json({ message: 'Usuario no encontrado' })
 
+      const userConfirmed = userRepository.findConfirmedUser(email)
+
+      if(!userConfirmed){
+        return res.status(404).json({ message: 'Usuario no confirmado' })
+      }
+
       const tokenGenerated = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '2h' })
       const resetPasswordUrl = `${process.env.FRONTEND_URL}/cambiar-clave/${tokenGenerated}`
 
@@ -41,8 +47,6 @@ class UserController {
       }
 
       const { newPassword } = req.body
-
-      if(!newPassword) return res.status(400).json({ message: 'La nueva contraseña es obligatoria' })
 
       const passwordHash = await bcrypt.hash(newPassword, 10)
 

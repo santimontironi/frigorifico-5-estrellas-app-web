@@ -1,0 +1,143 @@
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ChangePasswordSchema } from "../../../../shared/index.js"
+import type { ChangePasswordCredentiales } from "../../types/user.types"
+import UseUser from "../../hooks/UseUser"
+
+interface InputMailModalProps {
+  open: boolean
+  onClose: () => void
+}
+
+const InputMailModal = ({ open, onClose }: InputMailModalProps) => {
+
+  const { inputMail, loading } = UseUser()
+
+  const [success, setSuccess] = useState<string | null>(null)
+  const [errorResponse, setErrorResponse] = useState<string | null>(null)
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ChangePasswordCredentiales>({
+    resolver: zodResolver(ChangePasswordSchema),
+  })
+
+  if (!open) return null
+
+  async function onSubmit(data: ChangePasswordCredentiales) {
+    try {
+      setErrorResponse(null)
+      await inputMail(data.email)
+      setSuccess("Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña. Revisá tu bandeja de entrada.")
+      reset()
+    } catch (error: any) {
+      setErrorResponse(error.response?.data?.message ?? "No pudimos enviar el correo. Intentá nuevamente.")
+    }
+  }
+
+  function handleClose() {
+    setSuccess(null)
+    setErrorResponse(null)
+    reset()
+    onClose()
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-100 flex items-center justify-center px-6 py-10"
+      role="dialog"
+      aria-modal="true"
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-[#0F0507]/70 backdrop-blur-sm"
+        onClick={handleClose}
+      />
+
+      {/* Card */}
+      <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label="Cerrar"
+          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full text-[#7A6B63] hover:bg-[#F7F4F1] hover:text-[#9B2335] transition-colors duration-200 cursor-pointer"
+        >
+          <i className="bi bi-x-lg text-base" aria-hidden="true" />
+        </button>
+
+        <div className="px-8 pt-10 pb-6 text-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-linear-to-br from-[#9B2335] to-[#4A0E18] flex items-center justify-center mb-5 shadow-lg">
+            <i className="bi bi-envelope-paper text-white text-2xl" aria-hidden="true" />
+          </div>
+          <h2 className="text-[#1C1714] text-xl font-bold tracking-wide">
+            Recuperar contraseña
+          </h2>
+          <p className="text-[#7A6B63] text-sm mt-2 leading-relaxed">
+            Ingresá tu email y te enviaremos un enlace para crear una nueva contraseña.
+          </p>
+        </div>
+
+        <div className="mx-8 h-px bg-linear-to-r from-transparent via-[#E8DFD6] to-transparent" />
+
+        <div className="px-8 pt-6 pb-10">
+
+          {success ? (
+            <div className="flex flex-col items-center text-center gap-4 py-2">
+              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#9B2335]/10">
+                <i className="bi bi-check-lg text-[#9B2335] text-2xl" aria-hidden="true" />
+              </div>
+              <p className="text-[#1C1714] text-sm leading-relaxed">{success}</p>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="w-full cursor-pointer bg-linear-to-r from-[#9B2335] to-[#7A1C2A] text-white text-sm font-bold tracking-[0.12em] py-3.5 mt-2 rounded-xl shadow-lg hover:shadow-xl hover:from-[#B82A40] hover:to-[#9B2335] active:scale-[0.98] transition-all duration-200"
+              >
+                Entendido
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+
+              {errorResponse && (
+                <div className="flex items-center gap-3 bg-[#9B2335]/5 rounded-xl px-4 py-3">
+                  <i className="bi bi-exclamation-circle text-[#9B2335] text-lg shrink-0" aria-hidden="true" />
+                  <p className="text-[#9B2335] text-sm">{errorResponse}</p>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[#7A6B63] text-xs font-medium ml-1">Email</label>
+                <div className="relative">
+                  <i className="bi bi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-[#B8A898]" aria-hidden="true" />
+                  <input
+                    type="email"
+                    {...register("email")}
+                    className="w-full bg-[#F7F4F1] rounded-xl text-[#1C1714] text-sm pl-11 pr-4 py-3.5 outline-none border-2 border-transparent focus:border-[#9B2335]/30 focus:bg-white transition-all duration-200 placeholder:text-[#B8A898]/60"
+                    placeholder="tu@email.com"
+                    autoComplete="email"
+                    autoFocus
+                  />
+                </div>
+                {errors.email && (
+                  <span className="text-[#9B2335] text-xs ml-1">{errors.email.message}</span>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading.inputMail}
+                className="w-full cursor-pointer bg-linear-to-r from-[#9B2335] to-[#7A1C2A] text-white text-sm font-bold tracking-[0.12em] py-4 mt-1 rounded-xl shadow-lg hover:shadow-xl hover:from-[#B82A40] hover:to-[#9B2335] active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {loading.inputMail ? "Enviando..." : "Enviar enlace"}
+              </button>
+
+            </form>
+          )}
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default InputMailModal

@@ -20,6 +20,10 @@ class UserRepository {
   async updatePassword(id, newPassword) {
     return await User.findByIdAndUpdate(id, { password: newPassword }, { new: true })
   }
+
+  async findConfirmedUser(email){
+    return await User.find({email: email, confirmed: true})
+  }
 }
 
 const userRepository = new UserRepository()

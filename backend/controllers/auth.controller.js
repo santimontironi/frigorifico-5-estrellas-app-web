@@ -27,7 +27,7 @@ class AuthController {
       const user = await userRepository.create({ firstName, lastName, dni, phone, email, password: passwordHash, address, role: 'user' })
 
       const verificationToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '2h' })
-      const verificationUrl = `${process.env.FRONTEND_URL}/verificar/${verificationToken}`
+      const verificationUrl = `${process.env.FRONTEND_URL}/confirmar/${verificationToken}`
 
       await transporter.sendMail({
         from: `"Frigorífico 5 Estrellas" <${process.env.EMAIL_USER}>`,
