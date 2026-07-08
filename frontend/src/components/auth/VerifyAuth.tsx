@@ -5,10 +5,10 @@ import { Navigate } from "react-router-dom"
 
 interface VerifyAuthProps {
     children: ReactNode,
-    role: 'admin' | 'user'
+    roles: Array<'admin' | 'user' | 'employee'>
 }
 
-const VerifyAuth = ({ children, role }: VerifyAuthProps) => {
+const VerifyAuth = ({ children, roles }: VerifyAuthProps) => {
 
     const { auth, loading } = UseAuth()
 
@@ -24,8 +24,8 @@ const VerifyAuth = ({ children, role }: VerifyAuthProps) => {
         return <Navigate to="/" />
     }
 
-    if(auth.role !== role){
-        return <Navigate to={auth.role === 'admin' ? '/panel-admin' : '/panel-usuario'} />
+    if(!roles.includes(auth.role)){
+        return <Navigate to={auth.role === 'user' ? '/panel-usuario' : '/panel-admin'} />
     }
 
     return (

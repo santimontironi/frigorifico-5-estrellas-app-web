@@ -33,7 +33,9 @@ class ProductRepository {
   }
 
   async updateProductById(id, data) {
-    const product = await Product.findByIdAndUpdate(id, data, { returnDocument: 'after' });
+    // populate de category para que la respuesta tenga { _id, name } y matchee el schema
+    const product = await Product.findByIdAndUpdate(id, data, { returnDocument: 'after' })
+      .populate({ path: "category", select: "name" });
     return product;
   }
 }

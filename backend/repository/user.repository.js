@@ -24,6 +24,10 @@ class UserRepository {
   async findConfirmedUser(email){
     return await User.find({email: email, confirmed: true})
   }
+
+  async findByRole(role){
+    return await User.find({ role }).select('-password').sort({ createdAt: -1 })
+  }
 }
 
 const userRepository = new UserRepository()

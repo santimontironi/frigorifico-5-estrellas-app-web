@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const onlyUser = function () { return this.role === 'user' }
 
 const userSchema = new mongoose.Schema({
-  role:      { type: String, enum: ['user', 'admin'], default: 'user' },
+  role:      { type: String, enum: ['user', 'admin', 'employee'], default: 'user' },
 
   // Comunes a user y admin
   email:     { type: String, required: true, unique: true, lowercase: true, trim: true },

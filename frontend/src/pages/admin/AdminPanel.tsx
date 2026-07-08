@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import useProfile from "../../hooks/UseProfile"
+import UseAuth from "../../hooks/UseAuth"
 import type { viewDashboardAdmin } from "../../types/general.types"
 import SideNavAdmin from "../../components/admin/SideNavAdmin"
 import WelcomeAdmin from "../../components/admin/WelcomeAdmin"
@@ -8,11 +9,14 @@ import AddProduct from "../../components/admin/AddProduct"
 import ImportProducts from "../../components/admin/ImportProducts"
 import Categories from "../../components/admin/Categories"
 import AddCategory from "../../components/admin/AddCategory"
+import EmployeesAdmin from "../../components/admin/EmployeesAdmin"
 
 const AdminPanel = () => {
 
     const { fetchProfile, loading } = useProfile()
-    const [viewAdmin, setViewAdmin] = useState<viewDashboardAdmin>('welcome')
+    const { isEmployee } = UseAuth()
+    // El empleado solo gestiona pedidos, así que arranca directamente en esa vista
+    const [viewAdmin, setViewAdmin] = useState<viewDashboardAdmin>(isEmployee ? 'orders' : 'welcome')
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     useEffect(() => {
@@ -65,6 +69,7 @@ const AdminPanel = () => {
                     {viewAdmin === 'categories' && <Categories />}
                     {viewAdmin === 'addCategory' && <AddCategory />}
                     {viewAdmin === 'orders' && <div className="p-8 text-white/30 text-sm">Pedidos — próximamente</div>}
+                    {viewAdmin === 'employees' && <EmployeesAdmin />}
                 </main>
             </div>
 

@@ -1,6 +1,6 @@
 import api from './api'
-import { authResponseSchema, profileResponseSchema } from '../../../shared/index.js'
-import type { LoginCredentials, UserRegisterCredentials } from '../types/auth.types'
+import { authResponseSchema, profileResponseSchema, employeesResponseSchema } from '../../../shared/index.js'
+import type { LoginCredentials, UserRegisterCredentials, EmployeeRegisterCredentials } from '../types/auth.types'
 
 export const authMeService = async () => {
   const res = await api.get('/me')
@@ -15,6 +15,13 @@ export const loginService = async (credentials: LoginCredentials) => {
 export const logoutService = () => api.post('/logout')
 
 export const registerUserService = (credentials: UserRegisterCredentials) => api.post('/register/user', credentials)
+
+export const registerEmployeeService = (credentials: EmployeeRegisterCredentials) => api.post('/register/employee', credentials)
+
+export const getEmployeesService = async () => {
+  const res = await api.get('/employees')
+  return employeesResponseSchema.parse(res.data)
+}
 
 export const getProfileService = async () => {
   const res = await api.get('/profile')

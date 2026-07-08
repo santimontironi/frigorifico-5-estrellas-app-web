@@ -66,6 +66,35 @@ class AuthController {
     }
   }
 
+  async registerEmployee(req, res) {
+    try {
+      const { email, password } = req.body
+
+      if (!email || !password) return res.status(400).json({ message: 'Todos los campos son obligatorios' })
+
+      if (await userRepository.findByEmail(email)) {
+        return res.status(409).json({ message: 'El email ya está registrado' })
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10)
+      await userRepository.create({ email, password: passwordHash, role: 'employee', confirmed: true })
+
+      return res.status(201).json({ message: 'Empleado creado' })
+    }
+    catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  }
+
+  async getEmployees(req, res) {
+    try {
+      const employees = await userRepository.findByRole('employee')
+      return res.status(200).json(employees)
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  }
+
   async login(req, res) {
     try {
       const { email, password } = req.body

@@ -7,6 +7,7 @@ export const productSchema = z.object({
     category: categorySchema,
     price: z.number().min(0, 'El precio debe ser mayor o igual a 0'),
     unit: z.enum(['kg', 'unit'], 'La unidad debe ser "kg" o "unit"'),
+    image: z.string().nullable().optional(), // URL de Cloudinary — opcional
     active: z.boolean(),
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -26,11 +27,13 @@ export const getProductResponseSchema = z.object({
     product: productSchema
 })
 
-// PUT /api/products/:id — body de la request (campos editables, category como id)
+// PUT /api/products/:id — body de la request (campos editables, category como id).
+// La imagen NO va acá: viaja como archivo (multer) y se sube a Cloudinary en el controller.
+// price usa coerce porque al enviar FormData los campos llegan como string.
 export const updateProductSchema = z.object({
     name: z.string().min(1, 'El nombre es obligatorio'),
     category: z.string().min(1, 'La categoría es obligatoria'),
-    price: z.number().min(0, 'El precio debe ser mayor o igual a 0'),
+    price: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0'), //coerce para convertir string a number
     unit: z.enum(['kg', 'unit'], 'La unidad debe ser "kg" o "unit"'),
 })
 

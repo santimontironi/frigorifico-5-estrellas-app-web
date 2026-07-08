@@ -2,6 +2,22 @@ import * as xlsx from "xlsx"; // librería para leer archivos Excel
 import Product from "../models/product.model.js"; // modelo de producto en MongoDB
 import Category from "../models/category.model.js"; // modelo de categoría en MongoDB
 import productRepository from "../repository/product.repository.js";
+import cloudinary from "../config/cloudinary.config.js";
+
+// Sube un Buffer de imagen a Cloudinary usando un stream y devuelve la URL segura.
+// El Buffer viene de multer (memoryStorage), no se escribe nada en disco.
+function uploadImageToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "products" },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      },
+    );
+    stream.end(buffer);
+  });
+}
 
 class ProductController {
   async getAllProducts(req, res) {
@@ -51,14 +67,21 @@ class ProductController {
   async updateProductById(req, res) {
     try {
       const { id } = req.params;
-      
+
+      const data = { ...req.body };
+
+      // Si vino una imagen en el request, se sube a Cloudinary y se guarda la URL.
+      // Es opcional: si no hay archivo, el producto se actualiza sin tocar la imagen.
+      if (req.file) {
+        data.image = await uploadImageToCloudinary(req.file.buffer);
+      }
+
       const updatedProduct = await productRepository.updateProductById(
         id,
-        req.body,
+        data,
       );
 
-      if (!updatedProduct)
-        return res.status(404).json({ message: "Producto no encontrado" });
+      if (!updatedProduct) return res.status(404).json({ message: "Producto no encontrado" });
 
       return res.status(200).json({
         message: "Producto actualizado correctamente",

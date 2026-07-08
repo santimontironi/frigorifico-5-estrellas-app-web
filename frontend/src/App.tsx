@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./context/AuthContext";
+import { AdminContextProvider } from "./context/AdminContext";
 import { UserContextProvider } from "./context/UserContext";
 import { ProductContextProvider } from "./context/ProductContext";
 import { CategoryContextProvider } from "./context/CategoryContext";
@@ -19,6 +20,7 @@ import Cart from "./pages/public/Cart";
 const App = () => {
   return (
     <AuthContextProvider>
+      <AdminContextProvider>
       <UserContextProvider>
       <ProductContextProvider>
         <CategoryContextProvider>
@@ -30,11 +32,11 @@ const App = () => {
             <Route path="/registro" element={<Register />} />
             <Route path="/confirmar/:token" element={<Confirm/>} />
             <Route path="/cambiar-clave/:token" element={<ChangePassword/>} />
-            <Route path="/panel-admin" element={<VerifyAuth role="admin">
+            <Route path="/panel-admin" element={<VerifyAuth roles={['admin', 'employee']}>
               <AdminPanel />
             </VerifyAuth>} />
 
-            <Route path="/panel-usuario" element={<VerifyAuth role="user">
+            <Route path="/panel-usuario" element={<VerifyAuth roles={['user']}>
               <UserPanel />
             </VerifyAuth>} />
 
@@ -47,6 +49,7 @@ const App = () => {
         </CategoryContextProvider>
       </ProductContextProvider>
       </UserContextProvider>
+      </AdminContextProvider>
     </AuthContextProvider>
   )
 }

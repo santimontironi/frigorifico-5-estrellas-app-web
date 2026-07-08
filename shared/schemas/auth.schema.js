@@ -37,7 +37,7 @@ export const adminRegisterSchema = z.object({
 // Respuesta de sesión: la devuelven GET /api/me y POST /api/login.
 export const authResponseSchema = z.object({
   id:   z.string(),
-  role: z.enum(['user', 'admin']),
+  role: z.enum(['user', 'admin', 'employee']),
 })
 
 export const userDashboardResponseSchema = z.object({
@@ -56,8 +56,18 @@ export const adminDashboardResponseSchema = z.object({
   email: z.string(),
 })
 
-// Respuesta de GET /api/profile: puede ser un usuario o un admin.
+// Respuesta de GET /api/profile: puede ser un usuario o un admin. union es un or.
 export const profileResponseSchema = z.union([
   userDashboardResponseSchema,
   adminDashboardResponseSchema,
 ])
+
+// Respuesta de GET /api/employees: listado de cuentas con rol 'employee'.
+export const employeeResponseSchema = z.object({
+  _id:       z.string(),
+  email:     z.string(),
+  role:      z.string(),
+  createdAt: z.string(),
+})
+
+export const employeesResponseSchema = z.array(employeeResponseSchema)

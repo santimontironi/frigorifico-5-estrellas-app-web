@@ -21,7 +21,7 @@ const Login = () => {
     try {
       setError(null)
       const res = await login(data)
-      navigate(res.role === 'admin' ? '/panel-admin' : '/panel-usuario')
+      navigate(res.role === 'user' ? '/panel-usuario' : '/panel-admin')
     } catch (err: any) {
       setError(err?.response?.data?.message)
       reset()

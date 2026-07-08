@@ -1,18 +1,20 @@
 import { createContext, useState, useEffect } from 'react'
 
-import type { AuthInterface, LoginResponse, LoginCredentials, UserRegisterCredentials, AuthLoadingState } from '../types/auth.types'
+import type { AuthInterface, LoginResponse, LoginCredentials, UserRegisterCredentials, EmployeeRegisterCredentials, AuthLoadingState } from '../types/auth.types'
 
-import { authMeService, loginService, logoutService, registerUserService, confirmUserService } from '../services/auth.service'
+import { authMeService, loginService, logoutService, registerUserService, confirmUserService, registerEmployeeService } from '../services/auth.service'
 
 interface AuthContextType {
   loading: AuthLoadingState
   auth: AuthInterface | null
   isUser: boolean
   isAdmin: boolean
+  isEmployee: boolean
   login: (credentials: LoginCredentials) => Promise<LoginResponse>
   confirmUser: (token: string) => Promise<void>
   logout: () => Promise<void>
   registerUser: (credentials: UserRegisterCredentials) => Promise<void>
+  registerEmployee: (credentials: EmployeeRegisterCredentials) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null)
@@ -26,7 +28,8 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     login: false,
     logout: false,
     confirmUser: false,
-    registerUser: false
+    registerUser: false,
+    registerEmployee: false
   })
 
   useEffect(() => {
@@ -80,6 +83,17 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     }
   }
 
+  async function registerEmployee(credentials: EmployeeRegisterCredentials) {
+    try {
+      setLoading(prev => ({ ...prev, registerEmployee: true }))
+      await registerEmployeeService(credentials)
+    } catch (error: any) {
+      throw error
+    } finally {
+      setLoading(prev => ({ ...prev, registerEmployee: false }))
+    }
+  }
+
   async function confirmUser(token: string){
     try{
       setLoading(prev => ({ ...prev, confirmUser: true }))
@@ -99,10 +113,12 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       loading,
       isUser: auth?.role === 'user',
       isAdmin: auth?.role === 'admin',
+      isEmployee: auth?.role === 'employee',
       login,
       logout,
       confirmUser,
       registerUser,
+      registerEmployee,
     }}>
       {children}
     </AuthContext.Provider>

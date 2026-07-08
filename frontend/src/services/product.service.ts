@@ -1,5 +1,5 @@
 import api from './api'
-import { getProductsResponseSchema, importProductsResponseSchema } from '../../../shared/index.js'
+import { getProductsResponseSchema, importProductsResponseSchema, updateProductResponseSchema } from '../../../shared/index.js'
 
 export const importProductsService = async (file: File) => {
   const formData = new FormData()
@@ -13,4 +13,11 @@ export const importProductsService = async (file: File) => {
 export const getProductsService = async () => {
   const res = await api.get('/products')
   return getProductsResponseSchema.parse(res.data)
+}
+
+// Recibe FormData porque puede incluir una imagen (opcional) además de los campos editables.
+// Axios detecta el FormData y setea el multipart con boundary automáticamente.
+export const editProductService = async (id: string, data: FormData) => {
+  const res = await api.patch(`/products/${id}`, data)
+  return updateProductResponseSchema.parse(res.data)
 }

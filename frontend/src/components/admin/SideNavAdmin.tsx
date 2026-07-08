@@ -17,10 +17,11 @@ const navItems: { label: string; view: viewDashboardAdmin; icon: string }[] = [
   { label: 'Importar productos', view: 'importProducts', icon: 'bi bi-upload' },
   { label: 'Categorías',         view: 'categories',     icon: 'bi bi-collection' },
   { label: 'Pedidos',            view: 'orders',         icon: 'bi bi-receipt' },
+  { label: 'Ver administradores', view: 'employees',     icon: 'bi bi-people' },
 ]
 
 const SideNavAdmin = ({ viewAdmin, setViewAdmin, isOpen, onClose }: Props) => {
-  const { logout, loading } = UseAuth()
+  const { logout, loading, isEmployee } = UseAuth()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -58,18 +59,26 @@ const SideNavAdmin = ({ viewAdmin, setViewAdmin, isOpen, onClose }: Props) => {
       <nav className="flex-1 px-3 py-5 flex flex-col gap-0.5">
         {navItems.map((item) => {
           const isActive = viewAdmin === item.view
+          
+          const isLocked = isEmployee && item.view !== 'orders'
           return (
             <button
               key={item.view}
               onClick={() => handleNavClick(item.view)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer text-left
-                ${isActive
-                  ? 'bg-[#9B2335] text-white shadow-lg shadow-[#9B2335]/20'
-                  : 'text-white/50 hover:text-white hover:bg-white/6'
+              disabled={isLocked}
+              aria-disabled={isLocked}
+              title={isLocked ? 'Solo disponible para administradores' : undefined}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-left
+                ${isLocked
+                  ? 'text-white/20 cursor-not-allowed'
+                  : isActive
+                    ? 'bg-[#9B2335] text-white shadow-lg shadow-[#9B2335]/20 cursor-pointer'
+                    : 'text-white/50 hover:text-white hover:bg-white/6 cursor-pointer'
                 }`}
             >
               <i className={`${item.icon} text-base w-4 text-center`} />
               {item.label}
+              {isLocked && <i className="bi bi-lock-fill text-[10px] ml-auto" aria-hidden="true" />}
             </button>
           )
         })}
