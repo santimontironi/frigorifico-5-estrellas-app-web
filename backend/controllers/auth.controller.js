@@ -86,15 +86,6 @@ class AuthController {
     }
   }
 
-  async getEmployees(req, res) {
-    try {
-      const employees = await userRepository.findByRole('employee')
-      return res.status(200).json(employees)
-    } catch (error) {
-      return res.status(500).json({ message: error.message })
-    }
-  }
-
   async login(req, res) {
     try {
       const { email, password } = req.body

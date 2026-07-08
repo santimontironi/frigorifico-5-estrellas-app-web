@@ -19,7 +19,7 @@ export const registerUserService = (credentials: UserRegisterCredentials) => api
 export const registerEmployeeService = (credentials: EmployeeRegisterCredentials) => api.post('/register/employee', credentials)
 
 export const getEmployeesService = async () => {
-  const res = await api.get('/employees')
+  const res = await api.get('/admin/employees')
   return employeesResponseSchema.parse(res.data)
 }
 
