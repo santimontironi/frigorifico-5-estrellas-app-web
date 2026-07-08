@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { adminRegisterSchema } from "../../../../shared/index.js"
-import type { EmployeeRegisterCredentials } from "../../types/auth.types"
+import type { EmployeeRegisterCredentials } from "../../types/admin.types"
 import UseAuth from "../../hooks/UseAuth"
 import UseAdmin from "../../hooks/UseAdmin"
 

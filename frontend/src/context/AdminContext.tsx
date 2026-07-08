@@ -1,9 +1,8 @@
 import { createContext, useState } from 'react'
 
-import type { AdminLoadingState } from '../types/admin.types'
-import type { Employee } from '../types/auth.types'
+import type { AdminLoadingState, Employee } from '../types/admin.types'
 
-import { getEmployeesService } from '../services/auth.service'
+import { getEmployeesService } from '../services/admin.service'
 
 interface AdminContextType {
   loading: AdminLoadingState

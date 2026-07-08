@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react'
 
-import type { AuthInterface, LoginResponse, LoginCredentials, UserRegisterCredentials, EmployeeRegisterCredentials, AuthLoadingState } from '../types/auth.types'
+import type { AuthInterface, LoginResponse, LoginCredentials, UserRegisterCredentials, AuthLoadingState } from '../types/auth.types'
+import type { EmployeeRegisterCredentials } from '../types/admin.types'
 
 import { authMeService, loginService, logoutService, registerUserService, confirmUserService, registerEmployeeService } from '../services/auth.service'
 

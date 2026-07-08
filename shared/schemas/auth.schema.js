@@ -61,13 +61,3 @@ export const profileResponseSchema = z.union([
   userDashboardResponseSchema,
   adminDashboardResponseSchema,
 ])
-
-// Respuesta de GET /api/employees: listado de cuentas con rol 'employee'.
-export const employeeResponseSchema = z.object({
-  _id:       z.string(),
-  email:     z.string(),
-  role:      z.string(),
-  createdAt: z.string(),
-})
-
-export const employeesResponseSchema = z.array(employeeResponseSchema)
