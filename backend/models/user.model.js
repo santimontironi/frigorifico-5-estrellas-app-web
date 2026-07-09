@@ -38,14 +38,8 @@ const userSchema = new mongoose.Schema({
   },
 
   confirmed: { type: Boolean, default: false },
-<<<<<<< HEAD
-  active:    { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now }
-})
-=======
   active: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
 });
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
 
 export default mongoose.model("User", userSchema);

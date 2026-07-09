@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
-import UseProducts from "../../hooks/useProducts"
-import Loader from "../ui/Loader"
+import UseProducts from "../../../hooks/useProducts"
+import Loader from "../../ui/Loader"
 import EditProductModal from "./EditProductModal"
-import type { Product } from "../../types/product.types"
+import type { Product } from "../../../types/product.types"
 
 const ProductsAdmin = () => {
   const { products, getProducts, loading } = UseProducts()

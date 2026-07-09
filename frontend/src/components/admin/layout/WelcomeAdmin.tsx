@@ -1,5 +1,5 @@
-import DiagonalLines from '../ui/DiagonalLines'
-import InfoCard from './InfoCard'
+import DiagonalLines from '../../ui/DiagonalLines'
+import InfoCard from '../../ui/InfoCard'
 
 const WelcomeAdmin = () => {
   return (
@@ -14,7 +14,7 @@ const WelcomeAdmin = () => {
         </div>
         <h1 className="text-white text-2xl md:text-4xl font-bold mb-2 tracking-tight">Hola, administrador</h1>
         <p className="text-white/70 text-sm md:text-base max-w-2xl">
-          Este es el panel de gestión del frigorífico. Desde acá administrás el catálogo completo: agregá, editá y eliminá tanto productos como categorías. Usá el menú lateral para moverte entre las secciones; abajo te contamos qué podés hacer en cada una.
+          Este es el panel de gestión del frigorífico. Desde acá administrás el catálogo completo —productos, categorías y ofertas— y también las cuentas del equipo y de los clientes. Usá el menú lateral para moverte entre las secciones; abajo te contamos qué podés hacer en cada una.
         </p>
       </div>
 
@@ -30,12 +30,7 @@ const WelcomeAdmin = () => {
             <InfoCard
               icon="bi bi-box-seam"
               title="Productos"
-              description="Consultá, editá y eliminá los productos del catálogo."
-            />
-            <InfoCard
-              icon="bi bi-plus-circle"
-              title="Agregar producto"
-              description="Sumá un nuevo producto al catálogo con precio, unidad y categoría."
+              description="Gestioná el catálogo completo: consultá, agregá, editá y eliminá productos desde esta sección."
             />
             <InfoCard
               icon="bi bi-upload"
@@ -45,12 +40,12 @@ const WelcomeAdmin = () => {
             <InfoCard
               icon="bi bi-collection"
               title="Categorías"
-              description="Consultá y organizá las categorías con las que clasificás tus productos."
+              description="Administrá las categorías del catálogo: consultá, agregá, editá y eliminá desde esta sección."
             />
             <InfoCard
-              icon="bi bi-folder-plus"
-              title="Agregar categoría"
-              description="Vas a poder crear nuevas categorías para ordenar el catálogo."
+              icon="bi bi-percent"
+              title="Ofertas"
+              description="Vas a poder crear y gestionar descuentos y promociones sobre los productos."
               comingSoon
             />
             <InfoCard
@@ -58,6 +53,16 @@ const WelcomeAdmin = () => {
               title="Pedidos"
               description="Vas a poder revisar y gestionar los pedidos entrantes desde acá."
               comingSoon
+            />
+            <InfoCard
+              icon="bi bi-people"
+              title="Administradores"
+              description="Consultá, agregá y eliminá las cuentas del equipo con acceso al panel."
+            />
+            <InfoCard
+              icon="bi bi-person-lines-fill"
+              title="Clientes"
+              description="Consultá los clientes registrados y dá de baja sus cuentas cuando haga falta."
             />
           </div>
         </div>

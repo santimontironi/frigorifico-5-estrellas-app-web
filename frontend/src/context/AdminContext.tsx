@@ -1,32 +1,18 @@
 import { createContext, useState } from "react";
 
-<<<<<<< HEAD
-import type { AdminLoadingState, Employee, EmployeeRegisterCredentials, Customer } from '../types/admin.types'
+import type { AdminLoadingState, Employee, Customer, EmployeeRegisterCredentials } from "../types/admin.types";
 
-import { getEmployeesService, addEmployeeService, getCustomersService, deleteCustomerService } from '../services/admin.service'
-
-interface AdminContextType {
-  loading: AdminLoadingState
-  employees: Employee[]
-  customers: Customer[]
-  fetchEmployees: () => Promise<void>
-  addEmployee: (credentials: EmployeeRegisterCredentials) => Promise<void>
-  getCustomers: () => Promise<void>
-  deleteCustomer: (id: string) => Promise<void>
-=======
-import type { AdminLoadingState, Employee } from "../types/admin.types";
-
-import {
-  getEmployeesService,
-  deleteEmployeeService,
-} from "../services/admin.service";
+import { getEmployeesService, deleteEmployeeService, addEmployeeService, getCustomersService, deleteCustomerService } from "../services/admin.service";
 
 interface AdminContextType {
   loading: AdminLoadingState;
   employees: Employee[];
+  customers: Customer[];
   fetchEmployees: () => Promise<void>;
   deleteEmployee: (id: string) => Promise<void>;
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
+  addEmployee: (credentials: EmployeeRegisterCredentials) => Promise<void>;
+  getCustomers: () => Promise<void>;
+  deleteCustomer: (id: string) => Promise<void>;
 }
 
 export const AdminContext = createContext<AdminContextType | null>(null);
@@ -38,14 +24,10 @@ export const AdminContextProvider = ({ children }: { children: any }) => {
 
   const [loading, setLoading] = useState<AdminLoadingState>({
     employees: false,
-<<<<<<< HEAD
     customers: false,
     addEmployee: false,
-    deleteCustomer: false
-  })
-=======
+    deleteCustomer: false,
   });
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
 
   async function fetchEmployees() {
     try {
@@ -62,7 +44,7 @@ export const AdminContextProvider = ({ children }: { children: any }) => {
   async function deleteEmployee(id: string) {
     try {
       await deleteEmployeeService(id);
-      await fetchEmployees();
+      setEmployees((prev) => prev.filter((e) => e._id !== id));
     } catch (error: any) {
       throw error;
     }
@@ -105,26 +87,18 @@ export const AdminContextProvider = ({ children }: { children: any }) => {
   }
 
   return (
-<<<<<<< HEAD
-    <AdminContext.Provider value={{
-      loading,
-      employees,
-      fetchEmployees,
-      addEmployee,
-      customers,
-      getCustomers,
-      deleteCustomer
-    }}>
-=======
     <AdminContext.Provider
       value={{
         loading,
         employees,
+        customers,
         fetchEmployees,
         deleteEmployee,
+        addEmployee,
+        getCustomers,
+        deleteCustomer,
       }}
     >
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
       {children}
     </AdminContext.Provider>
   );

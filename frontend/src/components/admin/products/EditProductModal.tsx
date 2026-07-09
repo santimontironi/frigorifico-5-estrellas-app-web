@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { updateProductSchema } from "../../../../shared/index.js"
-import type { Product, UpdateProductInput, UpdateProductCredentials } from "../../types/product.types"
-import UseProducts from "../../hooks/useProducts"
-import useCategory from "../../hooks/useCategory"
+import { updateProductSchema } from "../../../../../shared/index.js"
+import type { Product, UpdateProductInput, UpdateProductCredentials } from "../../../types/product.types"
+import UseProducts from "../../../hooks/useProducts"
+import useCategory from "../../../hooks/useCategory"
 
 interface EditProductModalProps {
   product: Product

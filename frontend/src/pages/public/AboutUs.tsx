@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import Header from "../../components/ui/Header"
 import DiagonalLines from "../../components/ui/DiagonalLines"
-import InfoCard from "../../components/admin/InfoCard"
+import InfoCard from "../../components/ui/InfoCard"
 
 const AboutUs = () => {
   return (

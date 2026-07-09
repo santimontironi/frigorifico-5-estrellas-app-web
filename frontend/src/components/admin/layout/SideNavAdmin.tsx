@@ -1,7 +1,7 @@
-import type { viewDashboardAdmin } from '../../types/general.types'
-import UseAuth from '../../hooks/UseAuth'
+import type { viewDashboardAdmin } from '../../../types/general.types'
+import UseAuth from '../../../hooks/UseAuth'
 import { useNavigate } from 'react-router-dom'
-import GoBack from '../ui/GoBack'
+import GoBack from '../../ui/GoBack'
 
 interface Props {
   viewAdmin: viewDashboardAdmin
@@ -13,9 +13,9 @@ interface Props {
 const navItems: { label: string; view: viewDashboardAdmin; icon: string }[] = [
   { label: 'Inicio',             view: 'welcome',        icon: 'bi bi-house' },
   { label: 'Productos',          view: 'products',       icon: 'bi bi-box-seam' },
-  { label: 'Agregar producto',   view: 'addProduct',     icon: 'bi bi-plus-circle' },
   { label: 'Importar productos', view: 'importProducts', icon: 'bi bi-upload' },
   { label: 'Categorías',         view: 'categories',     icon: 'bi bi-collection' },
+  { label: 'Ofertas',            view: 'offers',         icon: 'bi bi-percent' },
   { label: 'Pedidos',            view: 'orders',         icon: 'bi bi-receipt' },
   { label: 'Ver administradores', view: 'employees',     icon: 'bi bi-people' },
   { label: 'Clientes',            view: 'customers',     icon: 'bi bi-person-lines-fill' },

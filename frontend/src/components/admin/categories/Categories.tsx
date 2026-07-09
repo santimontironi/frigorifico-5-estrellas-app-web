@@ -1,7 +1,7 @@
 import { useEffect } from "react"
-import useCategory from "../../hooks/useCategory"
-import CategoryCard from "../category/CategoryCard"
-import Loader from "../ui/Loader"
+import useCategory from "../../../hooks/useCategory"
+import CategoryCard from "../../category/CategoryCard"
+import Loader from "../../ui/Loader"
 
 const Categories = () => {
   const { categories, getCategories, loading } = useCategory()

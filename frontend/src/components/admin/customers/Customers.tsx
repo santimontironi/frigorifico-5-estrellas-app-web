@@ -1,6 +1,6 @@
 import { useEffect } from "react"
-import UseAdmin from "../../hooks/UseAdmin"
-import Loader from "../ui/Loader"
+import UseAdmin from "../../../hooks/UseAdmin"
+import Loader from "../../ui/Loader"
 import CustomerCard from "./CustomerCard"
 
 const Customers = () => {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import UseProducts from '../../hooks/useProducts'
-import type { ImportProductsResponse } from '../../types/product.types'
-import DiagonalLines from '../ui/DiagonalLines'
+import UseProducts from '../../../hooks/useProducts'
+import type { ImportProductsResponse } from '../../../types/product.types'
+import DiagonalLines from '../../ui/DiagonalLines'
 
 const ImportProducts = () => {
   const { importProducts, loading } = UseProducts()

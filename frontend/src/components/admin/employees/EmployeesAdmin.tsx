@@ -1,15 +1,8 @@
-<<<<<<< HEAD
-import { useEffect, useState } from "react"
-import UseAdmin from "../../hooks/UseAdmin"
-import Loader from "../ui/Loader"
-import AddEmployeeModal from "./AddEmployeeModal"
-import EmployeeCard from "./EmployeeCard"
-=======
 import { useEffect, useState } from "react";
-import UseAdmin from "../../hooks/UseAdmin";
-import Loader from "../ui/Loader";
+import UseAdmin from "../../../hooks/UseAdmin";
+import Loader from "../../ui/Loader";
 import AddEmployeeModal from "./AddEmployeeModal";
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
+import Swal from "sweetalert2";
 
 const EmployeesAdmin = () => {
   const { employees, fetchEmployees, loading, deleteEmployee } = UseAdmin();
@@ -21,9 +14,29 @@ const EmployeesAdmin = () => {
   }, []);
 
   async function handleDelete(id: string) {
-    if (!window.confirm("¿Dar de baja a este empleado?")) return;
     try {
-      await deleteEmployee(id);
+      Swal.fire({
+        title: "Dar de baja empleado",
+        html: `Vas a dar de baja a un empleado.<br/>No podrá volver a iniciar sesión.`,
+        icon: "warning",
+        showCancelButton: true,
+        reverseButtons: true,
+        focusCancel: true,
+        confirmButtonColor: "#8B1A2F",
+        cancelButtonColor: "#8A8078",
+        confirmButtonText: "Sí, dar de baja",
+        cancelButtonText: "Cancelar",
+        background: "#F5F0E8",
+        color: "#1A1416",
+        iconColor: "#9B2335",
+        backdrop: "rgba(15, 5, 7, 0.55)",
+        width: 420,
+        padding: "2rem 1.5rem",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await deleteEmployee(id);
+        }
+      })
     } catch (error) {
       console.error(error);
     }
@@ -74,9 +87,6 @@ const EmployeesAdmin = () => {
         ) : (
           <div className="flex flex-col gap-3">
             {employees.map((employee) => (
-<<<<<<< HEAD
-              <EmployeeCard key={employee._id} employee={employee} />
-=======
               <div
                 key={employee._id}
                 className="flex items-center gap-4 bg-white/4 border border-white/8 rounded-xl px-5 py-4 hover:bg-white/6 transition-colors duration-200"
@@ -107,7 +117,6 @@ const EmployeesAdmin = () => {
                   <i className="bi bi-trash text-base" aria-hidden="true" />
                 </button>
               </div>
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
             ))}
           </div>
         )}

@@ -1,6 +1,6 @@
 import Swal from "sweetalert2"
-import UseAdmin from "../../hooks/UseAdmin"
-import type { Customer } from "../../types/admin.types"
+import UseAdmin from "../../../hooks/UseAdmin"
+import type { Customer } from "../../../types/admin.types"
 
 interface Props {
   customer: Customer
