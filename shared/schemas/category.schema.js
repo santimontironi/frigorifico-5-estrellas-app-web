@@ -8,3 +8,11 @@ export const categorySchema = z.object({
 export const getAllCategoriesResponseSchema = z.object({
     categories: z.array(categorySchema)
 })
+
+export const createCategorySchema = z.object({
+    name: z.string().min(1, 'El nombre es obligatorio')
+})
+
+export const createCategoryResponseSchema = z.object({
+    category: categorySchema
+})

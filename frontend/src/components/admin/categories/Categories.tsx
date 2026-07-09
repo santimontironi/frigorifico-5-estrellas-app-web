@@ -1,10 +1,13 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import useCategory from "../../../hooks/useCategory"
 import CategoryCard from "../../category/CategoryCard"
 import Loader from "../../ui/Loader"
+import AddCategoryModal from "./AddCategoryModal"
 
 const Categories = () => {
   const { categories, getCategories, loading } = useCategory()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     getCategories()
@@ -24,10 +27,25 @@ const Categories = () => {
           <h2 className="text-white text-2xl md:text-4xl font-bold tracking-tight">Todas las categorías</h2>
         </div>
 
-        {/* contador — mismo patrón que el contador de productos en Home */}
-        <span className="shrink-0 text-white/50 text-sm font-mono">
-          {categories.length} categorías
-        </span>
+        {/* acciones de sección — botón de crear + contador */}
+        <div className="flex items-center gap-4 shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 bg-linear-to-r from-[#9B2335] to-[#7A1C2A] text-white text-sm font-semibold tracking-wide px-5 py-3 rounded-xl shadow-lg hover:shadow-xl hover:from-[#B82A40] hover:to-[#9B2335] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+          >
+            <i className="bi bi-folder-plus text-base" aria-hidden="true" />
+            Crear nueva categoría
+          </button>
+          {/* badge de total — número grande + label, más visible que el contador mono */}
+          <div className="flex items-center gap-3 rounded-xl border border-[#9B2335]/30 bg-[#9B2335]/10 px-5 py-3">
+            <i className="bi bi-collection text-[#E0808C] text-xl" aria-hidden="true" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-white text-2xl md:text-3xl font-bold tabular-nums leading-none">{categories.length}</span>
+              <span className="text-white/60 text-sm font-medium">categorías</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 p-6 md:p-10">
@@ -55,6 +73,8 @@ const Categories = () => {
           </div>
         )}
       </div>
+
+      <AddCategoryModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </section>
   )
 }

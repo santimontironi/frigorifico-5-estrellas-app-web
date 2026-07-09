@@ -1,6 +1,15 @@
 import Category from '../models/category.model.js'
 
 class CategoryRepository {
+
+    async createCategory(data) {
+        return await Category.create(data)
+    }
+
+    async findCategoryByName(name) {
+        return await Category.findOne({ name, active: true })
+    }
+
     async getAllCategories() {
         return await Category.find({ active: true })
     }

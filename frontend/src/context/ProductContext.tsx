@@ -1,5 +1,5 @@
 import type { Product, ProductsLoading, ImportProductsResponse } from '../types/product.types'
-import {getProductsService, editProductService, deleteProductService, importProductsService} from '../services/product.service'
+import {getProductsService, editProductService, deleteProductService, importProductsService, createProductService} from '../services/product.service'
 import { createContext, useState } from 'react'
 
 type ProductContextType = {
@@ -9,6 +9,7 @@ type ProductContextType = {
     editProduct: (id: string, data: FormData) => Promise<void>
     deleteProduct: (id: string) => Promise<void>
     importProducts: (file: File) => Promise<ImportProductsResponse>
+    createProduct: (data: FormData) => Promise<void>
 }
 
 export const ProductContext = createContext<ProductContextType | null>(null)
@@ -17,7 +18,7 @@ export const ProductContextProvider = ({children}: any) => {
 
     const [products, setProducts] = useState<Product[]>([])
 
-    const [loading, setLoading] = useState<ProductsLoading>({get: true, update: false, delete: false, import: false})
+    const [loading, setLoading] = useState<ProductsLoading>({get: true, update: false, delete: false, import: false, create: false})
 
     const getProducts = async () => {
         try{
@@ -71,8 +72,23 @@ export const ProductContextProvider = ({children}: any) => {
         }
     }
 
+    const createProduct = async (data: FormData) => {
+        setLoading((prev: ProductsLoading) => ({...prev, create: true}))
+        try{
+            await createProductService(data)
+            await getProducts()
+        }
+        catch(err){
+            console.error(err)
+            throw err
+        }
+        finally{
+            setLoading((prev: ProductsLoading) => ({...prev, create: false}))
+        }
+    }
+
     return (
-        <ProductContext.Provider value={{products, getProducts, editProduct, loading, deleteProduct, importProducts}}>
+        <ProductContext.Provider value={{products, getProducts, editProduct, loading, deleteProduct, importProducts, createProduct}}>
             {children}
         </ProductContext.Provider>
     )

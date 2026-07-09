@@ -5,10 +5,8 @@ import type { viewDashboardAdmin } from "../../types/general.types"
 import SideNavAdmin from "../../components/admin/layout/SideNavAdmin"
 import WelcomeAdmin from "../../components/admin/layout/WelcomeAdmin"
 import ProductsAdmin from "../../components/admin/products/ProductsAdmin"
-import AddProduct from "../../components/admin/products/AddProduct"
 import ImportProducts from "../../components/admin/products/ImportProducts"
 import Categories from "../../components/admin/categories/Categories"
-import AddCategory from "../../components/admin/categories/AddCategory"
 import EmployeesAdmin from "../../components/admin/employees/EmployeesAdmin"
 import Customers from "../../components/admin/customers/Customers"
 
@@ -65,10 +63,8 @@ const AdminPanel = () => {
                 <main className="flex-1 overflow-auto bg-[#0A0A0A]">
                     {viewAdmin === 'welcome' && <WelcomeAdmin />}
                     {viewAdmin === 'products' && <ProductsAdmin />}
-                    {viewAdmin === 'addProduct' && <AddProduct />}
                     {viewAdmin === 'importProducts' && <ImportProducts />}
                     {viewAdmin === 'categories' && <Categories />}
-                    {viewAdmin === 'addCategory' && <AddCategory />}
                     {viewAdmin === 'offers' && <div className="p-8 text-white/30 text-sm">Ofertas — próximamente</div>}
                     {viewAdmin === 'orders' && <div className="p-8 text-white/30 text-sm">Pedidos — próximamente</div>}
                     {viewAdmin === 'employees' && <EmployeesAdmin />}

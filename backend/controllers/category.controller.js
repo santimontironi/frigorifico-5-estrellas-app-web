@@ -1,6 +1,24 @@
 import categoryRepository from '../repository/category.repository.js'
 
 class CategoryController {
+
+    async createCategory(req,res){
+        try{
+            const { name } = req.body
+
+            const categoryRepeated = await categoryRepository.findCategoryByName(name)
+
+            if(categoryRepeated) return res.status(400).json({ message: 'La categoría ya existe' })
+
+            const newCategory = await categoryRepository.createCategory({ name })
+
+            return res.status(201).json({ message: 'Categoría creada correctamente', category: newCategory })
+        }
+        catch(error){
+            return res.status(500).json({ message: error.message })
+        }
+    }
+
     async getAllCategories(req,res){
         try{
             const allCategories = await categoryRepository.getAllCategories()

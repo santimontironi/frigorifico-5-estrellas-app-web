@@ -1,12 +1,13 @@
 import { createContext, useState } from "react";
-import type { Category, CategoriesLoading } from "../types/category.types";
-import { getAllCategoriesService, deleteCategoryService } from "../services/categories.service";
+import type { Category, CategoriesLoading, CreateCategoryCredentials } from "../types/category.types";
+import { getAllCategoriesService, deleteCategoryService, createCategoryService } from "../services/categories.service";
 
 type CategoryContextType = {
     categories: Category[];
     getCategories: () => Promise<void>;
     loading: CategoriesLoading;
     deleteCategory: (id: string) => Promise<void>;
+    createCategory: (credentials: CreateCategoryCredentials) => Promise<void>;
 }
 
 export const CategoryContext = createContext<CategoryContextType | null>(null);
@@ -15,7 +16,8 @@ export const CategoryContextProvider = ({children}: any) => {
     const [categories, setCategories] = useState<Category[]>([]);
 
     const [loading, setLoading] = useState<CategoriesLoading>({
-        get: false
+        get: false,
+        create: false
     })
 
     const getCategories = async () => {
@@ -42,8 +44,23 @@ export const CategoryContextProvider = ({children}: any) => {
         }
     }
 
+    const createCategory = async (credentials: CreateCategoryCredentials) => {
+        setLoading(prev => ({...prev, create: true}));
+        try{
+            await createCategoryService(credentials);
+            await getCategories();
+        }
+        catch(err){
+            console.error(err);
+            throw err;
+        }
+        finally{
+            setLoading(prev => ({...prev, create: false}));
+        }
+    }
+
     return (
-        <CategoryContext.Provider value={{categories, getCategories, loading, deleteCategory}}>
+        <CategoryContext.Provider value={{categories, getCategories, loading, deleteCategory, createCategory}}>
             {children}
         </CategoryContext.Provider>
     )

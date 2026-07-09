@@ -2,12 +2,15 @@ import { useEffect, useState } from "react"
 import UseProducts from "../../../hooks/useProducts"
 import Loader from "../../ui/Loader"
 import EditProductModal from "./EditProductModal"
+import AddProductModal from "./AddProductModal"
+import ProductAdminCard from "./ProductAdminCard"
 import type { Product } from "../../../types/product.types"
 
 const ProductsAdmin = () => {
   const { products, getProducts, loading } = UseProducts()
 
   const [editing, setEditing] = useState<Product | null>(null)
+  const [addOpen, setAddOpen] = useState(false)
 
   useEffect(() => {
     getProducts()
@@ -26,9 +29,24 @@ const ProductsAdmin = () => {
           <h2 className="text-white text-2xl md:text-4xl font-bold tracking-tight">Todos los productos</h2>
         </div>
 
-        <span className="shrink-0 text-white/50 text-sm font-mono">
-          {products.length} productos
-        </span>
+        <div className="shrink-0 flex items-center gap-3">
+          <div className="flex items-center gap-3 rounded-xl border border-[#9B2335]/30 bg-[#9B2335]/10 px-5 py-3">
+            <i className="bi bi-box-seam text-[#E0808C] text-xl" aria-hidden="true" />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-white text-2xl md:text-3xl font-bold tabular-nums leading-none">{products.length}</span>
+              <span className="text-white/60 text-sm font-medium">productos</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="flex items-center gap-2 rounded-xl bg-linear-to-r from-[#9B2335] to-[#7A1C2A] text-white text-sm font-bold tracking-wide px-5 py-3.5 shadow-lg hover:shadow-xl hover:from-[#B82A40] hover:to-[#9B2335] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+          >
+            <i className="bi bi-plus-lg text-base" aria-hidden="true" />
+            Agregar producto
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 p-6 md:p-10">
@@ -44,52 +62,19 @@ const ProductsAdmin = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {products.map((product) => (
-              <article
+              <ProductAdminCard
                 key={product._id}
-                className="group flex flex-col overflow-hidden rounded-2xl bg-[#0F0507] border border-white/8 transition-all duration-300 hover:border-[#9B2335]/60"
-              >
-                <div className="relative h-36 overflow-hidden bg-linear-to-br from-[#3A1119] via-[#1C0A0E] to-[#0A0A0A]">
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <i className="bi bi-image text-white/15 text-4xl" aria-hidden="true" />
-                    </div>
-                  )}
-
-                  <span className="absolute top-3 left-4 z-10 text-[10px] tracking-[0.22em] uppercase font-mono text-[#C9BFB5]/80 border border-white/12 bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                    {product.category.name}
-                  </span>
-                </div>
-
-                <div className="flex flex-1 flex-col p-5">
-                  <h3 className="text-[#F2EDE6] text-lg font-bold tracking-tight leading-snug">
-                    {product.name}
-                  </h3>
-
-                  <p className="text-[#C9BFB5]/70 text-sm font-mono mt-1">
-                    ${product.price.toLocaleString("es-AR")}
-                    <span className="text-[#C9BFB5]/40"> / {product.unit === "kg" ? "kg" : "un"}</span>
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={() => setEditing(product)}
-                    className="mt-5 flex items-center justify-center gap-2 w-full rounded-xl bg-[#872F31] text-[#F2EDE6] text-sm font-semibold tracking-wide py-3 cursor-pointer transition-all duration-200 hover:bg-[#9B2335] hover:shadow-[0_0_24px_-4px_rgba(155,35,53,0.7)] active:scale-[0.98]"
-                  >
-                    <i className="bi bi-pencil-square text-base" aria-hidden="true" />
-                    Editar
-                  </button>
-                </div>
-              </article>
+                product={product}
+                onEdit={setEditing}
+              />
             ))}
           </div>
         )}
       </div>
+
+      {addOpen && (
+        <AddProductModal onClose={() => setAddOpen(false)} />
+      )}
 
       {editing && (
         <EditProductModal product={editing} onClose={() => setEditing(null)} />

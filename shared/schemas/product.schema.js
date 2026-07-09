@@ -13,6 +13,18 @@ export const productSchema = z.object({
     updatedAt: z.string(),
 })
 
+export const createProductSchema = z.object({
+    image: z.string().optional().nullable(), //nullable para que no sea obligatorio
+    name: z.string().min(1, 'El nombre es obligatorio'),
+    category: z.string().min(1, 'La categoría es obligatoria'),
+    price: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0'),
+    unit: z.enum(['kg', 'unit'], 'La unidad debe ser "kg" o "unit"'),
+})
+
+export const createProductResponseSchema = z.object({
+    product: productSchema
+})
+
 export const deleteProductResponseSchema = z.object({
     product: productSchema
 })
