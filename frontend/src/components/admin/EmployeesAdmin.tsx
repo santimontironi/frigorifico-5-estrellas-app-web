@@ -1,28 +1,50 @@
+<<<<<<< HEAD
 import { useEffect, useState } from "react"
 import UseAdmin from "../../hooks/UseAdmin"
 import Loader from "../ui/Loader"
 import AddEmployeeModal from "./AddEmployeeModal"
 import EmployeeCard from "./EmployeeCard"
+=======
+import { useEffect, useState } from "react";
+import UseAdmin from "../../hooks/UseAdmin";
+import Loader from "../ui/Loader";
+import AddEmployeeModal from "./AddEmployeeModal";
+>>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
 
 const EmployeesAdmin = () => {
-  const { employees, fetchEmployees, loading } = UseAdmin()
+  const { employees, fetchEmployees, loading, deleteEmployee } = UseAdmin();
 
-  const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchEmployees()
-  }, [])
+    fetchEmployees();
+  }, []);
+
+  async function handleDelete(id: string) {
+    if (!window.confirm("¿Dar de baja a este empleado?")) return;
+    try {
+      await deleteEmployee(id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <section className="w-full min-h-full bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A] flex flex-col">
-      
       <div className="px-6 py-7 md:px-10 md:py-9 border-b border-white/8 flex items-end justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <i className="bi bi-people text-[#9B2335] text-xs" aria-hidden="true" />
-            <span className="text-white text-xs font-mono uppercase tracking-[0.2em]">Administradores</span>
+            <i
+              className="bi bi-people text-[#9B2335] text-xs"
+              aria-hidden="true"
+            />
+            <span className="text-white text-xs font-mono uppercase tracking-[0.2em]">
+              Administradores
+            </span>
           </div>
-          <h2 className="text-white text-2xl md:text-4xl font-bold tracking-tight">Ver administradores</h2>
+          <h2 className="text-white text-2xl md:text-4xl font-bold tracking-tight">
+            Ver administradores
+          </h2>
         </div>
 
         <button
@@ -41,13 +63,51 @@ const EmployeesAdmin = () => {
           </div>
         ) : employees.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-4 py-24 border border-dashed border-white/10 rounded-2xl">
-            <i className="bi bi-person-x text-white/25 text-4xl" aria-hidden="true" />
-            <p className="text-white/50 text-sm font-mono">No hay administradores todavía</p>
+            <i
+              className="bi bi-person-x text-white/25 text-4xl"
+              aria-hidden="true"
+            />
+            <p className="text-white/50 text-sm font-mono">
+              No hay administradores todavía
+            </p>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
             {employees.map((employee) => (
+<<<<<<< HEAD
               <EmployeeCard key={employee._id} employee={employee} />
+=======
+              <div
+                key={employee._id}
+                className="flex items-center gap-4 bg-white/4 border border-white/8 rounded-xl px-5 py-4 hover:bg-white/6 transition-colors duration-200"
+              >
+                <div className="w-11 h-11 shrink-0 rounded-full bg-[#9B2335]/15 flex items-center justify-center">
+                  <i
+                    className="bi bi-person text-[#9B2335] text-lg"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-white text-sm font-medium truncate">
+                    {employee.email}
+                  </p>
+                  <p className="text-white/40 text-xs font-mono mt-0.5">
+                    Alta:{" "}
+                    {new Date(employee.createdAt).toLocaleDateString("es-AR")}
+                  </p>
+                </div>
+                <span className="shrink-0 text-[#9B2335] text-xs font-mono uppercase tracking-[0.15em] bg-[#9B2335]/10 px-3 py-1 rounded-full">
+                  Pedidos
+                </span>
+                <button
+                  onClick={() => handleDelete(employee._id)}
+                  aria-label="Dar de baja"
+                  className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full text-white/40 hover:text-[#9B2335] hover:bg-[#9B2335]/10 transition-colors duration-200 cursor-pointer"
+                >
+                  <i className="bi bi-trash text-base" aria-hidden="true" />
+                </button>
+              </div>
+>>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
             ))}
           </div>
         )}
@@ -55,7 +115,7 @@ const EmployeesAdmin = () => {
 
       <AddEmployeeModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
-  )
-}
+  );
+};
 
-export default EmployeesAdmin
+export default EmployeesAdmin;
