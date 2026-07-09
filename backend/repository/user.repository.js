@@ -10,11 +10,7 @@ class UserRepository {
   }
 
   async findById(id) {
-<<<<<<< HEAD
-    return await User.findOne({ _id: id, active: true }).select('-password')
-=======
     return await User.findById(id).select("-password");
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
   }
 
   async confirmUser(id) {
@@ -33,7 +29,10 @@ class UserRepository {
     );
   }
 
-<<<<<<< HEAD
+  async deleteEmployeeById(id) {
+    return await User.findByIdAndUpdate(id, { active: false }, { returnDocument: "after" });
+  }
+
   async findConfirmedUser(email){
     return await User.find({email: email, confirmed: true, active: true})
   }
@@ -44,24 +43,6 @@ class UserRepository {
 
   async deleteUser(id) {
     return await User.findByIdAndUpdate(id, { active: false }, { returnDocument: 'after' })
-=======
-  async findConfirmedUser(email) {
-    return await User.find({ email: email, confirmed: true });
-  }
-
-  async findByRole(role) {
-    return await User.find({ role, active: true })
-      .select("-password")
-      .sort({ createdAt: -1 });
-  }
-
-  async deleteEmployeeById(id) {
-    return await User.findOneAndUpdate(
-      { _id: id, role: "employee" },
-      { active: false },
-      { returnDocument: "after" },
-    );
->>>>>>> c5eef5c01ecdf0f0d49d13e0fd92e1c6433876e8
   }
 }
 

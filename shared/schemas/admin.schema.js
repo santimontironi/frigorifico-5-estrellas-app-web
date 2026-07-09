@@ -8,6 +8,10 @@ export const employeeSchema = z.object({
   createdAt: z.string(),
 })
 
+export const deleteEmployeeResponseSchema = z.object({
+  employee: employeeSchema
+})
+
 export const employeesResponseSchema = z.array(employeeSchema)
 
 export const customerSchema = z.object({

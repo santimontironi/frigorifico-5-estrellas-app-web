@@ -18,7 +18,7 @@ class AdminController {
         return res.status(404).json({ message: "Empleado no encontrado" });
       return res
         .status(200)
-        .json({ message: "Empleado eliminado correctamente" });
+        .json({ message: "Empleado eliminado correctamente" }, employee);
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
