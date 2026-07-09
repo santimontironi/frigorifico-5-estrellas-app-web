@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Header from '../../components/ui/Header'
+import useAuth from '../../hooks/UseAuth'
 import DiagonalLines from '../../components/ui/DiagonalLines'
 import ProductInCart from '../../components/products/ProductInCart'
 import useCart from '../../hooks/useCart'
@@ -8,6 +9,8 @@ const formatPrice = (value: number) => `$${value.toLocaleString('es-AR')}`
 
 const Cart = () => {
   const { items, total, clearCart } = useCart()
+
+  const { isUser } = useAuth()
 
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0)
   const isEmpty = items.length === 0
@@ -125,16 +128,19 @@ const Cart = () => {
                   </div>
 
                   <button
+                    disabled={!isUser}
                     type="button"
-                    className="flex items-center justify-center gap-2 w-full bg-[#872F31] text-[#F2EDE6] text-sm font-semibold tracking-wide px-7 py-3.5 rounded-xl cursor-pointer transition-all duration-200 hover:bg-[#9B2335] hover:shadow-[0_0_24px_-4px_rgba(155,35,53,0.7)] active:scale-[0.98]"
+                    className="flex items-center justify-center gap-2 w-full bg-[#872F31] text-[#F2EDE6] text-sm font-semibold tracking-wide px-7 py-3.5 rounded-xl transition-all duration-200 hover:bg-[#9B2335] hover:shadow-[0_0_24px_-4px_rgba(155,35,53,0.7)] active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#872F31] disabled:hover:shadow-none disabled:active:scale-100"
                   >
                     <i className="bi bi-bag-check" aria-hidden="true" />
                     Finalizar compra
                   </button>
 
-                  <p className="flex items-center justify-center gap-1.5 text-[#C9BFB5]/40 text-[11px] mt-4">
-                    <i className="bi bi-shield-check" aria-hidden="true" />
-                    Coordinamos el pago y la entrega al confirmar
+                  <p className="flex items-center justify-center gap-1.5 text-[#ffffff]/90 font-bold text-[11px] mt-4">
+                    <i className={`bi ${isUser ? 'bi-shield-check' : 'bi-lock'}`} aria-hidden="true" />
+                    {isUser
+                      ? 'Coordinamos el pago y la entrega al confirmar'
+                      : 'Iniciá sesión como cliente para finalizar tu compra'}
                   </p>
                 </div>
               </div>

@@ -1,5 +1,5 @@
 import api from './api'
-import { getProductsResponseSchema, importProductsResponseSchema, updateProductResponseSchema } from '../../../shared/index.js'
+import { getProductsResponseSchema, importProductsResponseSchema, deleteProductResponseSchema, updateProductResponseSchema } from '../../../shared/index.js'
 
 export const importProductsService = async (file: File) => {
   const formData = new FormData()
@@ -20,4 +20,9 @@ export const getProductsService = async () => {
 export const editProductService = async (id: string, data: FormData) => {
   const res = await api.patch(`/products/${id}`, data)
   return updateProductResponseSchema.parse(res.data)
+}
+
+export const deleteProductService = async (id: string) => {
+  const res = await api.delete(`/products/${id}`)
+  return deleteProductResponseSchema.parse(res.data)
 }

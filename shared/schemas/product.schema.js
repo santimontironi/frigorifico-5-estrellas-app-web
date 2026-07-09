@@ -29,11 +29,12 @@ export const getProductResponseSchema = z.object({
 
 // PUT /api/products/:id — body de la request (campos editables, category como id).
 // La imagen NO va acá: viaja como archivo (multer) y se sube a Cloudinary en el controller.
-// price usa coerce porque al enviar FormData los campos llegan como string.
 export const updateProductSchema = z.object({
     name: z.string().min(1, 'El nombre es obligatorio'),
     category: z.string().min(1, 'La categoría es obligatoria'),
-    price: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0'), //coerce para convertir string a number
+    // Recorrido del price: string (input) -> number (validar) -> string (FormData) -> number (guardar).
+    // coerce convierte string a number, así valida igual en el front (input da string) y en el back (FormData da string).
+    price: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0'),
     unit: z.enum(['kg', 'unit'], 'La unidad debe ser "kg" o "unit"'),
 })
 

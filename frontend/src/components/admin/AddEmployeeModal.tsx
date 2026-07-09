@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { adminRegisterSchema } from "../../../../shared/index.js"
 import type { EmployeeRegisterCredentials } from "../../types/admin.types"
-import UseAuth from "../../hooks/UseAuth"
 import UseAdmin from "../../hooks/UseAdmin"
 
 interface AddEmployeeModalProps {
@@ -13,8 +12,7 @@ interface AddEmployeeModalProps {
 
 const AddEmployeeModal = ({ open, onClose }: AddEmployeeModalProps) => {
 
-  const { registerEmployee, loading } = UseAuth()
-  const { fetchEmployees } = UseAdmin()
+  const { addEmployee, loading } = UseAdmin()
 
   const [errorResponse, setErrorResponse] = useState<string | null>(null)
 
@@ -27,8 +25,7 @@ const AddEmployeeModal = ({ open, onClose }: AddEmployeeModalProps) => {
   async function onSubmit(data: EmployeeRegisterCredentials) {
     try {
       setErrorResponse(null)
-      await registerEmployee(data)
-      await fetchEmployees()
+      await addEmployee(data)
       reset()
       onClose()
     } catch (error: any) {
@@ -126,10 +123,10 @@ const AddEmployeeModal = ({ open, onClose }: AddEmployeeModalProps) => {
 
             <button
               type="submit"
-              disabled={loading.registerEmployee}
+              disabled={loading.addEmployee}
               className="w-full cursor-pointer bg-linear-to-r from-[#9B2335] to-[#7A1C2A] text-white text-sm font-bold tracking-[0.12em] py-4 mt-1 rounded-xl shadow-lg hover:shadow-xl hover:from-[#B82A40] hover:to-[#9B2335] active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {loading.registerEmployee ? "Creando..." : "Crear administrador"}
+              {loading.addEmployee ? "Creando..." : "Crear administrador"}
             </button>
 
           </form>

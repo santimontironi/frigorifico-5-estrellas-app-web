@@ -10,7 +10,7 @@ class UserRepository {
   }
 
   async findById(id) {
-    return await User.findById(id).select('-password')
+    return await User.findOne({ _id: id, active: true }).select('-password')
   }
 
   async confirmUser(id) {
@@ -22,11 +22,15 @@ class UserRepository {
   }
 
   async findConfirmedUser(email){
-    return await User.find({email: email, confirmed: true})
+    return await User.find({email: email, confirmed: true, active: true})
   }
 
   async findByRole(role){
-    return await User.find({ role }).select('-password').sort({ createdAt: -1 })
+    return await User.find({ role, active: true }).select('-password').sort({ createdAt: -1 })
+  }
+
+  async deleteUser(id) {
+    return await User.findByIdAndUpdate(id, { active: false }, { returnDocument: 'after' })
   }
 }
 

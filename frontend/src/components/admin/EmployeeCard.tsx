@@ -1,0 +1,26 @@
+import type { Employee } from "../../types/admin.types"
+
+interface Props {
+  employee: Employee
+}
+
+const EmployeeCard = ({ employee }: Props) => {
+  return (
+    <div className="flex items-center gap-4 bg-white/4 border border-white/8 rounded-xl px-5 py-4 hover:bg-white/6 transition-colors duration-200">
+      <div className="w-11 h-11 shrink-0 rounded-full bg-[#9B2335]/15 flex items-center justify-center">
+        <i className="bi bi-person text-[#9B2335] text-lg" aria-hidden="true" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-white text-sm font-medium truncate">{employee.email}</p>
+        <p className="text-white/40 text-xs font-mono mt-0.5">
+          Alta: {new Date(employee.createdAt).toLocaleDateString("es-AR")}
+        </p>
+      </div>
+      <span className="shrink-0 text-[#9B2335] text-xs font-mono uppercase tracking-[0.15em] bg-[#9B2335]/10 px-3 py-1 rounded-full">
+        Pedidos
+      </span>
+    </div>
+  )
+}
+
+export default EmployeeCard

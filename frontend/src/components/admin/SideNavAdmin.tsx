@@ -18,6 +18,7 @@ const navItems: { label: string; view: viewDashboardAdmin; icon: string }[] = [
   { label: 'Categorías',         view: 'categories',     icon: 'bi bi-collection' },
   { label: 'Pedidos',            view: 'orders',         icon: 'bi bi-receipt' },
   { label: 'Ver administradores', view: 'employees',     icon: 'bi bi-people' },
+  { label: 'Clientes',            view: 'customers',     icon: 'bi bi-person-lines-fill' },
 ]
 
 const SideNavAdmin = ({ viewAdmin, setViewAdmin, isOpen, onClose }: Props) => {

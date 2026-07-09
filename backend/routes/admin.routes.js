@@ -5,5 +5,6 @@ import verifyRole from '../middlewares/verifyRole.js'
 
 export const router = Router()
 
-// Todas las rutas del dominio admin exigen sesión + rol admin
 router.get('/admin/employees', verifyAuth, verifyRole('admin'), adminController.getEmployees)
+router.get('/admin/customers', verifyAuth, verifyRole('admin'), adminController.getCustomers)
+router.delete('/admin/customers/:id', verifyAuth, verifyRole('admin'), adminController.deleteCustomer)

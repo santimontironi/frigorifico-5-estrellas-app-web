@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { z } from "zod"
 import { updateProductSchema } from "../../../../shared/index.js"
-import type { Product, UpdateProductCredentials } from "../../types/product.types"
+import type { Product, UpdateProductInput, UpdateProductCredentials } from "../../types/product.types"
 import UseProducts from "../../hooks/useProducts"
 import useCategory from "../../hooks/useCategory"
 
@@ -24,20 +23,14 @@ const EditProductModal = ({ product, onClose }: EditProductModalProps) => {
     getCategories()
   }, [])
 
-  // useForm recibe 3 tipos: <ENTRADA, CONTEXTO, SALIDA>.
-  // Hacen falta los 3 porque el schema usa z.coerce.number() en price: el <input> siempre
-  // devuelve texto ("1500") y zod lo convierte a número, así que la ENTRADA y la SALIDA
-  // del form tienen tipos distintos y hay que declararlos por separado.
+
+  // 3 genéricos: entrada del form, contexto, salida ya validada (price como number)
   const { register, handleSubmit, formState: { errors } } = useForm<
-    z.input<typeof updateProductSchema>, // ENTRADA: los valores mientras se escriben (price: unknown, sin convertir)
-    any,                                 // CONTEXTO: dato extra para el resolver — no lo usamos, va de relleno
-    UpdateProductCredentials             // SALIDA: lo que recibe onSubmit ya validado y convertido (price: number)
+    UpdateProductInput, any, UpdateProductCredentials
   >({
-    // conecta zod con react-hook-form: valida al enviar, llena errors si falla
-    // y, si pasa, entrega los datos ya convertidos a onSubmit
+    // conecta zod con react-hook-form: valida al enviar y llena errors si falla
     resolver: zodResolver(updateProductSchema),
-    // valores iniciales — precargan el form con los datos actuales del producto.
-    // category usa el _id porque el <select> trabaja con ids, no con el objeto categoría.
+   
     defaultValues: {
       name: product.name,
       category: product.category._id,
@@ -46,13 +39,12 @@ const EditProductModal = ({ product, onClose }: EditProductModalProps) => {
     },
   })
 
-  // data llega como SALIDA del schema: ya validado y con price convertido a number.
+  // data ya viene validada por el schema (price convertido a number)
   async function onSubmit(data: UpdateProductCredentials) {
     try {
       setErrorResponse(null)
 
-      // Se arma FormData porque la imagen (opcional) viaja como archivo.
-      // Todo se manda como string; el back reconvierte price con z.coerce.number().
+      // FormData porque la imagen viaja como archivo; todo va como string y el back reconvierte price con coerce
       const formData = new FormData()
       formData.append("name", data.name)
       formData.append("category", data.category)

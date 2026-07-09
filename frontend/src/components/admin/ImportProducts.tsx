@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { importProductsService } from '../../services/product.service'
+import UseProducts from '../../hooks/useProducts'
 import type { ImportProductsResponse } from '../../types/product.types'
 import DiagonalLines from '../ui/DiagonalLines'
 
 const ImportProducts = () => {
+  const { importProducts, loading } = UseProducts()
+
   const [file, setFile] = useState<File | null>(null)
-  const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ImportProductsResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -18,18 +19,15 @@ const ImportProducts = () => {
   const handleSubmit = async () => {
     if (!file) return
 
-    setLoading(true)
     setResult(null)
     setError(null)
 
     try {
-      const res = await importProductsService(file)
+      const res = await importProducts(file)
       setResult(res)
     } catch (err: any) {
       const arrayErrors: string[] = err.response?.data?.message
       setError(arrayErrors[0])
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -128,11 +126,11 @@ const ImportProducts = () => {
         <div className="flex gap-3 items-center">
           <button
             onClick={handleSubmit}
-            disabled={!file || loading}
+            disabled={!file || loading.import}
             className="flex items-center gap-2 px-8 py-3 bg-[#872F31] text-white text-sm font-semibold tracking-wide rounded hover:bg-[#9B2335] hover:shadow-[0_0_24px_rgba(155,35,53,0.45)] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all duration-200"
           >
             <i className="bi bi-upload" aria-hidden="true" />
-            {loading ? 'Importando...' : 'Importar'}
+            {loading.import ? 'Importando...' : 'Importar'}
           </button>
           {file && (
             <button

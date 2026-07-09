@@ -1,5 +1,5 @@
-import type { Product, ProductsLoading } from '../types/product.types'
-import {getProductsService, editProductService} from '../services/product.service'
+import type { Product, ProductsLoading, ImportProductsResponse } from '../types/product.types'
+import {getProductsService, editProductService, deleteProductService, importProductsService} from '../services/product.service'
 import { createContext, useState } from 'react'
 
 type ProductContextType = {
@@ -7,6 +7,8 @@ type ProductContextType = {
     loading: ProductsLoading
     getProducts: () => Promise<void>
     editProduct: (id: string, data: FormData) => Promise<void>
+    deleteProduct: (id: string) => Promise<void>
+    importProducts: (file: File) => Promise<ImportProductsResponse>
 }
 
 export const ProductContext = createContext<ProductContextType | null>(null)
@@ -15,7 +17,7 @@ export const ProductContextProvider = ({children}: any) => {
 
     const [products, setProducts] = useState<Product[]>([])
 
-    const [loading, setLoading] = useState<ProductsLoading>({get: true, update: false})
+    const [loading, setLoading] = useState<ProductsLoading>({get: true, update: false, delete: false, import: false})
 
     const getProducts = async () => {
         try{
@@ -44,8 +46,33 @@ export const ProductContextProvider = ({children}: any) => {
         }
     }
 
+    async function deleteProduct(id: string) {
+        setLoading((prev: ProductsLoading) => ({...prev, delete: true}))
+        try{
+            await deleteProductService(id)
+            setProducts(prev => prev.filter(p => p._id !== id))
+        }
+        catch(err){
+            console.error(err)
+            throw err
+        }
+        finally{
+            setLoading((prev: ProductsLoading) => ({...prev, delete: false}))
+        }
+    }
+
+    const importProducts = async (file: File) => {
+        setLoading((prev: ProductsLoading) => ({...prev, import: true}))
+        try{
+            return await importProductsService(file)
+        }
+        finally{
+            setLoading((prev: ProductsLoading) => ({...prev, import: false}))
+        }
+    }
+
     return (
-        <ProductContext.Provider value={{products, getProducts, editProduct, loading}}>
+        <ProductContext.Provider value={{products, getProducts, editProduct, loading, deleteProduct, importProducts}}>
             {children}
         </ProductContext.Provider>
     )
