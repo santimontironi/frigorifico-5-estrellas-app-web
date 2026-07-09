@@ -11,7 +11,7 @@ export const deleteCategoryService = async (id: string) => {
   return await api.delete(`/categories/${id}`);
 }
 
-export const createCategoryService = async (name: CreateCategoryCredentials) => {
-  const res = await api.post("/categories", { name });
+export const createCategoryService = async (data: CreateCategoryCredentials) => {
+  const res = await api.post("/categories", data );
   return createCategoryResponseSchema.parse(res.data);
 }
