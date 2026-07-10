@@ -35,7 +35,7 @@ const OffersHome = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
           {offers.map((offer) => (
-            <OfferCard key={offer._id} offer={offer} />
+            <OfferCard key={offer._id} offer={offer} cart />
           ))}
         </div>
       </div>

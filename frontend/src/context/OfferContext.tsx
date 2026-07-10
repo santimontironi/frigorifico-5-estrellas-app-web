@@ -26,7 +26,6 @@ export const OfferContextProvider = ({ children }: any) => {
       const res = await getAllOffersService()
       setOffers(res.offers)
     } catch (err) {
-      // El back responde 404 cuando no hay ofertas activas: dejamos la lista vacía.
       console.error(err)
       setOffers([])
     } finally {

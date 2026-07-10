@@ -1,17 +1,21 @@
 import Swal from "sweetalert2"
 import type { Offer } from "../../types/offer.types"
 import useOffer from "../../hooks/useOffer"
+import useCart from "../../hooks/useCart"
 
 interface OfferCardProps {
   offer: Offer
   // Solo el panel admin habilita el borrado; en el Home público la card es de exhibición.
   deletable?: boolean
+  cart: boolean
 }
 
-const OfferCard = ({ offer, deletable = false }: OfferCardProps) => {
+const OfferCard = ({ offer, deletable = false, cart = false }: OfferCardProps) => {
   const { deleteOffer } = useOffer()
 
   const { product, newPrice, image } = offer
+
+  const { addToCart } = useCart()
 
   const oldPrice = product.price
 
@@ -46,18 +50,6 @@ const OfferCard = ({ offer, deletable = false }: OfferCardProps) => {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-3xl bg-[#0F0507] border border-white/8 transition-all duration-300 hover:border-[#9B2335]/60 hover:shadow-[0_28px_70px_-24px_rgba(155,35,53,0.65)] hover:-translate-y-1.5">
 
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-[#9B2335] to-[#7A1C2A] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white shadow-lg">
-          <i className="bi bi-fire" aria-hidden="true" />
-          Oferta
-        </span>
-        {discount > 0 && (
-          <span className="rounded-full bg-[#F7EA79] px-3 py-1.5 text-[11px] font-bold tracking-wide text-[#1C0A0E] shadow-lg">
-            -{discount}%
-          </span>
-        )}
-      </div>
-
       {deletable && (
         <button
           type="button"
@@ -68,6 +60,8 @@ const OfferCard = ({ offer, deletable = false }: OfferCardProps) => {
         >
           <i className="bi bi-trash3 text-base" aria-hidden="true" />
         </button>
+
+
       )}
 
       <div className="relative h-60 overflow-hidden bg-linear-to-br from-[#3A1119] via-[#1C0A0E] to-[#0A0A0A]">
@@ -104,6 +98,18 @@ const OfferCard = ({ offer, deletable = false }: OfferCardProps) => {
           {product.name}
         </h3>
 
+        <div className="mt-2 flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-[#9B2335] to-[#7A1C2A] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white shadow-lg">
+            <i className="bi bi-fire" aria-hidden="true" />
+            Oferta
+          </span>
+          {discount > 0 && (
+            <span className="rounded-full bg-[#F7EA79] px-3 py-1.5 text-[11px] xl:text-[15px] font-bold tracking-wide text-[#1C0A0E] shadow-lg">
+              -{discount}%
+            </span>
+          )}
+        </div>
+
         <div className="mt-auto pt-6">
           <span className="block text-[#C9BFB5]/45 text-sm font-mono line-through">
             ${oldPrice.toLocaleString("es-AR")}
@@ -117,6 +123,17 @@ const OfferCard = ({ offer, deletable = false }: OfferCardProps) => {
             </span>
           </div>
         </div>
+
+        {cart && (
+          <button
+            type="button"
+            onClick={() => addToCart(product, 1)}
+            className="mt-6 flex items-center justify-center gap-2 w-full rounded-xl bg-[#872F31] text-[#F2EDE6] text-sm md:text-base font-semibold tracking-wide py-3.5 cursor-pointer transition-all duration-200 hover:bg-[#9B2335] hover:shadow-[0_0_28px_-4px_rgba(155,35,53,0.75)] active:scale-[0.98]"
+          >
+            <i className="bi bi-cart-plus text-lg transition-transform duration-200 group-hover:scale-110" aria-hidden="true" />
+            Agregar al carrito
+          </button>
+        )}
       </div>
     </article>
   )

@@ -11,7 +11,10 @@ class OfferRepository {
       .populate({
         path: "product",
         match: { active: true },
-        select: "name price unit image",
+        populate: {
+          path: "category",
+          match: { active: true }
+        },
       });
 
     return offers.filter((o) => o.product !== null);

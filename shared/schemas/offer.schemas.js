@@ -1,16 +1,21 @@
 import { z } from "zod";
+import { categorySchema } from "./category.schema.js";
 
 export const offerProductSchema = z.object({
   _id: z.string(),
-  name: z.string(),
-  price: z.number(),
-  unit: z.enum(["kg", "unit"]),
-  image: z.string().nullable().optional(),
+  name: z.string().min(1, 'El nombre es obligatorio'),
+  category: categorySchema,
+  price: z.number().min(0, 'El precio debe ser mayor o igual a 0'),
+  unit: z.enum(['kg', 'unit'], 'La unidad debe ser "kg" o "unit"'),
+  image: z.string().nullable().optional(), // URL de Cloudinary — opcional
+  active: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export const offerSchema = z.object({
   _id: z.string(),
-  image: z.string().trim().optional(), 
+  image: z.string().trim().optional(),
   product: offerProductSchema,
   newPrice: z.number().min(0, "El precio debe ser mayor o igual a 0"),
   active: z.boolean().optional(),
