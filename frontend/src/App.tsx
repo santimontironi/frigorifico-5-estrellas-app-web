@@ -4,6 +4,7 @@ import { AdminContextProvider } from "./context/AdminContext";
 import { UserContextProvider } from "./context/UserContext";
 import { ProductContextProvider } from "./context/ProductContext";
 import { CategoryContextProvider } from "./context/CategoryContext";
+import { OfferContextProvider } from "./context/OfferContext";
 import { CartContextProvider } from "./context/CartContext";
 import AdminPanel from "./pages/admin/AdminPanel";
 import UserPanel from "./pages/user/UserPanel";
@@ -24,6 +25,7 @@ const App = () => {
       <UserContextProvider>
       <ProductContextProvider>
         <CategoryContextProvider>
+        <OfferContextProvider>
         <CartContextProvider>
         <BrowserRouter>
           <Routes>
@@ -46,6 +48,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
         </CartContextProvider>
+        </OfferContextProvider>
         </CategoryContextProvider>
       </ProductContextProvider>
       </UserContextProvider>

@@ -4,6 +4,7 @@ import ProductCard from "../../components/products/ProductCard"
 import Loader from "../../components/ui/Loader"
 import DiagonalLines from "../../components/ui/DiagonalLines"
 import HeroFeatures from "../../components/ui/HeroFeatures"
+import OffersHome from "../../components/ui/OffersHome"
 import UseProducts from "../../hooks/useProducts"
 import useCart from "../../hooks/useCart"
 
@@ -71,6 +72,8 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      <OffersHome />
 
       <div className="scroll-mt-20 max-w-7xl mx-auto px-6 py-12 md:px-10 md:py-16">
 
