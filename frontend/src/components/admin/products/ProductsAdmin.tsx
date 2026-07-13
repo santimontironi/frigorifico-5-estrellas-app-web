@@ -5,16 +5,25 @@ import EditProductModal from "./EditProductModal"
 import AddProductModal from "./AddProductModal"
 import ProductAdminCard from "./ProductAdminCard"
 import type { Product } from "../../../types/product.types"
+import FormSearch from "../../ui/FormSearch"
 
 const ProductsAdmin = () => {
-  const { products, getProducts, loading } = UseProducts()
+  const { products, getProducts, loading, searchProducts, productsFiltered } = UseProducts()
 
   const [editing, setEditing] = useState<Product | null>(null)
   const [addOpen, setAddOpen] = useState(false)
+  const [query, setQuery] = useState<string>('')
 
   useEffect(() => {
     getProducts()
   }, [])
+
+  useEffect(() => { //se pone en un useEffect porque puede que se busque algo mientras se cargan los productos o se modifique el array de productos
+    searchProducts(query)
+  }, [query, products])
+
+  const isSearching = query.trim().length > 0
+  const productsToShow = isSearching ? productsFiltered : products
 
   return (
 
@@ -49,19 +58,30 @@ const ProductsAdmin = () => {
         </div>
       </div>
 
+      <div className="px-6 py-5 md:px-10 md:py-6 border-b border-white/8 flex items-center gap-4">
+        <FormSearch value={query} onChange={setQuery} />
+        {isSearching && (
+          <span className="shrink-0 text-white/50 text-sm font-mono">
+            {productsToShow.length} resultado{productsToShow.length === 1 ? '' : 's'}
+          </span>
+        )}
+      </div>
+
       <div className="flex-1 p-6 md:p-10">
         {loading.get ? (
           <div className="flex items-center justify-center py-24">
             <Loader />
           </div>
-        ) : products.length === 0 ? (
+        ) : productsToShow.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-4 py-24 border border-dashed border-white/10 rounded-2xl">
             <i className="bi bi-inbox text-white/25 text-4xl" aria-hidden="true" />
-            <p className="text-white/50 text-sm font-mono">No hay productos todavía</p>
+            <p className="text-white/50 text-sm font-mono">
+              {isSearching ? `No se encontraron productos para "${query}"` : 'No hay productos todavía'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {productsToShow.map((product) => (
               <ProductAdminCard
                 key={product._id}
                 product={product}

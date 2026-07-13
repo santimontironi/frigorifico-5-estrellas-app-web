@@ -22,7 +22,7 @@ const Home = () => {
     getProducts()
   }, [])
 
-  useEffect(() => {
+  useEffect(() => { //se pone en un useEffect porque puede que se busque algo mientras se cargan los productos o se modifique el array de productos
     searchProducts(query)
   }, [query, products])
 
