@@ -4,7 +4,9 @@ import { createContext, useState } from 'react'
 
 type ProductContextType = {
     products: Product[]
+    productsFiltered: Product[]
     loading: ProductsLoading
+    searchProducts: (query: string) => Promise<void>
     getProducts: () => Promise<void>
     editProduct: (id: string, data: FormData) => Promise<void>
     deleteProduct: (id: string) => Promise<void>
@@ -17,6 +19,8 @@ export const ProductContext = createContext<ProductContextType | null>(null)
 export const ProductContextProvider = ({children}: any) => {
 
     const [products, setProducts] = useState<Product[]>([])
+
+    const [productsFiltered, setProductsFiltered] = useState<Product[]>([])
 
     const [loading, setLoading] = useState<ProductsLoading>({get: true, update: false, delete: false, import: false, create: false})
 
@@ -87,8 +91,18 @@ export const ProductContextProvider = ({children}: any) => {
         }
     }
 
+    const searchProducts = async (query: string) => {
+        try{
+            const productsFounded = products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
+            setProductsFiltered(productsFounded)
+        }
+        catch(err){
+            console.error(err)
+        }
+    }
+
     return (
-        <ProductContext.Provider value={{products, getProducts, editProduct, loading, deleteProduct, importProducts, createProduct}}>
+        <ProductContext.Provider value={{products, getProducts, editProduct, loading, deleteProduct, importProducts, createProduct, productsFiltered, searchProducts}}>
             {children}
         </ProductContext.Provider>
     )

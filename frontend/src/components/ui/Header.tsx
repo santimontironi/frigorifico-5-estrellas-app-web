@@ -25,7 +25,6 @@ const ghostBtnClass =
   'hover:border-[#9B2335] hover:text-[#F2EDE6] transition-colors duration-200 ' +
   'disabled:opacity-50 disabled:cursor-not-allowed'
 
-// botón ícono del carrito — misma familia visual que ghostBtnClass, huella cuadrada para el ícono
 const cartBtnClass =
   'relative flex items-center justify-center w-9 h-9 shrink-0 text-[#C9BFB5] ' +
   'border border-[#C9BFB5]/25 hover:border-[#9B2335] hover:text-[#F2EDE6] ' +
