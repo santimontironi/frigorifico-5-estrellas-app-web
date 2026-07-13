@@ -6,7 +6,7 @@ type ProductContextType = {
     products: Product[]
     productsFiltered: Product[]
     loading: ProductsLoading
-    searchProducts: (query: string) => Promise<void>
+    searchProducts: (query: string) => void
     getProducts: () => Promise<void>
     editProduct: (id: string, data: FormData) => Promise<void>
     deleteProduct: (id: string) => Promise<void>
@@ -91,7 +91,7 @@ export const ProductContextProvider = ({children}: any) => {
         }
     }
 
-    const searchProducts = async (query: string) => {
+    const searchProducts = (query: string) => {
         try{
             const productsFounded = products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
             setProductsFiltered(productsFounded)

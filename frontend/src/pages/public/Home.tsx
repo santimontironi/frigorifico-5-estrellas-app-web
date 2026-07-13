@@ -5,24 +5,31 @@ import Loader from "../../components/ui/Loader"
 import DiagonalLines from "../../components/ui/DiagonalLines"
 import HeroFeatures from "../../components/ui/HeroFeatures"
 import OffersHome from "../../components/ui/OffersHome"
+import FormSearch from "../../components/ui/FormSearch"
 import UseProducts from "../../hooks/useProducts"
 import useCart from "../../hooks/useCart"
 
 const PAGE_SIZE = 12
 
 const Home = () => {
-  const { products, getProducts, loading } = UseProducts()
+  const { products, productsFiltered, searchProducts, getProducts, loading } = UseProducts()
   const { addToCart } = useCart()
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [query, setQuery] = useState("")
 
   useEffect(() => {
     getProducts()
   }, [])
 
+  useEffect(() => {
+    searchProducts(query)
+  }, [query, products])
+
+  const isSearching = query.trim().length > 0
   const total = products?.length ?? 0
-  const visibleProducts = products?.slice(0, visibleCount) ?? []
-  const hasMore = total > visibleCount
+  const visibleProducts = isSearching ? productsFiltered : products?.slice(0, visibleCount) ?? []
+  const hasMore = !isSearching && total > visibleCount
 
   return (
     <section className="min-h-screen bg-[#0A0A0A]">
@@ -83,11 +90,23 @@ const Home = () => {
             <span className="text-[#C9BFB5] text-xs tracking-[0.3em] uppercase font-mono">Catálogo</span>
           </div>
           <h2 className="text-[#F2EDE6] text-2xl md:text-3xl font-bold tracking-tight">Nuestros productos</h2>
+
+          <div className="mt-6">
+            <FormSearch value={query} onChange={setQuery} />
+          </div>
         </div>
 
         {loading.get ? (
           <div className="flex items-center justify-center py-32">
             <Loader />
+          </div>
+        ) : isSearching && visibleProducts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <i className="bi bi-search text-[#9B2335]/60 text-4xl mb-4" aria-hidden="true" />
+            <p className="text-[#F2EDE6] text-lg font-semibold">Sin resultados</p>
+            <p className="text-[#C9BFB5]/60 text-sm mt-1">
+              No encontramos productos para "{query}"
+            </p>
           </div>
         ) : (
           <>
