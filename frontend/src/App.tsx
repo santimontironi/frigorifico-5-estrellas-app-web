@@ -6,6 +6,7 @@ import { ProductContextProvider } from "./context/ProductContext";
 import { CategoryContextProvider } from "./context/CategoryContext";
 import { OfferContextProvider } from "./context/OfferContext";
 import { CartContextProvider } from "./context/CartContext";
+import { OrderContextProvider } from "./context/OrderContext";
 import AdminPanel from "./pages/admin/AdminPanel";
 import UserPanel from "./pages/user/UserPanel";
 import Login from "./pages/auth/Login";
@@ -17,6 +18,9 @@ import Contact from "./pages/public/Contact";
 import AboutUs from "./pages/public/AboutUs";
 import Home from "./pages/public/Home";
 import Cart from "./pages/public/Cart";
+import PaymentSuccess from "./pages/public/PaymentSuccess";
+import PaymentFailure from "./pages/public/PaymentFailure";
+import PaymentPending from "./pages/public/PaymentPending";
 
 const App = () => {
   return (
@@ -27,6 +31,7 @@ const App = () => {
         <CategoryContextProvider>
         <OfferContextProvider>
         <CartContextProvider>
+        <OrderContextProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -45,8 +50,12 @@ const App = () => {
             <Route path="/contacto" element={<Contact />} />
             <Route path="/sobre-nosotros" element={<AboutUs />} />
             <Route path="/carrito" element={<Cart />} />
+            <Route path="/pago/exito" element={<PaymentSuccess />} />
+            <Route path="/pago/error" element={<PaymentFailure />} />
+            <Route path="/pago/pendiente" element={<PaymentPending />} />
           </Routes>
         </BrowserRouter>
+        </OrderContextProvider>
         </CartContextProvider>
         </OfferContextProvider>
         </CategoryContextProvider>

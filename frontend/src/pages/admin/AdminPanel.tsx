@@ -9,6 +9,7 @@ import ImportProducts from "../../components/admin/products/ImportProducts"
 import Categories from "../../components/admin/categories/Categories"
 import EmployeesAdmin from "../../components/admin/employees/EmployeesAdmin"
 import AllOffers from "../../components/admin/offers/AllOffers"
+import AllOrders from "../../components/admin/orders/AllOrders"
 import Customers from "../../components/admin/customers/Customers"
 
 const AdminPanel = () => {
@@ -67,7 +68,7 @@ const AdminPanel = () => {
                     {viewAdmin === 'importProducts' && <ImportProducts />}
                     {viewAdmin === 'categories' && <Categories />}
                     {viewAdmin === 'offers' && <AllOffers />}
-                    {viewAdmin === 'orders' && <div className="p-8 text-white/30 text-sm">Pedidos — próximamente</div>}
+                    {viewAdmin === 'orders' && <AllOrders />}
                     {viewAdmin === 'employees' && <EmployeesAdmin />}
                     {viewAdmin === 'customers' && <Customers />}
                 </main>

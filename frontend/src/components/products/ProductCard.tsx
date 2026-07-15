@@ -8,19 +8,17 @@ interface ProductCardProps {
 const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
   const { name, price, unit, category, image } = product
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#0F0507] border border-white/8 transition-all duration-300 hover:border-[#9B2335]/60 hover:shadow-[0_18px_50px_-18px_rgba(155,35,53,0.6)] hover:-translate-y-1.5">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#0F0507] border border-[#9B2335]/75 shadow-[0_0_20px_-12px_rgba(155,35,53,0.5)] transition-all duration-300 hover:border-[#9B2335]/80 hover:shadow-[0_18px_50px_-18px_rgba(155,35,53,0.7)] hover:-translate-y-1.5">
 
       <div className="relative h-44 overflow-hidden bg-linear-to-br from-[#3A1119] via-[#1C0A0E] to-[#0A0A0A]">
 
         {image ? (
-          // si el producto tiene imagen se muestra la foto limpia, sin nada encima que la tape
           <img
             src={image}
             alt={name}
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          // sin imagen: se mantiene el fondo decorativo (rayas + brillo + estrella)
           <>
             <div
               className="absolute inset-0 pointer-events-none"
@@ -44,7 +42,6 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
 
       <div className="flex flex-1 flex-col p-5">
 
-        {/* categoría — ahora fuera de la imagen, arriba del contenido */}
         <span className="inline-flex items-center gap-1.5 self-start text-[10px] tracking-[0.22em] uppercase font-mono text-[#C9BFB5]/70 mb-2.5">
           <i className="bi bi-tag-fill text-[#9B2335]" aria-hidden="true" />
           {category.name}
@@ -54,7 +51,6 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           {name}
         </h3>
 
-        {/* precio + botón anclados abajo para que las cards queden alineadas */}
         <div className="mt-auto pt-5">
           <div className="flex items-baseline gap-1.5 mb-4">
             <span className="text-[#F7EA79] text-2xl font-bold font-mono tracking-tight">

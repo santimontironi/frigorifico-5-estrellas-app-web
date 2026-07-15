@@ -13,5 +13,7 @@ export interface AdminLoadingState {
   employees: boolean,
   customers: boolean,
   addEmployee: boolean,
-  deleteCustomer: boolean
+  deleteCustomer: boolean,
+  orders: boolean,
+  updateOrder: boolean
 }

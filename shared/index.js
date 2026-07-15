@@ -5,3 +5,4 @@ export * from "./schemas/category.schema.js";
 export * from "./schemas/product.schema.js";
 export * from "./schemas/user.schemas.js";
 export * from "./schemas/offer.schemas.js";
+export * from "./schemas/order.schema.js";
