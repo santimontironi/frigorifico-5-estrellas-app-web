@@ -7,6 +7,7 @@ import HeroFeatures from "../../components/ui/HeroFeatures"
 import OffersHome from "../../components/ui/OffersHome"
 import FormSearch from "../../components/ui/FormSearch"
 import UseProducts from "../../hooks/useProducts"
+import useOffer from "../../hooks/useOffer"
 import useCart from "../../hooks/useCart"
 
 const PAGE_SIZE = 12
@@ -14,6 +15,8 @@ const PAGE_SIZE = 12
 const Home = () => {
   const { products, productsFiltered, searchProducts, getProducts, loading } = UseProducts()
   const { addToCart } = useCart()
+
+  const { offers } = useOffer()
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [query, setQuery] = useState("")
@@ -27,8 +30,13 @@ const Home = () => {
   }, [query, products])
 
   const isSearching = query.trim().length > 0
-  const total = products?.length ?? 0
-  const visibleProducts = isSearching ? productsFiltered : products?.slice(0, visibleCount) ?? []
+
+  const offerProductsIds = new Set(offers.map(offer => offer.product._id)) //se arma un array con los id de los productos de las ofertas
+
+  const catalog = (isSearching ? productsFiltered : products ).filter(product => !offerProductsIds.has(product._id)) //se filtran los productos de las ofertas
+
+  const total = catalog.length
+  const visibleProducts = isSearching ? catalog : catalog.slice(0, visibleCount)
   const hasMore = !isSearching && total > visibleCount
 
   return (

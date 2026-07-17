@@ -9,14 +9,14 @@ class AuthController {
     try {
       const { firstName, lastName, dni, phone, email, password, address } = req.body
 
-      if (!firstName || !lastName || !dni || !phone || !email || !password || !address) {
-        return res.status(400).json({ message: 'Todos los campos son obligatorios' })
-      }
-
       const { street, number, city, province } = address
       if (!street || !number || !city || !province) {
         return res.status(400).json({ message: 'La dirección está incompleta' })
       }
+
+      const userInactive = await userRepository.findUserInactiveByDni(dni)
+      
+      if(userInactive) return res.status(401).json({ message: 'Fuiste dado de baja. Contacta con el frigorífico' })
 
       if (await userRepository.findByEmail(email)) {
         return res.status(409).json({ message: 'El email ya está registrado' })
@@ -51,8 +51,6 @@ class AuthController {
     try {
       const { email, password } = req.body
 
-      if (!email || !password) return res.status(400).json({ message: 'Todos los campos son obligatorios' })
-
       if (await userRepository.findByEmail(email)) {
         return res.status(409).json({ message: 'El email ya está registrado' })
       }
@@ -69,8 +67,6 @@ class AuthController {
   async registerEmployee(req, res) {
     try {
       const { email, password } = req.body
-
-      if (!email || !password) return res.status(400).json({ message: 'Todos los campos son obligatorios' })
 
       if (await userRepository.findByEmail(email)) {
         return res.status(409).json({ message: 'El email ya está registrado' })
@@ -95,7 +91,10 @@ class AuthController {
       }
 
       const account = await userRepository.findByEmail(email)
+
       if (!account) return res.status(401).json({ message: 'Credenciales inválidas' })
+
+      if (!account.active) return res.status(401).json({ message: 'Fuiste dado de baja, contacta con el frigorífico' })
 
       const passwordMatch = await bcrypt.compare(password, account.password)
       if (!passwordMatch) return res.status(401).json({ message: 'Credenciales inválidas' })

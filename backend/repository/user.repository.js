@@ -44,6 +44,10 @@ class UserRepository {
   async deleteUser(id) {
     return await User.findByIdAndUpdate(id, { active: false }, { returnDocument: 'after' })
   }
+
+  async findUserInactiveByDni(dni) {
+    return await User.findOne({ dni, active: false })
+  }
 }
 
 const userRepository = new UserRepository();
