@@ -14,7 +14,7 @@ const MyOrders = () => {
 
     const interval = setInterval(() => {
       getOrders()
-    }, 15000)
+    }, 10000)
 
     return () => clearInterval(interval)
   }, [])
