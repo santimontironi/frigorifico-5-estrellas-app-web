@@ -1,5 +1,4 @@
 {
-  "installCommand": "npm install && cd ../shared && npm install",
   "rewrites": [
     {
       "source": "/(.*)",
