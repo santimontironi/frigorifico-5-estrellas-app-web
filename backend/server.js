@@ -3,7 +3,7 @@ import {connectDB} from './config/db.config.js'
 
 export const startServer = () => {
     try{
-        connectDB();
+        await connectDB();
         app.listen(process.env.PORT, () => {
             console.log(`Servidor corriendo en el puerto ${process.env.PORT}`);
         });
