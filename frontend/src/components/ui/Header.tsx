@@ -77,8 +77,11 @@ const Header = () => {
 
       <nav className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
 
-        <Link to="/" onClick={close} className="flex items-center">
-          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-30 h-30 object-contain" />
+        <Link to="/" onClick={close} className="flex items-center gap-2.5 min-w-0">
+          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-20 h-20 sm:w-28 sm:h-28 md:w-30 md:h-30 object-contain shrink-0" />
+          <span className="font-mono font-bold uppercase leading-[1.15] tracking-[0.12em] text-white text-xs sm:text-sm md:text-base">
+            Frigorífico<br /><span className="text-[#C9405A] lowercase [text-shadow:0_0_16px_rgba(201,64,90,0.5)]">5 Estrellas</span>
+          </span>
         </Link>
 
         <ul className="hidden md:flex items-center gap-8">
@@ -142,7 +145,7 @@ const Header = () => {
 
       <div className={`md:hidden grid transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
         <div className="overflow-hidden">
-          <div className="px-6 pt-2 pb-6 flex flex-col gap-6 border-t border-[#9B2335]/30">
+          <div className="px-6 pt-8 pb-6 flex flex-col gap-6 border-t border-[#9B2335]/30">
 
             <ul className="flex flex-col gap-5">
               {NAV_LINKS.map(({ label, to }) => (

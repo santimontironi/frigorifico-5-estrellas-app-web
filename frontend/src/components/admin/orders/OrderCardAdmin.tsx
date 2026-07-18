@@ -90,9 +90,9 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
   ].filter(Boolean).join(' · ')
 
   return (
-    <div className="bg-[#120A0C] border border-white/8 rounded-2xl p-6 md:p-7 transition-colors duration-300 hover:border-[#9B2335]/50">
+    <div className="bg-[#160C0F] border border-[#9B2335]/90 rounded-2xl p-5 sm:p-6 md:p-7 shadow-[0_10px_35px_-12px_rgba(0,0,0,0.9)] transition-colors duration-300 hover:border-[#9B2335]/60">
 
-      <div className="flex items-start justify-between gap-4 pb-5 border-b border-white/8">
+      <div className="flex items-start justify-between gap-4 pb-5 border-b border-white/10">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <i className="bi bi-receipt text-[#9B2335] text-sm" aria-hidden="true" />
@@ -107,15 +107,20 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
         </span>
       </div>
 
-      <div className="flex flex-col gap-3 my-4 rounded-xl border border-[#9B2335]/30 bg-[#9B2335]/10 px-5 py-4">
-        <div className="flex items-center gap-2.5">
+      <div className="flex flex-col gap-3 my-4 rounded-xl border border-[#9B2335]/30 bg-[#9B2335]/10 px-4 sm:px-5 py-4">
+        <div className="flex items-center gap-2.5 pb-3 border-b border-[#9B2335]/20">
           <i className="bi bi-person-fill text-[#E0808C] text-xl shrink-0" aria-hidden="true" />
           <span className="text-white text-lg md:text-xl font-bold tracking-tight truncate">{user.firstName} {user.lastName}</span>
         </div>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[#F2EDE6]/90 text-sm font-medium pl-0.5">
-          <span className="flex items-center gap-2"><i className="bi bi-envelope text-[#9B2335]" aria-hidden="true" />{user.email}</span>
-          <span className="flex items-center gap-2">
-            <i className="bi bi-telephone text-[#9B2335]" aria-hidden="true" />{user.phone}
+        <div className="flex flex-col gap-2.5 text-[#F2EDE6]/90 text-sm font-medium">
+          <span className="flex items-start gap-2 min-w-0">
+            <i className="bi bi-envelope text-[#9B2335] shrink-0 mt-0.5" aria-hidden="true" />
+            <span className="min-w-0 break-all">{user.email}</span>
+          </span>
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="flex items-center gap-2">
+              <i className="bi bi-telephone text-[#9B2335] shrink-0" aria-hidden="true" />{user.phone}
+            </span>
             <a
               href={whatsappUrl(user.phone)}
               target="_blank"
@@ -126,45 +131,54 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
               <i className="bi bi-whatsapp text-sm" aria-hidden="true" />
               WhatsApp
             </a>
-          </span>
+          </div>
         </div>
       </div>
 
-      <ul className="divide-y divide-white/5 py-2">
-        {order.items.map((item) => (
-          <li key={item._id} className="flex items-center justify-between gap-4 py-3">
-            <div className="min-w-0">
-              <p className="text-[#F2EDE6] text-base font-semibold truncate">{item.nameSnapshot}</p>
-              <p className="text-white/45 text-xs font-mono mt-0.5">
-                {item.quantity} {unitLabel(item.unitSnapshot)} · {formatPrice(item.priceSnapshot)}
-              </p>
-            </div>
-            <span className="text-[#F2EDE6] text-base font-mono font-bold tabular-nums shrink-0">
-              {formatPrice(item.subtotal)}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-4">
+        <div className="flex items-center gap-2 mb-1">
+          <i className="bi bi-box-seam text-[#9B2335] text-xs" aria-hidden="true" />
+          <span className="text-white/45 text-[11px] uppercase tracking-[0.15em] font-semibold">Productos</span>
+        </div>
+        <ul className="divide-y divide-white/8">
+          {order.items.map((item) => (
+            <li key={item._id} className="flex items-center justify-between gap-4 py-3">
+              <div className="min-w-0">
+                <p className="text-[#F2EDE6] text-base font-semibold truncate">{item.nameSnapshot}</p>
+                <p className="text-white/45 text-xs font-mono mt-0.5">
+                  {item.quantity} {unitLabel(item.unitSnapshot)} · {formatPrice(item.priceSnapshot)}
+                </p>
+              </div>
+              <span className="text-[#F2EDE6] text-base font-mono font-bold tabular-nums shrink-0">
+                {formatPrice(item.subtotal)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      <div className="flex items-start gap-2.5 py-4 border-t border-white/8">
-        <i className="bi bi-geo-alt-fill text-[#9B2335] text-base shrink-0 mt-0.5" aria-hidden="true" />
-        <p className="text-[#F2EDE6]/90 text-sm md:text-base font-medium leading-relaxed">
+      <div className="mt-4 pt-4 border-t border-white/10">
+        <div className="flex items-center gap-2 mb-1.5">
+          <i className="bi bi-geo-alt-fill text-[#9B2335] text-xs" aria-hidden="true" />
+          <span className="text-white/45 text-[11px] uppercase tracking-[0.15em] font-semibold">Entrega</span>
+        </div>
+        <p className="text-[#F2EDE6]/90 text-sm md:text-base font-medium leading-relaxed pl-0.5">
           {addressLine} — {address.city}, {address.province}
         </p>
       </div>
 
       {order.notesUser && (
-        <div className="flex items-start gap-2.5 pb-3">
-          <i className="bi bi-chat-left-text text-white/70 text-sm font-bold shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-white/80 text-xs font-bold leading-relaxed">{order.notesUser}</p>
+        <div className="flex items-start gap-2.5 mt-3 rounded-lg border border-white/10 bg-white/3 px-3.5 py-3">
+          <i className="bi bi-chat-left-text text-white/60 text-sm shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-white/80 text-xs font-medium leading-relaxed">{order.notesUser}</p>
         </div>
       )}
 
-      <div className="flex items-baseline justify-between pt-4 border-t border-white/8">
-        <span className="text-white/60 text-xs uppercase tracking-[0.15em] font-medium">
+      <div className="flex items-center justify-between gap-3 mt-4 rounded-xl border border-[#F7EA79]/25 bg-[#F7EA79]/8 px-4 sm:px-5 py-3.5">
+        <span className="text-[#F7EA79]/80 text-xs uppercase tracking-[0.15em] font-semibold">
           {hasFinal ? 'Total final' : 'Total aproximado'}
         </span>
-        <span className="text-[#F7EA79] text-xl md:text-2xl font-bold font-mono tracking-tight tabular-nums">
+        <span className="text-[#F7EA79] text-xl md:text-2xl font-bold font-mono tracking-tight tabular-nums shrink-0">
           {formatPrice(total)}
         </span>
       </div>

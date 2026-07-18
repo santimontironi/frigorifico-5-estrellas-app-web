@@ -48,6 +48,10 @@ class UserRepository {
   async findUserInactiveByDni(dni) {
     return await User.findOne({ dni, active: false })
   }
+
+  async findUserInactiveByEmail(email) {
+    return await User.findOne({ email, active: false })
+  }
 }
 
 const userRepository = new UserRepository();

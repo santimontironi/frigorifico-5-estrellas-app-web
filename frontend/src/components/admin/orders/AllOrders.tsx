@@ -52,7 +52,7 @@ const AllOrders = () => {
             <p className="text-white/50 text-sm font-mono">No hay pedidos todavía</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 md:gap-8 max-w-8xl">
             {orders.map((order) => (
               <OrderCardAdmin key={order._id} order={order} />
             ))}

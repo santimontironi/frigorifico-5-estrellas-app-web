@@ -2,7 +2,7 @@ const DiagonalLines = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
 
-      <div className="absolute -top-32 -left-24 w-xl h-xl rounded-full bg-[#9B2335]/20 blur-[120px]" />
+      <div className="absolute -top-32 -left-24 w-xl h-xl rounded-full bg-[#9B2335]/20 blur-[55px] md:blur-[120px]" />
 
       <div
         className="absolute inset-0"

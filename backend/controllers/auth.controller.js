@@ -15,8 +15,10 @@ class AuthController {
       }
 
       const userInactive = await userRepository.findUserInactiveByDni(dni)
+
+      const userInactiveByMail = await userRepository.findUserInactiveByEmail(email)
       
-      if(userInactive) return res.status(401).json({ message: 'Fuiste dado de baja. Contacta con el frigorífico' })
+      if(userInactive || userInactiveByMail) return res.status(401).json({ message: 'Fuiste dado de baja. Contacta con el frigorífico' })
 
       if (await userRepository.findByEmail(email)) {
         return res.status(409).json({ message: 'El email ya está registrado' })

@@ -1,7 +1,12 @@
 import DiagonalLines from '../../ui/DiagonalLines'
 import InfoCard from '../../ui/InfoCard'
+import type { viewDashboardAdmin } from '../../../types/general.types'
 
-const WelcomeAdmin = () => {
+type WelcomeAdminProps = {
+  setViewAdmin: (view: viewDashboardAdmin) => void
+}
+
+const WelcomeAdmin = ({ setViewAdmin }: WelcomeAdminProps) => {
   return (
     <div className="w-full min-h-full bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A] flex flex-col relative overflow-hidden">
 
@@ -31,38 +36,43 @@ const WelcomeAdmin = () => {
               icon="bi bi-box-seam"
               title="Productos"
               description="Gestioná el catálogo completo: consultá, agregá, editá y eliminá productos desde esta sección."
+              onClick={() => setViewAdmin('products')}
             />
             <InfoCard
               icon="bi bi-upload"
               title="Importar productos"
               description="Cargá productos en masa desde un archivo Excel estructurado."
+              onClick={() => setViewAdmin('importProducts')}
             />
             <InfoCard
               icon="bi bi-collection"
               title="Categorías"
               description="Administrá las categorías del catálogo: consultá, agregá, editá y eliminá desde esta sección."
+              onClick={() => setViewAdmin('categories')}
             />
             <InfoCard
               icon="bi bi-percent"
               title="Ofertas"
-              description="Vas a poder crear y gestionar descuentos y promociones sobre los productos."
-              comingSoon
+              description="Creá y gestioná descuentos y promociones sobre los productos."
+              onClick={() => setViewAdmin('offers')}
             />
             <InfoCard
               icon="bi bi-receipt"
               title="Pedidos"
-              description="Vas a poder revisar y gestionar los pedidos entrantes desde acá."
-              comingSoon
+              description="Revisá y gestioná los pedidos entrantes desde acá."
+              onClick={() => setViewAdmin('orders')}
             />
             <InfoCard
               icon="bi bi-people"
               title="Administradores"
               description="Consultá, agregá y eliminá las cuentas del equipo con acceso al panel."
+              onClick={() => setViewAdmin('employees')}
             />
             <InfoCard
               icon="bi bi-person-lines-fill"
               title="Clientes"
               description="Consultá los clientes registrados y dá de baja sus cuentas cuando haga falta."
+              onClick={() => setViewAdmin('customers')}
             />
           </div>
         </div>

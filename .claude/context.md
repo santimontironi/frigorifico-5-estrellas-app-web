@@ -29,3 +29,30 @@ preservar el historial ante futuros cambios de precio.
 
 **Stack:** React con TypeScript en el frontend, Tailwind CSS para los estilos, Node.js/Express
 en el backend, MongoDB con Mongoose como base de datos.
+
+## Proxy del frontend (fix de cookies en iPhone/Safari)
+
+El frontend y el backend están desplegados en dominios distintos de Vercel. Safari (iPhone)
+bloquea las **cookies cross-site**, por lo que el login respondía OK pero la cookie de sesión
+no se guardaba y el usuario no quedaba autenticado.
+
+**Solución:** hacer que las llamadas a la API parezcan del **mismo origen** que el frontend,
+usando un proxy vía *rewrites* de Vercel. El navegador cree que la API vive en el propio dominio
+del frontend; Vercel reescribe el request al backend de forma invisible, convirtiendo la
+comunicación en *same-site* y permitiendo que la cookie se acepte.
+
+Tres piezas deben estar alineadas, todas con el prefijo `/api`:
+
+1. **`frontend/.env`** → `VITE_BACKEND_URL=/api` (ruta **relativa**, no una URL absoluta al
+   backend). Así el cliente HTTP del front usa URLs relativas que el proxy puede interceptar.
+2. **`frontend/vercel.json`** → regla de rewrite que intercepta `/api/:path*` y lo redirige al
+   backend real, preservando el path con el wildcard `:path*`:
+   ```json
+   { "source": "/api/:path*", "destination": "https://<backend>.vercel.app/api/:path*" }
+   ```
+   (La segunda rewrite `/(.*) → /index.html` es el fallback de SPA para React Router.)
+3. **Backend** → todas las rutas se sirven bajo el namespace `/api`.
+
+El prefijo `/api` no es mágico ni obligatorio: es simplemente el punto de acuerdo entre las tres
+piezas. Lo importante es que `VITE_BACKEND_URL`, el `source` del rewrite y las rutas del backend
+usen el **mismo** prefijo. Si cambia una, deben cambiar las tres.

@@ -57,7 +57,7 @@ const UserPanel = () => {
         </div>
 
         <main className="flex-1 overflow-auto bg-[#0A0A0A]">
-          {viewUser === 'welcome' && <WelcomeUser name={profile && 'firstName' in profile ? profile.firstName : undefined} />}
+          {viewUser === 'welcome' && <WelcomeUser name={profile && 'firstName' in profile ? profile.firstName : undefined} setViewUser={setViewUser} />}
           {viewUser === 'myProfile' && <MyProfile profile={profile} />}
           {viewUser === 'myOrders' && <MyOrders />}
         </main>

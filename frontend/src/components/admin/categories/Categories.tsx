@@ -26,7 +26,7 @@ const Categories = () => {
           <h2 className="text-white text-2xl md:text-4xl font-bold tracking-tight">Todas las categorías</h2>
         </div>
 
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex flex-col-reverse md:flex-row items-start md:items-center gap-4 shrink-0">
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}

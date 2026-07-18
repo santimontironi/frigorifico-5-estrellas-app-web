@@ -63,7 +63,7 @@ const AdminPanel = () => {
                 </div>
 
                 <main className="flex-1 overflow-auto bg-[#0A0A0A]">
-                    {viewAdmin === 'welcome' && <WelcomeAdmin />}
+                    {viewAdmin === 'welcome' && <WelcomeAdmin setViewAdmin={setViewAdmin} />}
                     {viewAdmin === 'products' && <ProductsAdmin />}
                     {viewAdmin === 'importProducts' && <ImportProducts />}
                     {viewAdmin === 'categories' && <Categories />}

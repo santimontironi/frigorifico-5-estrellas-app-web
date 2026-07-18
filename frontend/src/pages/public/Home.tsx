@@ -47,7 +47,7 @@ const Home = () => {
 
         <DiagonalLines />
 
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-75 h-75 md:w-140 md:h-140 rounded-full bg-[#9B2335]/20 blur-[130px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-75 h-75 md:w-140 md:h-140 rounded-full bg-[#9B2335]/20 blur-[60px] md:blur-[130px] pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 py-20 md:py-28 flex flex-col items-center text-center">
 
@@ -58,9 +58,9 @@ const Home = () => {
           />
 
           <div className="flex items-center justify-center gap-3 mb-6">
-            <span className="h-0.5 w-10 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
-            <span className="text-[#9B2335] text-xs tracking-[0.3em] uppercase font-mono font-semibold">Frigorífico 5 Estrellas</span>
-            <span className="h-0.5 w-10 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
+            <span className="h-0.5 w-8 sm:w-12 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
+            <span className="text-white text-sm md:text-lg tracking-[0.28em] uppercase font-mono font-bold">Frigorífico <span className="text-[#C9405A] lowercase [text-shadow:0_0_20px_rgba(201,64,90,0.55)]">5 Estrellas</span></span>
+            <span className="h-0.5 w-8 sm:w-12 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
           </div>
 
           <h1 className="text-[#F2EDE6] text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-3xl mx-auto">
@@ -90,7 +90,7 @@ const Home = () => {
 
       <OffersHome />
 
-      <div className="scroll-mt-20 max-w-7xl mx-auto px-6 py-12 md:px-10 md:py-16">
+      <div className="scroll-mt-20 max-w-7xl mx-auto px-6 py-12 md:px-10 md:py-16" id="catalogo">
 
         <div className="mb-8 md:mb-12">
           <div className="flex items-center gap-2 mb-3">
@@ -118,7 +118,7 @@ const Home = () => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
               {visibleProducts.map((product) => (
                 <ProductCard
                   key={product._id}

@@ -68,7 +68,7 @@ const MyOrders = () => {
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col gap-6 max-w-3xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-8xl">
             {orders.map((order) => (
               <OrderCard key={order._id} order={order} />
             ))}

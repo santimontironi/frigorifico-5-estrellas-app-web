@@ -38,7 +38,7 @@ const ProductsAdmin = () => {
           <h2 className="text-white text-2xl md:text-4xl font-bold tracking-tight">Todos los productos</h2>
         </div>
 
-        <div className="shrink-0 flex items-center gap-3">
+        <div className="shrink-0 flex flex-col md:flex-row items-center gap-3">
           <div className="flex items-center gap-3 rounded-xl border border-[#9B2335]/30 bg-[#9B2335]/10 px-5 py-3">
             <i className="bi bi-box-seam text-[#E0808C] text-xl" aria-hidden="true" />
             <div className="flex items-baseline gap-1.5">
