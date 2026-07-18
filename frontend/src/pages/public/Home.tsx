@@ -59,7 +59,7 @@ const Home = () => {
 
           <div className="flex items-center justify-center gap-3 mb-6">
             <span className="h-0.5 w-8 sm:w-12 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
-            <span className="text-white text-sm md:text-lg tracking-[0.28em] uppercase font-mono font-bold">Frigorífico <span className="text-[#C9405A] lowercase [text-shadow:0_0_20px_rgba(201,64,90,0.55)]">5 Estrellas</span></span>
+            <span className="text-white text-base sm:text-xl md:text-2xl tracking-[0.15em] sm:tracking-[0.25em] md:tracking-[0.28em] uppercase font-mono font-bold">Frigorífico <span className="text-[#C9405A] lowercase [text-shadow:0_0_20px_rgba(201,64,90,0.55)]">5 Estrellas</span></span>
             <span className="h-0.5 w-8 sm:w-12 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
           </div>
 

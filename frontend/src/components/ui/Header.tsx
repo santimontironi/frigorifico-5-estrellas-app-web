@@ -79,7 +79,7 @@ const Header = () => {
 
         <Link to="/" onClick={close} className="flex items-center gap-2.5 min-w-0">
           <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-20 h-20 sm:w-28 sm:h-28 md:w-30 md:h-30 object-contain shrink-0" />
-          <span className="font-mono font-bold uppercase leading-[1.15] tracking-[0.12em] text-white text-xs sm:text-sm md:text-base">
+          <span className="font-mono font-bold uppercase leading-[1.15] tracking-[0.12em] text-white text-base md:text-lg">
             Frigorífico<br /><span className="text-[#C9405A] lowercase [text-shadow:0_0_16px_rgba(201,64,90,0.5)]">5 Estrellas</span>
           </span>
         </Link>
