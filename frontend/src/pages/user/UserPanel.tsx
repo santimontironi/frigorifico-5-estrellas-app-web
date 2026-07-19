@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import useProfile from "../../hooks/UseProfile"
+import UseUser from "../../hooks/UseUser"
 import type { viewDashboardUser } from "../../types/general.types"
 import SideNavUser from "../../components/user/SideNavUser"
 import WelcomeUser from "../../components/user/WelcomeUser"
@@ -11,13 +11,13 @@ const UserPanel = () => {
   const [viewUser, setViewUser] = useState<viewDashboardUser>('welcome')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const { fetchProfile, loading, profile } = useProfile()
+  const { fetchProfile, loading, profile } = UseUser()
 
   useEffect(() => {
     fetchProfile()
   }, [])
 
-  if (loading) {
+  if (loading.profile) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#F7EA79] border-t-transparent rounded-full animate-spin" />

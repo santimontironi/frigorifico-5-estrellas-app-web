@@ -14,8 +14,8 @@ export const ResetPasswordSchema = z.object({
 });
 
 // PUT /api/profile: body para editar el perfil del usuario.
-// No incluye dni (documento de identidad), email (requiere re-confirmación) ni
-// password (tiene su propio flujo con ResetPasswordSchema).
+// Incluye email (con re-confirmación en el back). No incluye dni (documento de
+// identidad) ni password (tiene su propio flujo con ResetPasswordSchema).
 export const EditProfileSchema = z.object({
   email: z.string().trim().toLowerCase().email("Email inválido"),
   phone: z.string().trim().min(6, "Teléfono inválido"),
@@ -24,4 +24,7 @@ export const EditProfileSchema = z.object({
 
 export const EditProfileResponseSchema = z.object({
   profileEdited: userDashboardResponseSchema,
+  emailChanged: z.boolean(),
+  message: z.string(),
 });
+

@@ -33,11 +33,11 @@ class UserRepository {
     return await User.findByIdAndUpdate(id, { active: false }, { returnDocument: "after" });
   }
 
-  async findConfirmedUser(email){
-    return await User.find({email: email, confirmed: true, active: true})
+  async findConfirmedUser(email) {
+    return await User.find({ email: email, confirmed: true, active: true })
   }
 
-  async findByRole(role){
+  async findByRole(role) {
     return await User.find({ role, active: true }).select('-password').sort({ createdAt: -1 })
   }
 
@@ -51,6 +51,10 @@ class UserRepository {
 
   async findUserInactiveByEmail(email) {
     return await User.findOne({ email, active: false })
+  }
+
+  async updateUser(id, data) {
+    return await User.findByIdAndUpdate(id, data, { returnDocument: 'after' }).select('-password')
   }
 }
 

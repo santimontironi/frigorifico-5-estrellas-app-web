@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import useProfile from "../../hooks/UseProfile"
+import UseUser from "../../hooks/UseUser"
 import UseAuth from "../../hooks/UseAuth"
 import type { viewDashboardAdmin } from "../../types/general.types"
 import SideNavAdmin from "../../components/admin/layout/SideNavAdmin"
@@ -14,7 +14,7 @@ import Customers from "../../components/admin/customers/Customers"
 
 const AdminPanel = () => {
 
-    const { fetchProfile, loading } = useProfile()
+    const { fetchProfile, loading } = UseUser()
     const { isEmployee } = UseAuth()
     // El empleado solo gestiona pedidos, así que arranca directamente en esa vista
     const [viewAdmin, setViewAdmin] = useState<viewDashboardAdmin>(isEmployee ? 'orders' : 'welcome')
@@ -24,7 +24,7 @@ const AdminPanel = () => {
         fetchProfile()
     }, [])
 
-    if (loading) {
+    if (loading.profile) {
         return (
             <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#9B2335] border-t-transparent rounded-full animate-spin" />

@@ -1,7 +1,8 @@
 import api from './api'
-import { authResponseSchema, profileResponseSchema } from '../../../shared/index.js'
+import { authResponseSchema, profileResponseSchema, EditProfileResponseSchema } from '../../../shared/index.js'
 import type { LoginCredentials, UserRegisterCredentials } from '../types/auth.types'
 import type { EmployeeRegisterCredentials } from '../types/admin.types'
+import type { EditProfileCredentials } from '../types/user.types'
 
 export const authMeService = async () => {
   const res = await api.get('/me')
@@ -22,6 +23,13 @@ export const registerEmployeeService = (credentials: EmployeeRegisterCredentials
 export const getProfileService = async () => {
   const res = await api.get('/profile')
   return profileResponseSchema.parse(res.data)
+}
+
+// Va JSON plano (no FormData): el perfil no tiene imagen.
+// Si cambió el email, el back invalida la cookie y responde emailChanged: true.
+export const editProfileService = async (data: EditProfileCredentials) => {
+  const res = await api.put('/profile', data)
+  return EditProfileResponseSchema.parse(res.data)
 }
 
 export const confirmUserService = (token: string) => api.get(`/confirm/${token}`)
