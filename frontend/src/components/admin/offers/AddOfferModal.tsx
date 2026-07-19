@@ -10,7 +10,7 @@ interface AddOfferModalProps {
   open: boolean
   onClose: () => void
 }
-
+const formatPrice = (value: number) => `$${value.toLocaleString('es-AR')}`
 const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
 
   const { createOffer, loading } = useOffer()
@@ -23,7 +23,7 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
     if (open) getProducts()
   }, [open])
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<
     CreateOfferInput, any, CreateOfferCredentials
   >({
     resolver: zodResolver(createOfferSchema),
@@ -32,6 +32,8 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
       newPrice: undefined,
     },
   })
+  const selectedProductId = watch("product")
+  const selectedProduct = products.find((p) => p._id === selectedProductId)
 
   if (!open) return null
 
@@ -127,6 +129,11 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
             </div>
 
             <div className="flex flex-col gap-1.5">
+              {selectedProduct && (
+                <span className="text-[#7A6B63] text-xs ml-1">
+                  Precio actual: {formatPrice(selectedProduct.price)}
+                </span>
+              )}
               <label className="text-[#7A6B63] text-xs font-medium ml-1">Precio de oferta</label>
               <input
                 type="number"
@@ -135,6 +142,7 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
                 className="w-full bg-[#F7F4F1] rounded-xl text-[#1C1714] text-sm px-4 py-3.5 outline-none border-2 border-transparent focus:border-[#9B2335]/30 focus:bg-white transition-all duration-200 placeholder:text-[#B8A898]/60"
                 placeholder="0"
               />
+
               {errors.newPrice && (
                 <span className="text-[#9B2335] text-xs ml-1">{errors.newPrice.message}</span>
               )}
