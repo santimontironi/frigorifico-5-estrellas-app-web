@@ -3,7 +3,8 @@ import Product from "../models/product.model.js";
 class ProductRepository {
   async getAllProducts() {
     const products = await Product.find({ active: true })
-      .sort({ createdAt: -1, updatedAt: -1 })
+      .sort({ name: 1 })
+      .collation({ locale: 'es' })
       .populate({
         path: "category",
         match: { active: true },
