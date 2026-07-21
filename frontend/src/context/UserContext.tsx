@@ -4,7 +4,8 @@ import type { UserLoadingState, EditProfileCredentials, EditProfileResponse } fr
 import type { ProfileResponse } from '../types/auth.types'
 
 import { sendMailChangePassword, changePassword as changePasswordService } from '../services/user.service'
-import { getProfileService, editProfileService } from '../services/auth.service'
+import { getProfileService } from '../services/auth.service'
+import { editProfileService } from '../services/user.service'
 
 interface UserContextType {
   loading: UserLoadingState
@@ -52,9 +53,6 @@ export const UserContextProvider = ({ children }: { children: any }) => {
     }
   }
 
-  // El loading arranca en true en cada llamada, no sólo la primera: como el estado
-  // ahora vive en el provider y sobrevive al desmontaje de los paneles, sin esto
-  // se vería el perfil anterior por un instante al volver a entrar.
   async function fetchProfile() {
     try {
       setLoading(prev => ({ ...prev, profile: true }))
@@ -67,9 +65,6 @@ export const UserContextProvider = ({ children }: { children: any }) => {
     }
   }
 
-  // Pisa el perfil con lo que devuelve el back, así la vista refresca sin volver
-  // a pedirlo. Devuelve la respuesta completa porque el modal necesita saber si
-  // cambió el email para cerrar la sesión.
   async function editProfile(data: EditProfileCredentials) {
     try {
       setLoading(prev => ({ ...prev, editProfile: true }))

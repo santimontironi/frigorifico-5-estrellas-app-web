@@ -4,7 +4,7 @@ import verifyAuth from '../middlewares/verifyAuth.js'
 import { authLimiter } from '../middlewares/rateLimiters.js'
 import { validate } from '../middlewares/validate.js'
 import verifyRole from '../middlewares/verifyRole.js'
-import { loginSchema, userRegisterSchema, adminRegisterSchema, EditProfileSchema } from '../../shared/index.js'
+import { loginSchema, userRegisterSchema, adminRegisterSchema } from '../../shared/index.js'
 
 export const router = Router()
 
@@ -16,4 +16,3 @@ router.post('/logout', authController.logout)
 router.get('/confirm/:token', authController.confirmUser)
 router.get('/me', verifyAuth, authController.me)
 router.get('/profile', verifyAuth, authController.profile)
-router.put('/profile', verifyAuth, verifyRole('user'), validate(EditProfileSchema), authController.editProfile)

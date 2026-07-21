@@ -25,8 +25,6 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
   const { register, handleSubmit, formState: { errors } } = useForm<EditProfileCredentials>({
     resolver: zodResolver(EditProfileSchema),
 
-    // floor y apartment son opcionales en el schema: se arrancan en '' para que
-    // el back reciba siempre la dirección completa y no quede un piso viejo colgado.
     defaultValues: {
       email: profile.email,
       phone: profile.phone,
@@ -59,12 +57,10 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
     }
   }
 
-  // Limpia el estado de auth del front (la cookie ya no existe) y sale al login.
   async function handleGoToLogin() {
     try {
       await logout()
     } catch {
-      // Si el logout falla no importa: la cookie ya fue invalidada por el back.
     }
     navigate('/ingreso')
   }
@@ -79,13 +75,12 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop */}
+
       <div
         className="absolute inset-0 bg-[#0F0507]/70 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Card */}
       <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] animate-[fadeIn_0.2s_ease-out]">
 
         <button
@@ -140,7 +135,6 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
                 </div>
               )}
 
-              {/* Datos de contacto */}
               <div className="flex flex-col gap-1.5">
                 <label className={labelClass}>Email</label>
                 <input
