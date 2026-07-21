@@ -33,7 +33,7 @@ const AdminPanel = () => {
     }
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen panel-bg">
 
             {sidebarOpen && (
                 <div
@@ -62,7 +62,7 @@ const AdminPanel = () => {
                     <span className="text-white/80 text-sm font-medium tracking-wide">Panel admin</span>
                 </div>
 
-                <main className="flex-1 overflow-auto bg-[#0A0A0A]">
+                <main className="flex-1 overflow-auto">
                     {viewAdmin === 'welcome' && <WelcomeAdmin setViewAdmin={setViewAdmin} />}
                     {viewAdmin === 'products' && <ProductsAdmin />}
                     {viewAdmin === 'importProducts' && <ImportProducts />}

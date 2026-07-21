@@ -38,7 +38,7 @@ const ImportProducts = () => {
   }
 
   return (
-    <div className="w-full min-h-full bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A] flex flex-col relative overflow-hidden">
+    <div className="w-full min-h-full bg-linear-to-br from-[#1C0A0E]/75 via-[#0F0507]/70 to-[#0A0A0A]/75 flex flex-col relative overflow-hidden">
 
       <DiagonalLines />
 

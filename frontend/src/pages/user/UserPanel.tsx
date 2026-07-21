@@ -26,7 +26,7 @@ const UserPanel = () => {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen panel-bg">
 
       {sidebarOpen && (
         <div
@@ -56,7 +56,7 @@ const UserPanel = () => {
           <span className="text-white/80 text-sm font-medium tracking-wide">Mi cuenta</span>
         </div>
 
-        <main className="flex-1 overflow-auto bg-[#0A0A0A]">
+        <main className="flex-1 overflow-auto">
           {viewUser === 'welcome' && <WelcomeUser name={profile && 'firstName' in profile ? profile.firstName : undefined} setViewUser={setViewUser} />}
           {viewUser === 'myProfile' && <MyProfile profile={profile} />}
           {viewUser === 'myOrders' && <MyOrders />}
