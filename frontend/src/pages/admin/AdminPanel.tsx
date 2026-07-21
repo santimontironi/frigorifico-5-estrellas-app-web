@@ -16,7 +16,7 @@ const AdminPanel = () => {
 
     const { fetchProfile, loading } = UseUser()
     const { isEmployee } = UseAuth()
-    // El empleado solo gestiona pedidos, así que arranca directamente en esa vista
+    
     const [viewAdmin, setViewAdmin] = useState<viewDashboardAdmin>(isEmployee ? 'orders' : 'welcome')
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
