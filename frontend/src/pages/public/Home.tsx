@@ -6,6 +6,7 @@ import DiagonalLines from "../../components/ui/DiagonalLines"
 import HeroFeatures from "../../components/ui/HeroFeatures"
 import OffersHome from "../../components/ui/OffersHome"
 import FormSearch from "../../components/ui/FormSearch"
+import ImageCarousel from "../../components/ui/Swiper"
 import UseProducts from "../../hooks/useProducts"
 import useOffer from "../../hooks/useOffer"
 import useCart from "../../hooks/useCart"
@@ -87,6 +88,8 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      <ImageCarousel />
 
       <OffersHome />
 
