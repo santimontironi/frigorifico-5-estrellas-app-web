@@ -143,9 +143,10 @@ const Header = () => {
 
       </nav>
 
-      <div className={`md:hidden grid transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-        <div className="overflow-hidden">
-          <div className="px-6 pt-8 pb-6 flex flex-col gap-6 border-t border-[#9B2335]/30">
+      <div
+        className={`md:hidden absolute top-full inset-x-0 bg-[#121212] border-b border-[#9B2335] shadow-xl shadow-black/40 transition-[opacity,transform] duration-300 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-3 pointer-events-none'}`}
+      >
+          <div className="px-6 pt-8 pb-6 flex flex-col gap-6">
 
             <ul className="flex flex-col gap-5">
               {NAV_LINKS.map(({ label, to }) => (
@@ -178,7 +179,6 @@ const Header = () => {
             )}
 
           </div>
-        </div>
       </div>
 
     </header>
