@@ -64,7 +64,7 @@ const Home = () => {
           </div>
 
           <h1 className="text-[#F2EDE6] text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-3xl mx-auto">
-            Carnes premium, <span className="text-[#C9405A] [text-shadow:0_0_28px_rgba(155,35,53,0.6)]">directo</span> del frigorífico
+            Carnes premium, <span className="text-[#C9405A] [text-shadow:0_0_28px_rgba(155,35,53,0.6)]">directo</span> del frigorífico a tu hogar
           </h1>
 
           <p className="text-[#C9BFB5]/70 text-base md:text-lg mt-6 max-w-xl mx-auto leading-relaxed">
