@@ -14,7 +14,7 @@ const MyProfile = ({ profile }: MyProfileProps) => {
 
   if (!profile || !('firstName' in profile)) {
     return (
-      <div className="w-full min-h-full bg-[#0A0A0A] flex items-center justify-center p-10">
+      <div className="w-full min-h-full flex items-center justify-center p-10">
         <p className="text-white/40 text-sm">No se pudieron cargar tus datos.</p>
       </div>
     )
@@ -34,7 +34,7 @@ const MyProfile = ({ profile }: MyProfileProps) => {
   ].filter(Boolean).join(' · ')
 
   return (
-    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608] via-[#0F0C05] to-[#0A0A0A] flex flex-col relative overflow-hidden">
+    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608]/75 via-[#0F0C05]/70 to-[#0A0A0A]/75 flex flex-col relative overflow-hidden">
 
       <GoldDiagonalLines />
 

@@ -25,7 +25,7 @@ const MyOrders = () => {
   const isEmpty = !loading.get && orders.length === 0
 
   return (
-    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608] via-[#0F0C05] to-[#0A0A0A] flex flex-col relative overflow-hidden">
+    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608]/75 via-[#0F0C05]/70 to-[#0A0A0A]/75 flex flex-col relative overflow-hidden">
 
       <GoldDiagonalLines />
 
