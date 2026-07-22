@@ -18,7 +18,7 @@ export const ResetPasswordSchema = z.object({
 // identidad) ni password (tiene su propio flujo con ResetPasswordSchema).
 export const EditProfileSchema = z.object({
   email: z.string().trim().toLowerCase().email("Email inválido"),
-  phone: z.string().trim().min(6, "Teléfono inválido"),
+  phone: z.string().trim().regex(/^\d{8,15}$/, "Teléfono inválido (solo números, 8 a 15 dígitos)"),
   address: addressSchema,
 });
 

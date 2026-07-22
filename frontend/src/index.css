@@ -8,21 +8,22 @@ body{
     font-family: "Ubuntu", sans-serif;
 }
 
-/* Marca de agua del logo para el fondo de los paneles (admin y usuario).
-   Va en el contenedor raíz (h-screen, sin scroll) para que quede siempre
-   centrado en pantalla; el <main> encima debe ser transparente.
-   El logo va a intensidad plena: quien lo atenúa es el gradiente translúcido
-   de cada vista, que se pinta encima. */
+/* Fondo de los paneles (admin y usuario). En desktop queda sólo el color
+   plano; la marca de agua del logo se muestra únicamente en mobile, chica y
+   muy atenuada (una capa oscura translúcida encima) para que sea apenas un
+   detalle. Va en el contenedor raíz (h-screen, sin scroll) para quedar
+   centrada; el <main> encima debe ser transparente. */
 .panel-bg{
     background-color: #0A0A0A;
-    background-image: url("/images/logo-fondo.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: min(70%, 560px);
 }
 
 @media (max-width: 767px){
     .panel-bg{
-        background-size: min(85%, 320px);
+        background-image:
+            linear-gradient(rgba(10, 10, 10, 0.1), rgba(10, 10, 10, 0.1)),
+            url("/images/logo-fondo.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover, min(60%, 240px);
     }
 }
