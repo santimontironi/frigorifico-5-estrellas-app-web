@@ -16,11 +16,11 @@ const PAGE_SIZE = 12
 const Home = () => {
   const { products, productsFiltered, searchProducts, getProducts, loading } = UseProducts()
   const { addToCart } = useCart()
-
   const { offers } = useOffer()
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [query, setQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   useEffect(() => {
     getProducts()
@@ -30,11 +30,25 @@ const Home = () => {
     searchProducts(query)
   }, [query, products])
 
+  // se arma la lista de categorías únicas a partir de los productos ya cargados (cada producto trae { _id, name })
+  const availableCategories = Array.from(
+    new Map(products.map(product => [product.category._id, product.category])).values()
+  ).sort((a, b) => a.name.localeCompare(b.name, 'es'))
+
+  const handleSelectCategory = (categoryId: string | null) => {
+    setSelectedCategory(categoryId)
+    setVisibleCount(PAGE_SIZE) //se reinicia el "Ver más" al cambiar de categoría
+  }
+
   const isSearching = query.trim().length > 0
 
   const offerProductsIds = new Set(offers.map(offer => offer.product._id)) //se arma un array con los id de los productos de las ofertas
 
-  const catalog = (isSearching ? productsFiltered : products ).filter(product => !offerProductsIds.has(product._id)) //se filtran los productos de las ofertas
+  const catalog = (isSearching ? productsFiltered : products)
+    .filter(product => !offerProductsIds.has(product._id))
+    // el filtro de categoría solo aplica cuando NO se está buscando: el buscador trabaja de forma global
+    .filter(product => isSearching || !selectedCategory || product.category._id === selectedCategory)
+
 
   const total = catalog.length
   const visibleProducts = isSearching ? catalog : catalog.slice(0, visibleCount)
@@ -106,6 +120,32 @@ const Home = () => {
             <FormSearch value={query} onChange={setQuery} />
           </div>
         </div>
+
+        <div className="mt-4 mb-8 md:mb-12 flex flex-wrap gap-2">
+          <button
+            onClick={() => handleSelectCategory(null)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border transition-all duration-200 cursor-pointer ${selectedCategory === null
+              ? "bg-[#9B2335] border-[#9B2335] text-white"
+              : "border-white/15 text-[#C9BFB5] hover:border-[#9B2335]/60"
+              }`}
+          >
+            Todas
+          </button>
+
+          {availableCategories.map((category) => (
+            <button
+              key={category._id}
+              onClick={() => handleSelectCategory(category._id)}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border transition-all duration-200 cursor-pointer ${selectedCategory === category._id
+                ? "bg-[#9B2335] border-[#9B2335] text-white"
+                : "border-white/15 text-[#C9BFB5] hover:border-[#9B2335]/60"
+                }`}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+
 
         {loading.get ? (
           <div className="flex items-center justify-center py-32">
