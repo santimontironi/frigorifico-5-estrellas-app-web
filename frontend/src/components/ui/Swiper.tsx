@@ -7,9 +7,9 @@ import 'swiper/css/pagination'
 // Placeholder: dejá caer las imágenes reales en public/images con estos nombres
 // (o cambialos acá) y el bloque de color de fallback desaparece solo.
 const banners = [
-  { src: '/images/banner1.jpg', alt: 'Banner 1', gradient: 'from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A]' },
+  { src: '/images/banner1.png', alt: 'Banner 1', gradient: 'from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A]' },
   { src: '/images/banner2.jpg', alt: 'Banner 2', gradient: 'from-[#2A0E14] via-[#160709] to-[#0A0A0A]' },
-  { src: '/images/banner3.jpeg', alt: 'Banner 3', gradient: 'from-[#2A0E14] via-[#160709] to-[#0A0A0A]' }
+  { src: '/images/banner3.png', alt: 'Banner 3', gradient: 'from-[#2A0E14] via-[#160709] to-[#0A0A0A]' }
 ]
 
 const ImageCarousel = () => {
@@ -22,7 +22,7 @@ const ImageCarousel = () => {
         modules={[Autoplay, Pagination]}
         slidesPerView={1}
         loop
-        autoplay={{ delay: 2850, disableOnInteraction: false }}
+        autoplay={{ delay: 3000, disableOnInteraction: false }}
         pagination={{ clickable: true }}
         style={{
           '--swiper-pagination-color': '#C9405A',
