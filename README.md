@@ -1,8 +1,8 @@
-# 🚧 Frigorífico 5 Estrellas — Pedidos Online (En desarrollo)
+# 🥩 Frigorífico 5 Estrellas — Pedidos Online
 
-Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes navegan el catálogo, buscan productos, arman su carrito y (próximamente) confirman el pedido para que el administrador lo revise, cargue el monto final tras el pesaje y lo acepte. El pago se realizará online mediante **Mercado Pago Checkout Pro**.
+Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes navegan el catálogo, buscan productos, arman su carrito y confirman el pedido para que el administrador (o un empleado) lo revise, cargue el monto final tras el pesaje y lo pase a preparación. El cliente paga online mediante **Mercado Pago Checkout Pro** y sigue el estado del pedido desde su panel.
 
-> El proyecto está activamente en construcción. El catálogo, la búsqueda, las ofertas, el carrito y el panel de administración ya funcionan de punta a punta; el circuito de pedidos y pagos todavía se está conectando (ver [Estado de implementación](#-estado-de-implementación)).
+> El circuito completo —catálogo, búsqueda, ofertas, carrito, panel de administración, pedidos y pagos con Mercado Pago— está implementado de punta a punta. Ver [Estado de implementación](#-estado-de-implementación).
 
 ---
 
@@ -13,13 +13,17 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 - Precios por kilo o por unidad
 - Sistema de ofertas: el admin marca un producto con precio promocional y se muestra destacado en el home
 - Carrito de compras persistente en `localStorage`, agregable desde el catálogo y desde las ofertas
-- Panel de administración con secciones para productos, categorías, ofertas, empleados y clientes
+- Panel de administración con secciones para productos, categorías, ofertas, empleados, clientes y **pedidos**
 - Importación masiva de productos desde un archivo Excel (crea categorías automáticamente si no existen)
 - Carga de imágenes de productos y ofertas a Cloudinary
 - Autenticación con tres roles (`user`, `admin`, `employee`) y rutas protegidas por rol en el frontend
 - Alta de empleados desde el panel de admin, con vista inicial reducida (los empleados arrancan directo en la vista de pedidos)
 - Baja de clientes y empleados desde el panel de admin
 - Recuperación de contraseña por email y confirmación de cuenta por token
+- **Circuito de pedidos completo:** el cliente confirma la compra, el admin/empleado carga el monto final tras el pesaje y lo pasa a preparación, y el cliente paga
+- **Pago online con Mercado Pago Checkout Pro,** confirmado por webhook (con respaldo al volver del checkout para desarrollo)
+- **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, pago confirmado)
+- Historial de pedidos del usuario con seguimiento de estado
 - Sesión persistente con JWT en cookie httpOnly
 - Validación de datos con schemas de Zod compartidos entre frontend y backend
 
@@ -47,7 +51,7 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 | Subida de archivos | Multer (memoryStorage) | 2.x |
 | Imágenes | Cloudinary | 2.x |
 | Email | Nodemailer | 9.x |
-| Pagos | SDK de Mercado Pago (instalado, integración en curso) | 3.x |
+| Pagos | SDK de Mercado Pago (Checkout Pro) | 3.x |
 
 ---
 
@@ -59,28 +63,29 @@ frigorifico-5-estrellas/
 │   ├── index.js               # Entry point
 │   ├── server.js              # Conexión a BD y app.listen()
 │   ├── app.js                 # Express: middlewares globales + rutas
-│   ├── config/                # cookie.js, db.config.js, mail, cloudinary
-│   ├── models/                # User, Admin, Category, Product, Offer, OrderItem, Order
-│   ├── controllers/           # auth, user, admin, product, category, offer, contact (+ pendiente: order/payment)
-│   ├── repository/            # user, product, category, offer, order (+ pendiente: wiring de order)
-│   ├── routes/                # auth, user, admin, product, category, offer, contact (order.routes.js aún no montado)
-│   └── middlewares/           # verifyAuth.js, verifyRole.js, validate.js (Zod), rateLimiters.js, multer.js
+│   ├── config/                # cookie, db, mail (Nodemailer), cloudinary, mercadopago
+│   ├── models/                # User (roles user/admin/employee), Category, Product, Offer, OrderItem, Order
+│   ├── controllers/           # auth, user, admin, product, category, offer, contact, order
+│   ├── repository/            # user, product, category, offer, order
+│   ├── routes/                # auth, user, admin, product, category, offer, contact, order (todas montadas)
+│   ├── middlewares/           # verifyAuth.js, verifyRole.js, validate.js (Zod), rateLimiters.js, multer.js
+│   └── utils/                 # order.mail.js (mails transaccionales de pedidos)
 │
 ├── shared/                    # Schemas de Zod compartidos entre backend y frontend (standalone)
 │   ├── package.json
 │   ├── index.js               # Re-exporta todos los schemas
-│   └── schemas/                # auth, product, category, offer, contact, etc.
+│   └── schemas/                # auth, admin, user, product, category, offer, order, contact
 │
 └── frontend/
     └── src/
-        ├── context/           # Auth, Admin, User, Product, Category, Offer, Cart (+ pendiente: Order)
-        ├── hooks/              # UseAuth, UseAdmin, UseUser, UseProfile, useProducts, useCategory, useOffer, useCart
+        ├── context/           # Auth, Admin, User, Product, Category, Offer, Cart, Order
+        ├── hooks/              # UseAuth, UseAdmin, UseUser, useProducts, useCategory, useOffer, useCart, useOrder
         ├── pages/
-        │   ├── admin/          # AdminPanel (productos, categorías, ofertas, empleados, clientes)
+        │   ├── admin/          # AdminPanel (productos, categorías, ofertas, empleados, clientes, pedidos)
         │   ├── auth/           # Login, Register, Confirm, ChangePassword
         │   ├── user/           # UserPanel
-        │   └── public/         # Home, Cart, Contact, AboutUs
-        ├── components/         # admin/*, products/*, category/*, user/*, ui/* (Header, FormSearch, OfferCard...)
+        │   └── public/         # Home, Cart, Contact, AboutUs, PaymentSuccess/Failure/Pending
+        ├── components/         # admin/*, products/*, category/*, cart/*, payment/*, user/*, ui/*
         ├── services/           # api.ts (Axios) + servicios por dominio
         └── types/              # tipos TypeScript por dominio
 ```
@@ -126,6 +131,7 @@ MONGO_URL=mongodb://localhost:27017/frigorifico5estrellas
 JWT_SECRET=supersecretkey
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
+BACKEND_URL=                      # URL pública del back para el webhook de MP; vacío en desarrollo
 NODEMAILER_USER=correo@ejemplo.com
 NODEMAILER_PASS=password_de_correo
 MP_ACCESS_TOKEN=TEST-xxxxxxxxxxxxxxxxxxxx
@@ -138,10 +144,10 @@ CLOUDINARY_API_SECRET=
 ### `frontend/.env`
 
 ```env
-VITE_API_URL=http://localhost:3001/api
+VITE_BACKEND_URL=http://localhost:3001/api
 ```
 
-> La variable de Mongo es `MONGO_URL` (no `MONGO_URI`). La URL del frontend desde el backend es `FRONTEND_URL` (no `CLIENT_URL`).
+> La variable de Mongo es `MONGO_URL` (no `MONGO_URI`). La URL del frontend desde el backend es `FRONTEND_URL` (no `CLIENT_URL`). El cliente Axios usa `VITE_BACKEND_URL`. En producción, `VITE_BACKEND_URL=/api` para aprovechar el proxy de Vercel (evita el bloqueo de cookies cross-site en Safari/iPhone). `BACKEND_URL` solo se usa para el `notification_url` del webhook de Mercado Pago.
 
 ---
 
@@ -184,6 +190,7 @@ Base URL: `http://localhost:3001/api`
 | GET | `/profile` | token | Perfil completo del usuario autenticado |
 | POST | `/change-password` | — | Solicita el email de recuperación de contraseña |
 | POST | `/change-password/:token` | — | Confirma el cambio de contraseña |
+| PATCH | `/profile` | user | Edita el perfil del cliente autenticado |
 | GET | `/products` | — | Lista todos los productos |
 | GET | `/products/:id` | — | Detalle de un producto |
 | PATCH | `/products/:id` | admin | Edita un producto (con imagen opcional) |
@@ -199,6 +206,14 @@ Base URL: `http://localhost:3001/api`
 | DELETE | `/admin/customers/:id` | admin | Da de baja a un cliente |
 | GET | `/admin/employees` | admin | Lista los empleados |
 | DELETE | `/admin/employees/:id` | admin | Da de baja a un empleado |
+| POST | `/orders` | user | Crea un pedido desde el carrito |
+| GET | `/orders` | user | Historial de pedidos del usuario |
+| PATCH | `/orders/:id/cancel` | user | Cancela un pedido propio (solo si está pendiente) |
+| GET | `/orders/all` | admin, employee | Lista todos los pedidos |
+| PATCH | `/orders/:id/status` | admin, employee | Cambia el estado del pedido (carga `finalAmount`, rechazo, etc.) |
+| POST | `/orders/:id/pay` | user | Crea la preferencia de Mercado Pago; devuelve `init_point` |
+| POST | `/orders/payment/confirm` | user | Confirma el pago al volver del checkout (respaldo del webhook) |
+| POST | `/orders/payment/webhook` | — | Webhook de Mercado Pago; marca el pedido como pagado |
 | POST | `/contact` | — | Envía un mensaje desde el formulario de contacto |
 
 ---
@@ -214,40 +229,42 @@ Base URL: `http://localhost:3001/api`
 - Sistema de ofertas: alta, listado y baja, con precio promocional aplicado en el home
 - Carrito de compras persistente en `localStorage` (agregar, quitar, actualizar cantidad, vaciar)
 - Búsqueda de productos en tiempo real en el home
-- Panel de administración con secciones de productos, importación, categorías, ofertas, empleados y clientes
+- Panel de administración con secciones de productos, importación, categorías, ofertas, empleados, clientes y pedidos
 - Baja de clientes y empleados desde el panel de admin
 - Subida de imágenes a Cloudinary para productos y ofertas
+- **Flujo de pedidos completo:** creación desde el carrito, cancelación, listado del usuario y gestión de estado por admin/empleado
+- **Pago con Mercado Pago Checkout Pro:** creación de preferencia, webhook de confirmación e idempotencia, con respaldo al volver del checkout (para desarrollo sin URL pública)
+- **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, pago confirmado)
+- Historial de pedidos del usuario con seguimiento de estado y polling
 - Validación con Zod (schemas compartidos en `shared/`) en todos los endpoints que reciben datos
 
-### Pendiente
+### Pendiente / en curso
 
-- Conectar el flujo de pedidos: el modelo `Order`/`OrderItem` y el controller/repository de `order` existen, pero las rutas todavía no están montadas en `app.js`
-- `OrderContext` en el frontend (archivo creado, sin implementar)
-- Botón "Finalizar compra" del carrito (actualmente deshabilitado a la espera del flujo de pedidos)
-- Vista de pedidos en el panel de admin/empleado (placeholder "próximamente")
-- Integración funcional de Mercado Pago Checkout Pro y confirmación de pago por webhook (SDK ya instalado)
-- Historial de pedidos del usuario
+- Pruebas end-to-end del pago real de Mercado Pago en producción (con `BACKEND_URL` pública y webhook efectivo)
+- Ajustes finos de UX en el panel de pedidos
 
 ---
 
-## 💼 Flujo de negocio (objetivo)
+## 💼 Flujo de negocio
 
 ```
 Usuario navega el catálogo sin login
   → Agrega productos al carrito (persistente en localStorage)
   → Inicia sesión (o se registra y confirma su cuenta por email)
-  → Confirma pedido → status: "pending"          ⏳ pendiente de conectar
+  → Confirma pedido → status: "pending"
         ↓
-Admin/empleado revisa el pedido desde su panel    ⏳ pendiente de conectar
+Admin/empleado revisa el pedido desde su panel
   → Rechaza → status: "rejected"
-  → Acepta con monto final (tras el pesaje) → status: "accepted"
+  → Acepta con monto final (tras el pesaje) → status: "in_preparation"
         ↓
-Usuario ve el pedido aceptado y el monto real
-  → Hace clic en "Pagar" → Mercado Pago Checkout Pro   ⏳ pendiente de conectar
+Usuario ve el pedido en preparación y el monto real
+  → Hace clic en "Pagar" → Mercado Pago Checkout Pro
         ↓
-Webhook de MP confirma el pago → status: "paid"
+Webhook de MP (o confirmación del front al volver) → status: "paid"
         ↓
-Admin avanza: "paid" → "in_preparation" → "delivered"
+Admin/empleado marca entregado → status: "delivered"
+
+El usuario puede cancelar su pedido solo mientras está "pending".
 ```
 
 ---
