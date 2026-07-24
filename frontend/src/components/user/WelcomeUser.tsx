@@ -1,13 +1,18 @@
+import { useNavigate } from 'react-router-dom'
 import GoldDiagonalLines from '../ui/GoldDiagonalLines'
 import UserCard from './UserCard'
+import type { viewDashboardUser } from '../../types/general.types'
 
 type WelcomeUserProps = {
   name?: string
+  setViewUser: (view: viewDashboardUser) => void
 }
 
-const WelcomeUser = ({ name }: WelcomeUserProps) => {
+const WelcomeUser = ({ name, setViewUser }: WelcomeUserProps) => {
+  const navigate = useNavigate()
+
   return (
-    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608] via-[#0F0C05] to-[#0A0A0A] flex flex-col relative overflow-hidden">
+    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608]/75 via-[#0F0C05]/70 to-[#0A0A0A]/75 flex flex-col relative overflow-hidden">
 
       <GoldDiagonalLines />
 
@@ -37,27 +42,31 @@ const WelcomeUser = ({ name }: WelcomeUserProps) => {
               icon="bi bi-shop"
               title="Explorá el catálogo"
               description="Navegá los productos filtrados por categoría y descubrí las ofertas vigentes."
+              onClick={() => navigate('/')}
             />
             <UserCard
               icon="bi bi-cart-plus"
               title="Armá tu pedido"
               description="El carrito se arma desde el inicio de la web: agregá productos desde el catálogo y confirmá tu pedido cuando estés listo."
+              onClick={() => navigate('/')}
             />
             <UserCard
               icon="bi bi-bag-check"
               title="Mis pedidos"
               description="Seguí el estado de cada pedido: pendiente, aceptado, en preparación y entregado."
+              onClick={() => setViewUser('myOrders')}
             />
             <UserCard
               icon="bi bi-person"
               title="Mi perfil"
               description="Consultá tus datos personales y tu domicilio de entrega registrados."
+              onClick={() => setViewUser('myProfile')}
             />
             <UserCard
               icon="bi bi-credit-card"
               title="Pagá online"
-              description="Cuando el pedido es aceptado, vas a poder pagarlo con Mercado Pago desde acá."
-              comingSoon
+              description="Cuando tu pedido está en preparación, pagalo con Mercado Pago desde Mis pedidos."
+              onClick={() => setViewUser('myOrders')}
             />
           </div>
         </div>

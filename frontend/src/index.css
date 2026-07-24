@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+html{
+    scroll-behavior: smooth;
+}
+
 body{
     font-family: "Ubuntu", sans-serif;
+}
+
+/* Marca de agua del logo para el fondo de los paneles (admin y usuario).
+   Va en el contenedor raíz (h-screen, sin scroll) para que quede siempre
+   centrado en pantalla; el <main> encima debe ser transparente.
+   El logo va a intensidad plena: quien lo atenúa es el gradiente translúcido
+   de cada vista, que se pinta encima.
+   Solo se muestra en mobile; en desktop el fondo queda liso. */
+.panel-bg{
+    background-color: #0A0A0A;
+}
+
+@media (max-width: 767px){
+    .panel-bg{
+        background-image: url("/images/logo-fondo.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: min(85%, 320px);
+    }
 }

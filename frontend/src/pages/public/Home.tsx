@@ -5,24 +5,58 @@ import Loader from "../../components/ui/Loader"
 import DiagonalLines from "../../components/ui/DiagonalLines"
 import HeroFeatures from "../../components/ui/HeroFeatures"
 import OffersHome from "../../components/ui/OffersHome"
+import FormSearch from "../../components/ui/FormSearch"
+import ImageCarousel from "../../components/ui/Swiper"
 import UseProducts from "../../hooks/useProducts"
+import useOffer from "../../hooks/useOffer"
+import usePhoto from "../../hooks/usePhoto"
 import useCart from "../../hooks/useCart"
 
 const PAGE_SIZE = 12
 
 const Home = () => {
-  const { products, getProducts, loading } = UseProducts()
+  const { products, productsFiltered, searchProducts, getProducts, loading } = UseProducts()
+
+  const { photos } = usePhoto()
+
   const { addToCart } = useCart()
+  const { offers } = useOffer()
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [query, setQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   useEffect(() => {
     getProducts()
   }, [])
 
-  const total = products?.length ?? 0
-  const visibleProducts = products?.slice(0, visibleCount) ?? []
-  const hasMore = total > visibleCount
+  useEffect(() => { //se pone en un useEffect porque puede que se busque algo mientras se cargan los productos o se modifique el array de productos
+    searchProducts(query)
+  }, [query, products])
+
+  // se arma la lista de categorías únicas a partir de los productos ya cargados (cada producto trae { _id, name })
+  const availableCategories = Array.from(
+    new Map(products.map(product => [product.category._id, product.category])).values()
+  ).sort((a, b) => a.name.localeCompare(b.name, 'es'))
+
+  const handleSelectCategory = (categoryId: string | null) => {
+    setSelectedCategory(categoryId)
+    setVisibleCount(PAGE_SIZE) //se reinicia el "Ver más" al cambiar de categoría
+  }
+
+  const isSearching = query.trim().length > 0
+
+  const offerProductsIds = new Set(offers.map(offer => offer.product._id)) //se arma un array con los id de los productos de las ofertas
+
+  const catalog = (isSearching ? productsFiltered : products)
+    .filter(product => !offerProductsIds.has(product._id))
+    // el filtro de categoría solo aplica cuando NO se está buscando: el buscador trabaja de forma global
+    .filter(product => isSearching || !selectedCategory || product.category._id === selectedCategory)
+
+
+  const total = catalog.length
+  const visibleProducts = isSearching ? catalog : catalog.slice(0, visibleCount)
+  const hasMore = !isSearching && total > visibleCount
 
   return (
     <section className="min-h-screen bg-[#0A0A0A]">
@@ -32,7 +66,7 @@ const Home = () => {
 
         <DiagonalLines />
 
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-75 h-75 md:w-140 md:h-140 rounded-full bg-[#9B2335]/20 blur-[130px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-75 h-75 md:w-140 md:h-140 rounded-full bg-[#9B2335]/20 blur-[60px] md:blur-[130px] pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 py-20 md:py-28 flex flex-col items-center text-center">
 
@@ -43,13 +77,13 @@ const Home = () => {
           />
 
           <div className="flex items-center justify-center gap-3 mb-6">
-            <span className="h-0.5 w-10 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
-            <span className="text-[#9B2335] text-xs tracking-[0.3em] uppercase font-mono font-semibold">Frigorífico 5 Estrellas</span>
-            <span className="h-0.5 w-10 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
+            <span className="h-0.5 w-8 sm:w-12 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
+            <span className="text-white text-base sm:text-xl md:text-2xl tracking-[0.15em] sm:tracking-[0.25em] md:tracking-[0.28em] uppercase font-mono font-bold">Frigorífico <span className="text-[#C9405A] lowercase [text-shadow:0_0_20px_rgba(201,64,90,0.55)]">5 Estrellas</span></span>
+            <span className="h-0.5 w-8 sm:w-12 bg-[#9B2335] shadow-[0_0_12px_rgba(155,35,53,0.8)]" />
           </div>
 
           <h1 className="text-[#F2EDE6] text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] max-w-3xl mx-auto">
-            Carnes premium, <span className="text-[#C9405A] [text-shadow:0_0_28px_rgba(155,35,53,0.6)]">directo</span> del frigorífico
+            Carnes premium, <span className="text-[#C9405A] [text-shadow:0_0_28px_rgba(155,35,53,0.6)]">directo</span> del frigorífico a tu hogar
           </h1>
 
           <p className="text-[#C9BFB5]/70 text-base md:text-lg mt-6 max-w-xl mx-auto leading-relaxed">
@@ -73,9 +107,13 @@ const Home = () => {
         </div>
       </div>
 
+      {photos.length > 0 && (
+        <ImageCarousel />
+      )}
+
       <OffersHome />
 
-      <div className="scroll-mt-20 max-w-7xl mx-auto px-6 py-12 md:px-10 md:py-16">
+      <div className="scroll-mt-20 max-w-7xl mx-auto px-6 py-12 md:px-10 md:py-16" id="catalogo">
 
         <div className="mb-8 md:mb-12">
           <div className="flex items-center gap-2 mb-3">
@@ -83,15 +121,52 @@ const Home = () => {
             <span className="text-[#C9BFB5] text-xs tracking-[0.3em] uppercase font-mono">Catálogo</span>
           </div>
           <h2 className="text-[#F2EDE6] text-2xl md:text-3xl font-bold tracking-tight">Nuestros productos</h2>
+
+          <div className="mt-6">
+            <FormSearch value={query} onChange={setQuery} />
+          </div>
+        </div>
+
+        <div className="mt-4 mb-8 md:mb-12 flex flex-wrap gap-2">
+          <button
+            onClick={() => handleSelectCategory(null)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border transition-all duration-200 cursor-pointer ${selectedCategory === null
+              ? "bg-[#9B2335] border-[#9B2335] text-white"
+              : "border-white/15 text-[#C9BFB5] hover:border-[#9B2335]/60"
+              }`}
+          >
+            Todas
+          </button>
+
+          {availableCategories.map((category) => (
+            <button
+              key={category._id}
+              onClick={() => handleSelectCategory(category._id)}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border transition-all duration-200 cursor-pointer ${selectedCategory === category._id
+                ? "bg-[#9B2335] border-[#9B2335] text-white"
+                : "border-white/15 text-[#C9BFB5] hover:border-[#9B2335]/60"
+                }`}
+            >
+              {category.name}
+            </button>
+          ))}
         </div>
 
         {loading.get ? (
           <div className="flex items-center justify-center py-32">
             <Loader />
           </div>
+        ) : isSearching && visibleProducts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <i className="bi bi-search text-[#9B2335]/60 text-4xl mb-4" aria-hidden="true" />
+            <p className="text-[#F2EDE6] text-lg font-semibold">Sin resultados</p>
+            <p className="text-[#C9BFB5]/60 text-sm mt-1">
+              No encontramos productos para "{query}"
+            </p>
+          </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
               {visibleProducts.map((product) => (
                 <ProductCard
                   key={product._id}

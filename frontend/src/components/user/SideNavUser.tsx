@@ -46,18 +46,25 @@ const SideNavUser = ({ profile, viewUser, setViewUser, isOpen, onClose }: sideNa
       ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
     `}>
 
-      <div className="px-6 py-6 border-b border-white/8 flex items-center justify-between">
-        <div>
+      <div className="px-6 py-6 border-b border-white/8">
+        <div className="flex items-center justify-between">
           <p className="text-[#F7EA79] text-xs font-semibold tracking-[0.15em] uppercase">Mi cuenta</p>
-          <h2 className="text-white text-base font-bold tracking-wide mt-0.5">Frigorífico ★</h2>
+          <button
+            onClick={onClose}
+            className="md:hidden text-white/40 hover:text-white transition-colors cursor-pointer"
+            aria-label="Cerrar menú"
+          >
+            <i className="bi bi-x-lg text-lg" />
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="md:hidden text-white/40 hover:text-white transition-colors cursor-pointer"
-          aria-label="Cerrar menú"
-        >
-          <i className="bi bi-x-lg text-lg" />
-        </button>
+
+        {/* Mismo lockup de marca que el Header del home */}
+        <div className="flex items-center gap-2.5 min-w-0 mt-4">
+          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-20 h-20 object-contain shrink-0" />
+          <span className="font-mono font-bold uppercase leading-[1.15] tracking-[0.12em] text-white text-sm">
+            Frigorífico<br /><span className="text-[#C9405A] lowercase [text-shadow:0_0_16px_rgba(201,64,90,0.5)]">5 Estrellas</span>
+          </span>
+        </div>
       </div>
 
       {isUserProfile && (

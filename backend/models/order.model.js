@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'rejected', 'paid', 'in_preparation', 'delivered'],
+    enum: ['pending', 'rejected', 'paid', 'in_preparation', 'delivered', 'canceled'],
     default: 'pending'
   },
 
@@ -31,7 +31,8 @@ const orderSchema = new mongoose.Schema({
     province:  String
   },
 
-  notes:     { type: String, default: '' },
+  notesUser:     { type: String, default: '' },
+  notesAdmin:    { type: String, default: '' }
 },{
   timestamps: true
 })

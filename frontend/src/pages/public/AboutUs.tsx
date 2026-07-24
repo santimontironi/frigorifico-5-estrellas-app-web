@@ -128,7 +128,6 @@ const AboutUs = () => {
         </div>
       </div>
 
-      {/* CTA */}
       <div className="relative overflow-hidden border-t border-white/8 bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A]">
         <DiagonalLines />
 

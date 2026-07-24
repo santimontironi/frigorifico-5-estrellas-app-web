@@ -25,7 +25,6 @@ const ghostBtnClass =
   'hover:border-[#9B2335] hover:text-[#F2EDE6] transition-colors duration-200 ' +
   'disabled:opacity-50 disabled:cursor-not-allowed'
 
-// botón ícono del carrito — misma familia visual que ghostBtnClass, huella cuadrada para el ícono
 const cartBtnClass =
   'relative flex items-center justify-center w-9 h-9 shrink-0 text-[#C9BFB5] ' +
   'border border-[#C9BFB5]/25 hover:border-[#9B2335] hover:text-[#F2EDE6] ' +
@@ -78,8 +77,11 @@ const Header = () => {
 
       <nav className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
 
-        <Link to="/" onClick={close} className="flex items-center">
-          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-30 h-30 object-contain" />
+        <Link to="/" onClick={close} className="flex items-center gap-2.5 min-w-0">
+          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-20 h-20 sm:w-28 sm:h-28 md:w-30 md:h-30 object-contain shrink-0" />
+          <span className="font-mono font-bold uppercase leading-[1.15] tracking-[0.12em] text-white text-base md:text-lg">
+            Frigorífico<br /><span className="text-[#C9405A] lowercase [text-shadow:0_0_16px_rgba(201,64,90,0.5)]">5 Estrellas</span>
+          </span>
         </Link>
 
         <ul className="hidden md:flex items-center gap-8">
@@ -141,9 +143,10 @@ const Header = () => {
 
       </nav>
 
-      <div className={`md:hidden grid transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-        <div className="overflow-hidden">
-          <div className="px-6 pt-2 pb-6 flex flex-col gap-6 border-t border-[#9B2335]/30">
+      <div
+        className={`md:hidden absolute top-full inset-x-0 bg-[#121212] border-b border-[#9B2335] shadow-xl shadow-black/40 transition-[opacity,transform] duration-300 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-3 pointer-events-none'}`}
+      >
+          <div className="px-6 pt-8 pb-6 flex flex-col gap-6">
 
             <ul className="flex flex-col gap-5">
               {NAV_LINKS.map(({ label, to }) => (
@@ -176,7 +179,6 @@ const Header = () => {
             )}
 
           </div>
-        </div>
       </div>
 
     </header>

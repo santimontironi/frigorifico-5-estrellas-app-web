@@ -44,7 +44,7 @@ const EmployeesAdmin = () => {
   }
 
   return (
-    <section className="w-full min-h-full bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A] flex flex-col">
+    <section className="w-full min-h-full bg-linear-to-br from-[#1C0A0E]/75 via-[#0F0507]/70 to-[#0A0A0A]/75 flex flex-col">
       <div className="px-6 py-7 md:px-10 md:py-9 border-b border-white/8 flex items-end justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-2 mb-4">

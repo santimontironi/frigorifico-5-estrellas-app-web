@@ -8,25 +8,14 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ["user", "admin", "employee"], default: "user" },
 
   // Comunes a user y admin
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-  },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+
   password: { type: String, required: true, min: 8 },
 
-  // Solo para role 'user'
   firstName: { type: String, trim: true, required: onlyUser },
   lastName: { type: String, trim: true, required: onlyUser },
-  dni: {
-    type: String,
-    unique: true,
-    sparse: true,
-    trim: true,
-    required: onlyUser,
-  },
+  dni: { type: String, unique: true, sparse: true, trim: true, required: onlyUser },
+
   phone: { type: String, trim: true, required: onlyUser },
   address: {
     street: { type: String, required: onlyUser },
@@ -40,6 +29,7 @@ const userSchema = new mongoose.Schema({
   confirmed: { type: Boolean, default: false },
   active: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
+  
 });
 
 export default mongoose.model("User", userSchema);

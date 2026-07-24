@@ -1,5 +1,5 @@
-const verifyRole = (role) => (req, res, next) => {
-  if (req.auth?.role !== role) return res.status(403).json({ message: 'Sin permisos' })
+const verifyRole = (...roles) => (req, res, next) => {
+  if (!roles.includes(req.auth?.role)) return res.status(403).json({ message: 'Sin permisos' })
   next()
 }
 

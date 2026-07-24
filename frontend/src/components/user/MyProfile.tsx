@@ -1,6 +1,8 @@
+import { useState } from "react"
 import type { ProfileResponse } from "../../types/auth.types"
 import GoldDiagonalLines from "../ui/GoldDiagonalLines"
 import ProfileField from "./ProfileField"
+import EditProfileModal from "./EditProfileModal"
 
 interface MyProfileProps {
   profile: ProfileResponse | null
@@ -8,9 +10,11 @@ interface MyProfileProps {
 
 const MyProfile = ({ profile }: MyProfileProps) => {
 
+  const [editOpen, setEditOpen] = useState(false)
+
   if (!profile || !('firstName' in profile)) {
     return (
-      <div className="w-full min-h-full bg-[#0A0A0A] flex items-center justify-center p-10">
+      <div className="w-full min-h-full flex items-center justify-center p-10">
         <p className="text-white/40 text-sm">No se pudieron cargar tus datos.</p>
       </div>
     )
@@ -30,7 +34,7 @@ const MyProfile = ({ profile }: MyProfileProps) => {
   ].filter(Boolean).join(' · ')
 
   return (
-    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608] via-[#0F0C05] to-[#0A0A0A] flex flex-col relative overflow-hidden">
+    <div className="w-full min-h-full bg-linear-to-br from-[#1C1608]/75 via-[#0F0C05]/70 to-[#0A0A0A]/75 flex flex-col relative overflow-hidden">
 
       <GoldDiagonalLines />
 
@@ -49,6 +53,15 @@ const MyProfile = ({ profile }: MyProfileProps) => {
             <p className="text-white/50 text-sm truncate">{profile.email}</p>
             <p className="text-white/35 text-xs mt-1">Cliente desde {memberSince}</p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setEditOpen(true)}
+            className="ml-auto shrink-0 flex items-center gap-2 cursor-pointer bg-[#F7EA79]/10 hover:bg-[#F7EA79]/20 border border-[#F7EA79]/30 hover:border-[#F7EA79]/50 text-[#F7EA79] text-xs font-medium tracking-wide px-4 py-2.5 rounded-xl transition-colors duration-200"
+          >
+            <i className="bi bi-pencil-square text-sm" aria-hidden="true" />
+            <span className="hidden sm:inline">Editar datos</span>
+          </button>
         </div>
       </div>
 
@@ -80,6 +93,13 @@ const MyProfile = ({ profile }: MyProfileProps) => {
         </div>
 
       </div>
+
+      {editOpen && (
+        <EditProfileModal
+          profile={profile}
+          onClose={() => setEditOpen(false)}
+        />
+      )}
 
     </div>
   )

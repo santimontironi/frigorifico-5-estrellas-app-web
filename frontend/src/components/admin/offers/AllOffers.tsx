@@ -15,7 +15,7 @@ const AllOffers = () => {
 
   return (
 
-    <section className="w-full min-h-full bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A] flex flex-col">
+    <section className="w-full min-h-full bg-linear-to-br from-[#1C0A0E]/75 via-[#0F0507]/70 to-[#0A0A0A]/75 flex flex-col">
 
       <div className="px-6 py-7 md:px-10 md:py-9 border-b border-white/8 flex items-end justify-between gap-4 flex-wrap">
         <div>
@@ -26,7 +26,7 @@ const AllOffers = () => {
           <h2 className="text-white text-2xl md:text-4xl font-bold tracking-tight">Todas las ofertas</h2>
         </div>
 
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex flex-col-reverse md:flex-row items-start md:items-center gap-4 shrink-0">
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
@@ -59,7 +59,7 @@ const AllOffers = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
             {offers.map((offer) => (
-              <OfferCard key={offer._id} offer={offer} deletable cart={false} />
+              <OfferCard key={offer._id} offer={offer} deletable />
             ))}
           </div>
         )}

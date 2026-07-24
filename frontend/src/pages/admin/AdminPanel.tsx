@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import useProfile from "../../hooks/UseProfile"
+import UseUser from "../../hooks/UseUser"
 import UseAuth from "../../hooks/UseAuth"
 import type { viewDashboardAdmin } from "../../types/general.types"
 import SideNavAdmin from "../../components/admin/layout/SideNavAdmin"
@@ -9,13 +9,15 @@ import ImportProducts from "../../components/admin/products/ImportProducts"
 import Categories from "../../components/admin/categories/Categories"
 import EmployeesAdmin from "../../components/admin/employees/EmployeesAdmin"
 import AllOffers from "../../components/admin/offers/AllOffers"
+import AllOrders from "../../components/admin/orders/AllOrders"
 import Customers from "../../components/admin/customers/Customers"
+import Photos from "../../components/admin/photos/Photos"
 
 const AdminPanel = () => {
 
-    const { fetchProfile, loading } = useProfile()
+    const { fetchProfile, loading } = UseUser()
     const { isEmployee } = UseAuth()
-    // El empleado solo gestiona pedidos, así que arranca directamente en esa vista
+    
     const [viewAdmin, setViewAdmin] = useState<viewDashboardAdmin>(isEmployee ? 'orders' : 'welcome')
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -23,7 +25,7 @@ const AdminPanel = () => {
         fetchProfile()
     }, [])
 
-    if (loading) {
+    if (loading.profile) {
         return (
             <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#9B2335] border-t-transparent rounded-full animate-spin" />
@@ -32,7 +34,7 @@ const AdminPanel = () => {
     }
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen panel-bg">
 
             {sidebarOpen && (
                 <div
@@ -61,13 +63,14 @@ const AdminPanel = () => {
                     <span className="text-white/80 text-sm font-medium tracking-wide">Panel admin</span>
                 </div>
 
-                <main className="flex-1 overflow-auto bg-[#0A0A0A]">
-                    {viewAdmin === 'welcome' && <WelcomeAdmin />}
+                <main className="flex-1 overflow-auto">
+                    {viewAdmin === 'welcome' && <WelcomeAdmin setViewAdmin={setViewAdmin} />}
                     {viewAdmin === 'products' && <ProductsAdmin />}
                     {viewAdmin === 'importProducts' && <ImportProducts />}
                     {viewAdmin === 'categories' && <Categories />}
                     {viewAdmin === 'offers' && <AllOffers />}
-                    {viewAdmin === 'orders' && <div className="p-8 text-white/30 text-sm">Pedidos — próximamente</div>}
+                    {viewAdmin === 'photos' && <Photos />}
+                    {viewAdmin === 'orders' && <AllOrders />}
                     {viewAdmin === 'employees' && <EmployeesAdmin />}
                     {viewAdmin === 'customers' && <Customers />}
                 </main>
