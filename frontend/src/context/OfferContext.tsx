@@ -38,9 +38,6 @@ export const OfferContextProvider = ({ children }: any) => {
     try {
       await createOfferService(data)
       await getOffers()
-    } catch (err) {
-      console.error(err)
-      throw err
     } finally {
       setLoading(prev => ({ ...prev, create: false }))
     }

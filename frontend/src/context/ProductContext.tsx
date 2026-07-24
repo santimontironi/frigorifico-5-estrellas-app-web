@@ -25,9 +25,6 @@ export const ProductContextProvider = ({children}: any) => {
             const res = await getProductsService()
             setProducts(res.products)
         }
-        catch(err){
-            console.error(err)
-        }
         finally{
             setLoading((prev: ProductsLoading) => ({...prev, get: false}))
         }
