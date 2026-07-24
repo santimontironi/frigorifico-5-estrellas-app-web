@@ -5,6 +5,7 @@ import { UserContextProvider } from "./context/UserContext";
 import { ProductContextProvider } from "./context/ProductContext";
 import { CategoryContextProvider } from "./context/CategoryContext";
 import { OfferContextProvider } from "./context/OfferContext";
+import { PhotoContextProvider } from "./context/PhotoContext";
 import { CartContextProvider } from "./context/CartContext";
 import { OrderContextProvider } from "./context/OrderContext";
 import AdminPanel from "./pages/admin/AdminPanel";
@@ -30,8 +31,9 @@ const App = () => {
           <ProductContextProvider>
             <CategoryContextProvider>
               <OfferContextProvider>
-                <CartContextProvider>
-                  <OrderContextProvider>
+                <PhotoContextProvider>
+                  <CartContextProvider>
+                    <OrderContextProvider>
                     <BrowserRouter>
                       <Routes>
                         <Route path="/" element={<Home />} />
@@ -55,8 +57,9 @@ const App = () => {
                         <Route path="/pago/pendiente" element={<PaymentPending />} />
                       </Routes>
                     </BrowserRouter>
-                  </OrderContextProvider>
-                </CartContextProvider>
+                    </OrderContextProvider>
+                  </CartContextProvider>
+                </PhotoContextProvider>
               </OfferContextProvider>
             </CategoryContextProvider>
           </ProductContextProvider>

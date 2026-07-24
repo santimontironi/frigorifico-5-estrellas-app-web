@@ -79,6 +79,7 @@ frigorifico-5-estrellas/
 │   │   ├── category.model.js
 │   │   ├── product.model.js
 │   │   ├── offer.model.js
+│   │   ├── photo.model.js
 │   │   ├── orderItem.model.js
 │   │   └── order.model.js
 │   ├── controllers/
@@ -88,12 +89,14 @@ frigorifico-5-estrellas/
 │   │   ├── product.controller.js  # getAllProducts, getProductById, updateProductById, deleteProductById, importFromExcel
 │   │   ├── category.controller.js # createCategory, getAllCategories, deleteCategoryById
 │   │   ├── offer.controller.js    # createOffer, getAllOffers, deleteOffer
+│   │   ├── photo.controller.js    # createPhoto, getAllPhotos, deletePhoto
 │   │   └── order.controller.js    # createOrder, getUserOrders, cancelOrder, getAllOrders, updateOrderStatus, createPayment, confirmPayment, paymentWebhook
 │   ├── repository/
 │   │   ├── user.repository.js
 │   │   ├── product.repository.js
 │   │   ├── category.repository.js
 │   │   ├── offer.repository.js
+│   │   ├── photo.repository.js
 │   │   └── order.repository.js
 │   ├── routes/
 │   │   ├── auth.routes.js
@@ -102,6 +105,7 @@ frigorifico-5-estrellas/
 │   │   ├── product.routes.js
 │   │   ├── category.routes.js
 │   │   ├── offer.routes.js
+│   │   ├── photo.routes.js
 │   │   ├── contact.routes.js
 │   │   └── order.routes.js
 │   ├── middlewares/
@@ -124,6 +128,7 @@ frigorifico-5-estrellas/
 │       ├── product.schema.js
 │       ├── user.schemas.js
 │       ├── offer.schemas.js
+│       ├── photo.schema.js
 │       └── order.schema.js
 │
 └── frontend/
@@ -140,6 +145,7 @@ frigorifico-5-estrellas/
         │   ├── ProductContext.tsx    # catálogo + filtro por categoría
         │   ├── CategoryContext.tsx   # categorías
         │   ├── OfferContext.tsx      # ofertas
+        │   ├── PhotoContext.tsx      # fotos del carrusel del home
         │   ├── CartContext.tsx       # carrito (memoria + localStorage)
         │   └── OrderContext.tsx      # pedidos: crear, listar, cancelar, pagar, confirmar pago
         ├── hooks/
@@ -149,6 +155,7 @@ frigorifico-5-estrellas/
         │   ├── useProducts.tsx
         │   ├── useCategory.tsx
         │   ├── useOffer.tsx
+        │   ├── usePhoto.tsx
         │   ├── useCart.tsx
         │   └── useOrder.tsx
         ├── pages/
@@ -157,7 +164,7 @@ frigorifico-5-estrellas/
         │   ├── user/         # UserPanel
         │   └── admin/        # AdminPanel
         ├── components/
-        │   ├── admin/        # products, categories, offers, employees, customers, orders, layout
+        │   ├── admin/        # products, categories, offers, photos, employees, customers, orders, layout
         │   ├── auth/         # VerifyAuth
         │   ├── cart/         # CheckoutModal
         │   ├── category/     # CategoryCard
@@ -165,8 +172,8 @@ frigorifico-5-estrellas/
         │   ├── products/     # ProductCard, ProductInCart, Features
         │   ├── user/
         │   └── ui/           # Header, FormSearch, OfferCard, OffersHome, Loader, ImageCarousel, etc.
-        ├── services/         # api.ts (Axios) + auth, user, admin, product, categories, offer, order, contact
-        └── types/            # auth, user, admin, product, category, offer, cart, order, general
+        ├── services/         # api.ts (Axios) + auth, user, admin, product, categories, offer, photo, order, contact
+        └── types/            # auth, user, admin, product, category, offer, photo, cart, order, general
 ```
 
 ---
@@ -256,6 +263,21 @@ frigorifico-5-estrellas/
 
 ---
 
+### Photo
+
+```js
+// models/photo.model.js
+{
+  image:     { type: String, required: true },   // URL de Cloudinary — obligatoria
+  publicId:  { type: String, required: true },   // public_id de Cloudinary (para borrar la imagen)
+  createdAt: { type: Date, default: Date.now }
+}
+```
+
+> Fotos del carrusel del home. A diferencia de otros dominios, la eliminación es física (`findByIdAndDelete`) y además borra la imagen en Cloudinary con `publicId` (`cloudinary.uploader.destroy`) para no dejar archivos huérfanos. Se sirven al carrusel del home (`ImageCarousel`), que cae a un placeholder si no hay ninguna cargada.
+
+---
+
 ### OrderItem
 
 ```js
@@ -330,6 +352,7 @@ app.use('/api', categoryRouter)
 app.use('/api', contactRouter)
 app.use('/api', offerRouter)
 app.use('/api', orderRouter)
+app.use('/api', photoRouter)
 ```
 
 ### Auth
@@ -388,6 +411,14 @@ app.use('/api', orderRouter)
 | POST | `/api/offers` | admin | Crear oferta sobre un producto (imagen opcional) |
 | DELETE | `/api/offers/:id` | admin | Eliminar oferta |
 
+### Fotos (carrusel del home)
+
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| GET | `/api/photos` | — | Listar las fotos del carrusel (orden `createdAt` desc) |
+| POST | `/api/photos` | admin | Subir una foto al carrusel (imagen obligatoria, vía multer/Cloudinary) |
+| DELETE | `/api/photos/:id` | admin | Eliminar una foto (de la BD y de Cloudinary) |
+
 ### Contacto
 
 | Método | Ruta | Auth | Descripción |
@@ -435,7 +466,7 @@ Rate limiting de dos niveles (`express-rate-limit`): `apiLimiter` general aplica
 ### `multer.js`
 
 Dos uploaders sobre `memoryStorage`:
-- `uploadImage` — imágenes de productos y ofertas; el buffer se sube a Cloudinary.
+- `uploadImage` — imágenes de productos, ofertas y fotos del carrusel; el buffer se sube a Cloudinary.
 - `uploadExcel` — archivo `.xlsx` para la importación masiva de productos (se parsea con `xlsx`).
 
 ---
@@ -460,6 +491,7 @@ La validación se centraliza en **schemas de Zod** compartidos entre backend y f
 | `product.schema.js` | `updateProductSchema` y schemas de producto |
 | `category.schema.js` | `createCategorySchema` |
 | `offer.schemas.js` | `createOfferSchema` |
+| `photo.schema.js` | `photoSchema`, `getPhotosResponse`, `createPhotoResponse`, `deletePhotoResponse` |
 | `order.schema.js` | `createOrderSchema`, `updateOrderStatusSchema`, `orderSchema`, `orderAdminSchema`, y responses (`createOrderResponse`, `getOrdersResponse`, `payOrderResponse`, etc.) |
 | `contact.schema.js` | `contactSchema` |
 
@@ -512,6 +544,7 @@ El árbol de providers vive en `App.tsx`. Cada dominio tiene su Context + hook c
 | `ProductContext` | `useProducts` | Catálogo, filtro por categoría, mutaciones para el panel admin |
 | `CategoryContext` | `useCategory` | Categorías |
 | `OfferContext` | `useOffer` | Ofertas |
+| `PhotoContext` | `usePhoto` | Fotos del carrusel del home (listar, subir, eliminar); el `ImageCarousel` las consume |
 | `CartContext` | `useCart` | Carrito en memoria + `localStorage` (agregar, quitar, actualizar cantidad, vaciar) |
 | `OrderContext` | `useOrder` | Pedidos: `getOrders`, `createOrder`, `cancelOrder`, `payOrder`, `confirmPayment`; `loading` granular por operación |
 
@@ -620,7 +653,8 @@ Cada transición dispara un email al cliente (creación, cancelación, cambio de
 - **Snapshot de precios.** Al crear un Order se copia `name`, `price` y `unit` de cada Product en `OrderItem`. El historial no cambia si el admin modifica precios luego.
 - **Snapshot de domicilio.** `deliveryAddress` se copia del perfil del usuario al crear el pedido (dato de confianza resuelto por el back, no viene del body).
 - **Importación de productos.** El Excel se sube con multer y se parsea con `xlsx`; si una categoría del archivo no existe, se crea automáticamente.
-- **Soft delete / baja lógica.** Productos, categorías y ofertas se eliminan (según el controller); clientes y empleados se dan de baja con `active: false`.
+- **Fotos del carrusel.** La imagen es obligatoria al subir (el controller rechaza con `400` si no llega archivo). Al eliminar, se borra de la BD y de Cloudinary. Las gestiona solo el admin; el carrusel del home las lee público y cae a un placeholder si no hay ninguna.
+- **Soft delete / baja lógica.** Productos, categorías y ofertas se eliminan (según el controller); clientes y empleados se dan de baja con `active: false`. Las fotos del carrusel son la excepción: se borran físicamente (incluida la imagen en Cloudinary).
 - **Acceso al catálogo sin login.** Solo se requiere autenticación (y cuenta confirmada) para confirmar un pedido.
 - **`floor` y `apartment` son opcionales.** Tienen `default: ''` en el modelo y el schema.
 
@@ -663,9 +697,10 @@ VITE_BACKEND_URL=http://localhost:3001/api   # en dev; en prod se usa "/api" (pr
 
 **Backend:**
 - Modelo `User` unificado con roles (`user`/`admin`/`employee`), `confirmed` y `active` (baja lógica).
-- Modelos: Category, Product (imagen Cloudinary), Offer (con imagen), OrderItem, Order (estados completos + notas + snapshot MP).
+- Modelos: Category, Product (imagen Cloudinary), Offer (con imagen), Photo (fotos del carrusel), OrderItem, Order (estados completos + notas + snapshot MP).
 - Auth completa: registro cliente con confirmación por email, alta de admin/empleado, login unificado, logout, `me`, `profile`, recuperación de contraseña.
 - CRUD de productos (edición con imagen), importación masiva vía Excel, CRUD de categorías, CRUD de ofertas.
+- Fotos del carrusel del home: subida (imagen obligatoria), listado público y borrado (BD + Cloudinary).
 - Gestión de empleados y clientes (listar + baja lógica).
 - Flujo de pedidos completo: crear, listar (usuario/admin), cancelar, cambiar estado.
 - Pagos con Mercado Pago: creación de Preference, webhook público idempotente y confirmación de respaldo desde el front; mails transaccionales por cada evento del pedido.
@@ -674,10 +709,10 @@ VITE_BACKEND_URL=http://localhost:3001/api   # en dev; en prod se usa "/api" (pr
 - Validación con Zod: schemas compartidos en `shared/` aplicados en todos los endpoints con body.
 
 **Frontend:**
-- Todos los contextos implementados: Auth, Admin, User, Product, Category, Offer, Cart, Order.
+- Todos los contextos implementados: Auth, Admin, User, Product, Category, Offer, Photo, Cart, Order.
 - Hooks consumidores por dominio.
 - Pages: Home (catálogo + búsqueda + ofertas + carrusel), Cart, Contact, AboutUs, Login, Register, Confirm, ChangePassword, UserPanel, AdminPanel, y vistas de resultado de pago (Success/Failure/Pending).
-- Panel admin con secciones: productos, importación, categorías, ofertas, empleados, clientes, pedidos.
+- Panel admin con secciones: productos, importación, categorías, ofertas, fotos del carrusel, empleados, clientes, pedidos.
 - Rutas protegidas por rol con `VerifyAuth` (empleados con vista reducida enfocada en pedidos).
 - Carrito persistente en `localStorage` + checkout que crea el pedido.
 - Servicios Axios por dominio con validación de responses vía Zod.

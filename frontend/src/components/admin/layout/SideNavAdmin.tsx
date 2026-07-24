@@ -16,6 +16,7 @@ const navItems: { label: string; view: viewDashboardAdmin; icon: string }[] = [
   { label: 'Importar productos', view: 'importProducts', icon: 'bi bi-upload' },
   { label: 'Categorías',         view: 'categories',     icon: 'bi bi-collection' },
   { label: 'Ofertas',            view: 'offers',         icon: 'bi bi-percent' },
+  { label: 'Cargar fotos',       view: 'photos',         icon: 'bi bi-images' },
   { label: 'Pedidos',            view: 'orders',         icon: 'bi bi-receipt' },
   { label: 'Ver administradores', view: 'employees',     icon: 'bi bi-people' },
   { label: 'Clientes',            view: 'customers',     icon: 'bi bi-person-lines-fill' },

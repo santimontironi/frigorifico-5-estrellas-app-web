@@ -9,12 +9,16 @@ import FormSearch from "../../components/ui/FormSearch"
 import ImageCarousel from "../../components/ui/Swiper"
 import UseProducts from "../../hooks/useProducts"
 import useOffer from "../../hooks/useOffer"
+import usePhoto from "../../hooks/usePhoto"
 import useCart from "../../hooks/useCart"
 
 const PAGE_SIZE = 12
 
 const Home = () => {
   const { products, productsFiltered, searchProducts, getProducts, loading } = UseProducts()
+
+  const { photos } = usePhoto()
+
   const { addToCart } = useCart()
   const { offers } = useOffer()
 
@@ -103,7 +107,9 @@ const Home = () => {
         </div>
       </div>
 
-      <ImageCarousel />
+      {photos.length > 0 && (
+        <ImageCarousel />
+      )}
 
       <OffersHome />
 
