@@ -2,10 +2,12 @@
 
 html{
     scroll-behavior: smooth;
+    background-color: #0A0A0A;
 }
 
 body{
     font-family: "Ubuntu", sans-serif;
+    background-color: #0A0A0A;
 }
 
 /* Marca de agua del logo para el fondo de los paneles (admin y usuario).
