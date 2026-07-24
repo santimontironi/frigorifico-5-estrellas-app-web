@@ -4,18 +4,22 @@ import { getOrdersService, createOrderService, cancelOrderService, payOrderServi
 
 type OrderContextType = {
   orders: Order[]
+  ordersFiltered: Order[]
   loading: OrdersLoading
   getOrders: () => Promise<void>
   createOrder: (data: CreateOrderInput) => Promise<Order>
   cancelOrder: (id: string) => Promise<void>
   payOrder: (id: string) => Promise<string>
   confirmPayment: (paymentId: string) => Promise<void>
+  getOrdersByStatus: (status: string) => void
 }
 
 export const OrderContext = createContext<OrderContextType | null>(null)
 
 export const OrderContextProvider = ({ children }: any) => {
   const [orders, setOrders] = useState<Order[]>([])
+
+  const [ordersFiltered, setOrdersFiltered] = useState<Order[]>([])
 
   const [loading, setLoading] = useState<OrdersLoading>({
     get: false,
@@ -95,8 +99,13 @@ export const OrderContextProvider = ({ children }: any) => {
     }
   }
 
+  // Filtra los pedidos por estado. "" = todos. Guarda el resultado en ordersFiltered.
+  const getOrdersByStatus = (status: string) => {
+    setOrdersFiltered(status ? orders.filter(order => order.status === status) : orders)
+  }
+
   return (
-    <OrderContext.Provider value={{ orders, loading, getOrders, createOrder, cancelOrder, payOrder, confirmPayment }}>
+    <OrderContext.Provider value={{ orders, ordersFiltered, loading, getOrders, createOrder, cancelOrder, payOrder, confirmPayment, getOrdersByStatus }}>
       {children}
     </OrderContext.Provider>
   )
