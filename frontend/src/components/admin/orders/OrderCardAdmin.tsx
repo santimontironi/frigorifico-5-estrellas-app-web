@@ -18,7 +18,7 @@ const STATUS_CONFIG = {
   rejected:       { label: 'Rechazado',      icon: 'bi-x-circle',        className: 'text-[#C9405A] bg-[#9B2335]/10 border-[#9B2335]/40' },
   paid:           { label: 'Pagado',         icon: 'bi-credit-card',     className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
   in_preparation: { label: 'En preparación', icon: 'bi-box-seam',        className: 'text-[#F0A868] bg-[#F0A868]/10 border-[#F0A868]/30' },
-  delivered:      { label: 'Entregado',      icon: 'bi-bag-check',       className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
+  delivered:      { label: 'Entregado',      icon: 'bi-bag-check',       className: 'text-[#0F2915] bg-[#5CD68A] border-[#5CD68A]' },
   canceled:       { label: 'Cancelado',      icon: 'bi-slash-circle',    className: 'text-white/50 bg-white/5 border-white/15' },
 }
 
@@ -47,8 +47,10 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
 
   // Acciones disponibles según el estado del pedido.
   const isPending = order.status === 'pending'
-  const canDeliver = order.status === 'in_preparation' || order.status === 'paid'
-  const hasActions = isPending || canDeliver
+  // Solo se entrega un pedido ya pagado: el estado "paid" lo pone Mercado Pago.
+  const canDeliver = order.status === 'paid'
+  const isWaitingPayment = order.status === 'in_preparation'
+  const hasActions = isPending || canDeliver || isWaitingPayment
 
   const handlePreparation = async () => {
     try {
@@ -257,6 +259,15 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
                   {loading.updateOrder ? "Rechazando..." : "Confirmar rechazo"}
                 </button>
               </div>
+            </div>
+          )}
+
+          {isWaitingPayment && (
+            <div className="flex items-start gap-2.5 rounded-lg border border-[#F0A868]/25 bg-[#F0A868]/8 px-4 py-3">
+              <i className="bi bi-hourglass-split text-[#F0A868] text-sm shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-white/70 text-xs leading-relaxed">
+                Esperando el pago del cliente. Cuando lo pague vas a poder marcarlo como entregado.
+              </p>
             </div>
           )}
 

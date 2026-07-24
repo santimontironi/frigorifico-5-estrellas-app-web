@@ -53,9 +53,12 @@ class OrderRepository {
     );
   }
 
+  // Marca el pedido como pagado solo si todavía no lo estaba: el webhook de MP y
+  // la confirmación al volver del checkout pueden llegar los dos por el mismo pago.
+  // Si ya estaba pagado devuelve null y el controller no repite el mail.
   async markOrderAsPaid(id, paymentId) {
-    return await Order.findByIdAndUpdate(
-      id,
+    return await Order.findOneAndUpdate(
+      { _id: id, status: { $ne: "paid" } },
       {
         status: "paid",
         "mercadoPagoPayment.paymentId": paymentId,

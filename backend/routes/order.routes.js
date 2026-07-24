@@ -19,5 +19,9 @@ router.patch('/orders/:id/status', verifyAuth, verifyRole('admin', 'employee'), 
 // Pago con Mercado Pago: el cliente genera la preferencia de su pedido.
 router.post('/orders/:id/pay', verifyAuth, verifyRole('user'), orderController.createPayment);
 
+// Confirmación del pago al volver del checkout: el front manda el payment_id
+// que MP deja en la URL de retorno (respaldo del webhook).
+router.post('/orders/payment/confirm', verifyAuth, verifyRole('user'), orderController.confirmPayment);
+
 // Webhook público: Mercado Pago notifica el resultado del pago (sin auth).
 router.post('/orders/payment/webhook', orderController.paymentWebhook);

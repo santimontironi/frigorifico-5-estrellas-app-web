@@ -1,5 +1,5 @@
 import api from "./api"
-import { getOrdersResponse, createOrderResponse, cancelOrderResponse, getAllOrdersResponse, payOrderResponse, updateOrderResponse } from "../../../shared"
+import { getOrdersResponse, createOrderResponse, cancelOrderResponse, getAllOrdersResponse, payOrderResponse, updateOrderResponse, confirmPaymentResponse } from "../../../shared"
 import type { CreateOrderInput, UpdateOrderStatusInput } from "../types/order.types"
 
 export const getOrdersService = async () => {
@@ -30,4 +30,11 @@ export const cancelOrderService = async (id: string) => {
 export const payOrderService = async (id: string) => {
   const res = await api.post(`/orders/${id}/pay`)
   return payOrderResponse.parse(res.data)
+}
+
+// Al volver del checkout de Mercado Pago confirmamos el pago con el payment_id
+// que viene en la URL, para que el pedido pase a "paid" sin depender del webhook.
+export const confirmPaymentService = async (paymentId: string) => {
+  const res = await api.post("/orders/payment/confirm", { paymentId })
+  return confirmPaymentResponse.parse(res.data)
 }

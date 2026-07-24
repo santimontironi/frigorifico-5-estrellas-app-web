@@ -19,8 +19,9 @@ export const createOrderSchema = z.object({
   notesUser: z.string().trim().optional(),
 });
 
+// "paid" no está: ese estado lo pone el pago de Mercado Pago, no el admin.
 export const updateOrderStatusSchema = z.object({
-  status: z.enum(["in_preparation", "rejected", "paid", "delivered"]),
+  status: z.enum(["in_preparation", "rejected", "delivered"]),
   rejectionReason: z.string().trim().optional(),
   finalAmount: z.coerce.number().min(0, "El monto debe ser mayor o igual a 0").optional(),
   notesAdmin: z.string().trim().optional(),
@@ -75,6 +76,10 @@ export const cancelOrderResponse = z.object({
 export const payOrderResponse = z.object({
   init_point: z.string(),
   preferenceId: z.string(),
+});
+
+export const confirmPaymentResponse = z.object({
+  message: z.string(),
 });
 
 export const orderAdminSchema = orderSchema.extend({

@@ -12,7 +12,7 @@ const STATUS_CONFIG = {
   rejected:       { label: 'Rechazado',      icon: 'bi-x-circle',        className: 'text-[#C9405A] bg-[#9B2335]/10 border-[#9B2335]/40' },
   paid:           { label: 'Pagado',         icon: 'bi-credit-card',     className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
   in_preparation: { label: 'En preparación', icon: 'bi-box-seam',        className: 'text-[#F0A868] bg-[#F0A868]/10 border-[#F0A868]/30' },
-  delivered:      { label: 'Entregado',      icon: 'bi-bag-check',       className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
+  delivered:      { label: 'Entregado',      icon: 'bi-bag-check',       className: 'text-[#0F2915] bg-[#5CD68A] border-[#5CD68A]' },
   canceled:       { label: 'Cancelado',      icon: 'bi-slash-circle',    className: 'text-white/50 bg-white/5 border-white/15' },
 }
 
@@ -130,6 +130,24 @@ const OrderCard = ({ order }: OrderCardProps) => {
         <p className="text-white/30 text-[11px] mt-2 text-right">
           Los cortes por kilo se pesan al preparar el pedido. El monto final lo confirma el frigorífico.
         </p>
+      )}
+
+      {order.status === 'paid' && (
+        <div className="flex items-start gap-2.5 bg-[#5CD68A]/8 border border-[#5CD68A]/25 rounded-lg px-4 py-3 mt-4">
+          <i className="bi bi-check-circle text-[#5CD68A] text-sm shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-white/70 text-xs leading-relaxed">
+            Pago confirmado. Estamos coordinando la entrega de tu pedido.
+          </p>
+        </div>
+      )}
+
+      {order.status === 'delivered' && (
+        <div className="flex items-start gap-2.5 bg-[#5CD68A]/8 border border-[#5CD68A]/25 rounded-lg px-4 py-3 mt-4">
+          <i className="bi bi-bag-check text-[#5CD68A] text-sm shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-white/70 text-xs leading-relaxed">
+            Pedido entregado. ¡Gracias por elegirnos!
+          </p>
+        </div>
       )}
 
       {isPayable && (
