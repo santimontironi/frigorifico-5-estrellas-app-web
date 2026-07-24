@@ -162,11 +162,15 @@ class OrderController {
         if (payment.status === "approved" && orderId) {
           const paidOrder = await orderRepository.markOrderAsPaid(orderId, String(paymentId));
 
-          // Aviso de pago al cliente y al frigorífico (no corta el flujo del webhook).
-          try {
-            if (paidOrder?.user) await sendOrderPaidMail(paidOrder.user, paidOrder);
-          } catch (mailError) {
-            console.error("No se pudo enviar el mail de pago:", mailError.message);
+          // Si viene null el pedido ya estaba pagado (lo confirmó el front al volver
+          // del checkout): no repetimos el mail.
+          if (paidOrder) {
+            // Aviso de pago al cliente y al frigorífico (no corta el flujo del webhook).
+            try {
+              if (paidOrder.user) await sendOrderPaidMail(paidOrder.user, paidOrder);
+            } catch (mailError) {
+              console.error("No se pudo enviar el mail de pago:", mailError.message);
+            }
           }
         }
       }
@@ -176,6 +180,53 @@ class OrderController {
     } catch (error) {
       console.error("Error en webhook de Mercado Pago:", error.message);
       return res.sendStatus(200);
+    }
+  }
+
+  // Confirmación del pago al volver del checkout de Mercado Pago.
+  // El webhook necesita que el back tenga URL pública; esta ruta la llama el
+  // front con el payment_id que MP deja en la URL de retorno, así el pedido
+  // queda en "paid" apenas el cliente vuelve (también en desarrollo).
+  async confirmPayment(req, res) {
+    try {
+      const userId = req.auth.id;
+      const { paymentId } = req.body;
+
+      if (!paymentId)
+        return res.status(400).json({ message: "Falta el identificador del pago" });
+
+      // El estado del pago lo resuelve Mercado Pago, no el front.
+      const payment = await new Payment(mercadopago).get({ id: paymentId });
+      const orderId = payment.external_reference;
+
+      if (!orderId)
+        return res.status(400).json({ message: "El pago no corresponde a ningún pedido" });
+
+      const order = await orderRepository.getOrderById(orderId);
+      if (!order) return res.status(404).json({ message: "Pedido no encontrado" });
+
+      // Solo el dueño del pedido puede confirmar su pago.
+      if (order.user.toString() !== userId)
+        return res.status(403).json({ message: "No podés confirmar este pago" });
+
+      if (payment.status !== "approved")
+        return res.status(400).json({ message: "El pago todavía no está aprobado" });
+
+      const paidOrder = await orderRepository.markOrderAsPaid(orderId, String(paymentId));
+
+      // null = ya lo había marcado el webhook: no repetimos el mail.
+      if (!paidOrder)
+        return res.status(200).json({ message: "El pago ya estaba confirmado" });
+
+      try {
+        if (paidOrder.user) await sendOrderPaidMail(paidOrder.user, paidOrder);
+      } catch (mailError) {
+        console.error("No se pudo enviar el mail de pago:", mailError.message);
+      }
+
+      return res.status(200).json({ message: "Pago confirmado correctamente" });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
     }
   }
 
@@ -197,10 +248,11 @@ class OrderController {
       if (!order)
         return res.status(404).json({ message: "Pedido no encontrado" });
 
-      // Transiciones permitidas: el pedido avanza en un orden lógico.
+      // Transiciones permitidas para el admin. "paid" no está: ese estado lo
+      // pone el pago de Mercado Pago, no una acción manual. Por eso solo se
+      // puede marcar como entregado un pedido que ya está pagado.
       const allowedTransitions = {
         pending: ["in_preparation", "rejected"],
-        in_preparation: ["paid", "delivered"],
         paid: ["delivered"],
       };
 

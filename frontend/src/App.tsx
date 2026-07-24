@@ -26,41 +26,41 @@ const App = () => {
   return (
     <AuthContextProvider>
       <AdminContextProvider>
-      <UserContextProvider>
-      <ProductContextProvider>
-        <CategoryContextProvider>
-        <OfferContextProvider>
-        <CartContextProvider>
-        <OrderContextProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/ingreso" element={<Login />} />
-            <Route path="/registro" element={<Register />} />
-            <Route path="/confirmar/:token" element={<Confirm/>} />
-            <Route path="/cambiar-clave/:token" element={<ChangePassword/>} />
-            <Route path="/panel-admin" element={<VerifyAuth roles={['admin', 'employee']}>
-              <AdminPanel />
-            </VerifyAuth>} />
+        <UserContextProvider>
+          <ProductContextProvider>
+            <CategoryContextProvider>
+              <OfferContextProvider>
+                <CartContextProvider>
+                  <OrderContextProvider>
+                    <BrowserRouter>
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/ingreso" element={<Login />} />
+                        <Route path="/registro" element={<Register />} />
+                        <Route path="/confirmar/:token" element={<Confirm />} />
+                        <Route path="/cambiar-clave/:token" element={<ChangePassword />} />
+                        <Route path="/panel-admin" element={<VerifyAuth roles={['admin', 'employee']}>
+                          <AdminPanel />
+                        </VerifyAuth>} />
 
-            <Route path="/panel-usuario" element={<VerifyAuth roles={['user']}>
-              <UserPanel />
-            </VerifyAuth>} />
+                        <Route path="/panel-usuario" element={<VerifyAuth roles={['user']}>
+                          <UserPanel />
+                        </VerifyAuth>} />
 
-            <Route path="/contacto" element={<Contact />} />
-            <Route path="/sobre-nosotros" element={<AboutUs />} />
-            <Route path="/carrito" element={<Cart />} />
-            <Route path="/pago/exito" element={<PaymentSuccess />} />
-            <Route path="/pago/error" element={<PaymentFailure />} />
-            <Route path="/pago/pendiente" element={<PaymentPending />} />
-          </Routes>
-        </BrowserRouter>
-        </OrderContextProvider>
-        </CartContextProvider>
-        </OfferContextProvider>
-        </CategoryContextProvider>
-      </ProductContextProvider>
-      </UserContextProvider>
+                        <Route path="/contacto" element={<Contact />} />
+                        <Route path="/sobre-nosotros" element={<AboutUs />} />
+                        <Route path="/carrito" element={<Cart />} />
+                        <Route path="/pago/exito" element={<PaymentSuccess />} />
+                        <Route path="/pago/error" element={<PaymentFailure />} />
+                        <Route path="/pago/pendiente" element={<PaymentPending />} />
+                      </Routes>
+                    </BrowserRouter>
+                  </OrderContextProvider>
+                </CartContextProvider>
+              </OfferContextProvider>
+            </CategoryContextProvider>
+          </ProductContextProvider>
+        </UserContextProvider>
       </AdminContextProvider>
     </AuthContextProvider>
   )

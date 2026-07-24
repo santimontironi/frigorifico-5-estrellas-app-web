@@ -1,6 +1,6 @@
 import { createContext, useState } from "react"
 import type { Order, OrdersLoading, CreateOrderInput } from "../types/order.types"
-import { getOrdersService, createOrderService, cancelOrderService, payOrderService } from "../services/order.service"
+import { getOrdersService, createOrderService, cancelOrderService, payOrderService, confirmPaymentService } from "../services/order.service"
 
 type OrderContextType = {
   orders: Order[]
@@ -9,6 +9,7 @@ type OrderContextType = {
   createOrder: (data: CreateOrderInput) => Promise<Order>
   cancelOrder: (id: string) => Promise<void>
   payOrder: (id: string) => Promise<string>
+  confirmPayment: (paymentId: string) => Promise<void>
 }
 
 export const OrderContext = createContext<OrderContextType | null>(null)
@@ -21,6 +22,7 @@ export const OrderContextProvider = ({ children }: any) => {
     create: false,
     cancel: false,
     pay: false,
+    confirm: false,
   })
 
   const getOrders = async () => {
@@ -79,8 +81,22 @@ export const OrderContextProvider = ({ children }: any) => {
     }
   }
 
+  const confirmPayment = async (paymentId: string) => {
+    setLoading(prev => ({ ...prev, confirm: true }))
+    try {
+      await confirmPaymentService(paymentId)
+      // Releemos los pedidos para que "Mis pedidos" ya muestre el estado "Pagado".
+      await getOrders()
+    } catch (err) {
+      console.error(err)
+      throw err
+    } finally {
+      setLoading(prev => ({ ...prev, confirm: false }))
+    }
+  }
+
   return (
-    <OrderContext.Provider value={{ orders, loading, getOrders, createOrder, cancelOrder, payOrder }}>
+    <OrderContext.Provider value={{ orders, loading, getOrders, createOrder, cancelOrder, payOrder, confirmPayment }}>
       {children}
     </OrderContext.Provider>
   )

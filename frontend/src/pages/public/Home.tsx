@@ -146,7 +146,6 @@ const Home = () => {
           ))}
         </div>
 
-
         {loading.get ? (
           <div className="flex items-center justify-center py-32">
             <Loader />
