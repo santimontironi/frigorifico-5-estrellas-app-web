@@ -1,20 +1,17 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
-
-// Placeholder: dejá caer las imágenes reales en public/images con estos nombres
-// (o cambialos acá) y el bloque de color de fallback desaparece solo.
-const banners = [
-  { src: '/images/banner1.png', alt: 'Banner 1', gradient: 'from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A]' },
-  { src: '/images/banner2.jpg', alt: 'Banner 2', gradient: 'from-[#2A0E14] via-[#160709] to-[#0A0A0A]' },
-  { src: '/images/banner3.png', alt: 'Banner 3', gradient: 'from-[#2A0E14] via-[#160709] to-[#0A0A0A]' }
-]
+import usePhoto from '../../hooks/usePhoto'
 
 const ImageCarousel = () => {
-  // trackea qué imágenes fallaron (aún no subidas) para mostrar el placeholder
-  const [failed, setFailed] = useState<Record<string, boolean>>({})
+  
+  const { photos, getPhotos } = usePhoto()
+
+  useEffect(() => {
+    getPhotos()
+  }, [])
 
   return (
     <div className="border-b border-white/8">
@@ -31,26 +28,29 @@ const ImageCarousel = () => {
           '--swiper-pagination-bullet-size': '9px',
         } as React.CSSProperties}
       >
-        {banners.map((banner) => (
-          <SwiperSlide key={banner.src}>
-            <div className={`relative h-70 md:h-105 xl:h-140 2xl:h-160 w-full overflow-hidden bg-linear-to-br ${banner.gradient}`}>
-              {failed[banner.src] ? (
-                // Placeholder mientras no exista la imagen real
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
-                  <i className="bi bi-image text-[#9B2335]/50 text-4xl md:text-5xl" aria-hidden="true" />
-                  <span className="text-[#C9BFB5]/50 text-xs tracking-[0.3em] uppercase font-mono">{banner.alt}</span>
-                </div>
-              ) : (
+        {photos.length > 0 ? (
+          photos.map((photo) => (
+            <SwiperSlide key={photo._id}>
+              <div className="relative h-70 md:h-105 xl:h-140 2xl:h-160 w-full overflow-hidden bg-[#0A0A0A]">
                 <img
-                  src={banner.src}
-                  alt={banner.alt}
+                  src={photo.image}
+                  alt="Foto del carrusel"
                   className="h-full w-full object-cover"
-                  onError={() => setFailed((prev) => ({ ...prev, [banner.src]: true }))}
                 />
-              )}
+              </div>
+            </SwiperSlide>
+          ))
+        ) : (
+          // Placeholder mientras el admin no haya subido ninguna foto
+          <SwiperSlide>
+            <div className="relative h-70 md:h-105 xl:h-140 2xl:h-160 w-full overflow-hidden bg-linear-to-br from-[#1C0A0E] via-[#0F0507] to-[#0A0A0A]">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
+                <i className="bi bi-image text-[#9B2335]/50 text-4xl md:text-5xl" aria-hidden="true" />
+                <span className="text-[#C9BFB5]/50 text-xs tracking-[0.3em] uppercase font-mono">Frigorífico 5 Estrellas</span>
+              </div>
             </div>
           </SwiperSlide>
-        ))}
+        )}
       </Swiper>
     </div>
   )

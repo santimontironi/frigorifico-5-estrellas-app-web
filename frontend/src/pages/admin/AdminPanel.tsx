@@ -11,6 +11,7 @@ import EmployeesAdmin from "../../components/admin/employees/EmployeesAdmin"
 import AllOffers from "../../components/admin/offers/AllOffers"
 import AllOrders from "../../components/admin/orders/AllOrders"
 import Customers from "../../components/admin/customers/Customers"
+import Photos from "../../components/admin/photos/Photos"
 
 const AdminPanel = () => {
 
@@ -68,6 +69,7 @@ const AdminPanel = () => {
                     {viewAdmin === 'importProducts' && <ImportProducts />}
                     {viewAdmin === 'categories' && <Categories />}
                     {viewAdmin === 'offers' && <AllOffers />}
+                    {viewAdmin === 'photos' && <Photos />}
                     {viewAdmin === 'orders' && <AllOrders />}
                     {viewAdmin === 'employees' && <EmployeesAdmin />}
                     {viewAdmin === 'customers' && <Customers />}

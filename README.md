@@ -13,9 +13,10 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 - Precios por kilo o por unidad
 - Sistema de ofertas: el admin marca un producto con precio promocional y se muestra destacado en el home
 - Carrito de compras persistente en `localStorage`, agregable desde el catálogo y desde las ofertas
-- Panel de administración con secciones para productos, categorías, ofertas, empleados, clientes y **pedidos**
+- Panel de administración con secciones para productos, categorías, ofertas, **fotos del carrusel**, empleados, clientes y **pedidos**
 - Importación masiva de productos desde un archivo Excel (crea categorías automáticamente si no existen)
 - Carga de imágenes de productos y ofertas a Cloudinary
+- **Fotos del carrusel del home gestionadas desde el panel:** el admin sube y elimina las imágenes que se muestran en el carrusel de la página de inicio
 - Autenticación con tres roles (`user`, `admin`, `employee`) y rutas protegidas por rol en el frontend
 - Alta de empleados desde el panel de admin, con vista inicial reducida (los empleados arrancan directo en la vista de pedidos)
 - Baja de clientes y empleados desde el panel de admin
@@ -64,24 +65,24 @@ frigorifico-5-estrellas/
 │   ├── server.js              # Conexión a BD y app.listen()
 │   ├── app.js                 # Express: middlewares globales + rutas
 │   ├── config/                # cookie, db, mail (Nodemailer), cloudinary, mercadopago
-│   ├── models/                # User (roles user/admin/employee), Category, Product, Offer, OrderItem, Order
-│   ├── controllers/           # auth, user, admin, product, category, offer, contact, order
-│   ├── repository/            # user, product, category, offer, order
-│   ├── routes/                # auth, user, admin, product, category, offer, contact, order (todas montadas)
+│   ├── models/                # User (roles user/admin/employee), Category, Product, Offer, Photo, OrderItem, Order
+│   ├── controllers/           # auth, user, admin, product, category, offer, photo, contact, order
+│   ├── repository/            # user, product, category, offer, photo, order
+│   ├── routes/                # auth, user, admin, product, category, offer, photo, contact, order (todas montadas)
 │   ├── middlewares/           # verifyAuth.js, verifyRole.js, validate.js (Zod), rateLimiters.js, multer.js
 │   └── utils/                 # order.mail.js (mails transaccionales de pedidos)
 │
 ├── shared/                    # Schemas de Zod compartidos entre backend y frontend (standalone)
 │   ├── package.json
 │   ├── index.js               # Re-exporta todos los schemas
-│   └── schemas/                # auth, admin, user, product, category, offer, order, contact
+│   └── schemas/                # auth, admin, user, product, category, offer, photo, order, contact
 │
 └── frontend/
     └── src/
-        ├── context/           # Auth, Admin, User, Product, Category, Offer, Cart, Order
-        ├── hooks/              # UseAuth, UseAdmin, UseUser, useProducts, useCategory, useOffer, useCart, useOrder
+        ├── context/           # Auth, Admin, User, Product, Category, Offer, Photo, Cart, Order
+        ├── hooks/              # UseAuth, UseAdmin, UseUser, useProducts, useCategory, useOffer, usePhoto, useCart, useOrder
         ├── pages/
-        │   ├── admin/          # AdminPanel (productos, categorías, ofertas, empleados, clientes, pedidos)
+        │   ├── admin/          # AdminPanel (productos, categorías, ofertas, fotos, empleados, clientes, pedidos)
         │   ├── auth/           # Login, Register, Confirm, ChangePassword
         │   ├── user/           # UserPanel
         │   └── public/         # Home, Cart, Contact, AboutUs, PaymentSuccess/Failure/Pending
@@ -202,6 +203,9 @@ Base URL: `http://localhost:3001/api`
 | GET | `/offers` | — | Lista las ofertas activas |
 | POST | `/offers` | admin | Crea una oferta sobre un producto (con imagen opcional) |
 | DELETE | `/offers/:id` | admin | Elimina una oferta |
+| GET | `/photos` | — | Lista las fotos del carrusel del home |
+| POST | `/photos` | admin | Sube una foto al carrusel (imagen obligatoria) |
+| DELETE | `/photos/:id` | admin | Elimina una foto del carrusel (también de Cloudinary) |
 | GET | `/admin/customers` | admin | Lista los clientes registrados |
 | DELETE | `/admin/customers/:id` | admin | Da de baja a un cliente |
 | GET | `/admin/employees` | admin | Lista los empleados |
@@ -227,11 +231,12 @@ Base URL: `http://localhost:3001/api`
 - CRUD de productos (con edición de imagen) e importación masiva vía Excel
 - CRUD de categorías, con creación automática al importar productos
 - Sistema de ofertas: alta, listado y baja, con precio promocional aplicado en el home
+- Fotos del carrusel del home: alta y baja desde el panel de admin, servidas al carrusel de la página de inicio
 - Carrito de compras persistente en `localStorage` (agregar, quitar, actualizar cantidad, vaciar)
 - Búsqueda de productos en tiempo real en el home
-- Panel de administración con secciones de productos, importación, categorías, ofertas, empleados, clientes y pedidos
+- Panel de administración con secciones de productos, importación, categorías, ofertas, fotos del carrusel, empleados, clientes y pedidos
 - Baja de clientes y empleados desde el panel de admin
-- Subida de imágenes a Cloudinary para productos y ofertas
+- Subida de imágenes a Cloudinary para productos, ofertas y fotos del carrusel
 - **Flujo de pedidos completo:** creación desde el carrito, cancelación, listado del usuario y gestión de estado por admin/empleado
 - **Pago con Mercado Pago Checkout Pro:** creación de preferencia, webhook de confirmación e idempotencia, con respaldo al volver del checkout (para desarrollo sin URL pública)
 - **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, pago confirmado)
