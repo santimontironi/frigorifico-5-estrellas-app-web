@@ -81,7 +81,7 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] animate-[fadeIn_0.2s_ease-out]">
+      <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] animate-[fadeIn_0.2s_ease-out]">
 
         <button
           type="button"
@@ -135,32 +135,35 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
                 </div>
               )}
 
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Email</label>
-                <input
-                  type="email"
-                  {...register("email")}
-                  className={inputClass}
-                  placeholder="tu@email.com"
-                  autoComplete="email"
-                />
-                <span className="text-[#B8A898] text-xs ml-1">
-                  Si cambiás el email vas a tener que confirmarlo desde tu casilla.
-                </span>
-                {errors.email && <span className={errorClass}>{errors.email.message}</span>}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <label className={labelClass}>Email</label>
+                  <input
+                    type="email"
+                    {...register("email")}
+                    className={inputClass}
+                    placeholder="tu@email.com"
+                    autoComplete="email"
+                  />
+                  {errors.email && <span className={errorClass}>{errors.email.message}</span>}
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className={labelClass}>Teléfono</label>
+                  <input
+                    type="tel"
+                    {...register("phone")}
+                    className={inputClass}
+                    placeholder="1122334455"
+                    autoComplete="tel"
+                  />
+                  {errors.phone && <span className={errorClass}>{errors.phone.message}</span>}
+                </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Teléfono</label>
-                <input
-                  type="tel"
-                  {...register("phone")}
-                  className={inputClass}
-                  placeholder="1122334455"
-                  autoComplete="tel"
-                />
-                {errors.phone && <span className={errorClass}>{errors.phone.message}</span>}
-              </div>
+              <span className="text-[#B8A898] text-xs ml-1 -mt-3">
+                Si cambiás el email vas a tener que confirmarlo desde tu casilla.
+              </span>
 
               <div className="h-px bg-[#E8DFD6] my-1" />
 

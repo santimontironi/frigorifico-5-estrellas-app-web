@@ -88,7 +88,7 @@ const Contact = () => {
                             <ContactItem
                                 icon="bi bi-geo-alt"
                                 label="Ubicación"
-                                value="Argentina"
+                                value="25 de mayo 3721, Ibarlucea, Santa Fe"
                             />
                         </div>
                     </div>

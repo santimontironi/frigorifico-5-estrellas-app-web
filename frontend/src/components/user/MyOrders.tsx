@@ -1,11 +1,23 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import GoldDiagonalLines from "../ui/GoldDiagonalLines"
 import OrderCard from "./OrderCard"
 import useOrder from "../../hooks/useOrder"
 
+// Chips de filtro por estado. "" = todos. Los cancelados no se listan en el back.
+const STATUS_FILTERS = [
+  { value: '',               label: 'Todos',          icon: 'bi-grid' },
+  { value: 'pending',        label: 'Pendientes',     icon: 'bi-hourglass-split' },
+  { value: 'in_preparation', label: 'En preparación', icon: 'bi-box-seam' },
+  { value: 'paid',           label: 'Pagados',        icon: 'bi-credit-card' },
+  { value: 'delivered',      label: 'Entregados',     icon: 'bi-bag-check' },
+  { value: 'rejected',       label: 'Rechazados',     icon: 'bi-x-circle' },
+]
+
 const MyOrders = () => {
-  const { orders, loading, getOrders } = useOrder()
+  const { orders, ordersFiltered, loading, getOrders, getOrdersByStatus } = useOrder()
+
+  const [selectedStatus, setSelectedStatus] = useState('')
 
   useEffect(() => {
     // Fetch inicial + polling: refrescamos los pedidos cada 15s para reflejar
@@ -18,6 +30,12 @@ const MyOrders = () => {
 
     return () => clearInterval(interval)
   }, [])
+
+  // Re-aplica el filtro cada vez que cambian los pedidos (polling) o el estado
+  // elegido, así ordersFiltered nunca queda desactualizado respecto de orders.
+  useEffect(() => {
+    getOrdersByStatus(selectedStatus)
+  }, [orders, selectedStatus])
 
   // Spinner solo en la carga inicial (sin pedidos aún). En los refrescos del
   // polling ya hay lista en pantalla, así que se actualiza sin parpadear.
@@ -68,11 +86,37 @@ const MyOrders = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-8xl">
-            {orders.map((order) => (
-              <OrderCard key={order._id} order={order} />
-            ))}
-          </div>
+          <>
+            <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
+              {STATUS_FILTERS.map((filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  onClick={() => setSelectedStatus(filter.value)}
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide border transition-all duration-200 cursor-pointer ${selectedStatus === filter.value
+                    ? "bg-[#F7EA79] border-[#F7EA79] text-[#0A0A0A]"
+                    : "border-white/15 text-white/60 hover:border-[#F7EA79]/60"
+                    }`}
+                >
+                  <i className={`bi ${filter.icon}`} aria-hidden="true" />
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+
+            {ordersFiltered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-4 py-20 border border-dashed border-white/10 rounded-2xl">
+                <i className="bi bi-bag-x text-white/25 text-4xl" aria-hidden="true" />
+                <p className="text-white/50 text-sm font-mono">No tenés pedidos con este estado</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-8xl">
+                {ordersFiltered.map((order) => (
+                  <OrderCard key={order._id} order={order} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

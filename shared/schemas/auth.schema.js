@@ -4,7 +4,7 @@ import { z } from 'zod'
 // Los campos opcionales (floor/apartment) coinciden con el modelo de Mongoose.
 export const addressSchema = z.object({
   street:    z.string().trim().min(1, 'La calle es obligatoria'),
-  number:    z.string().trim().min(1, 'El número es obligatorio'),
+  number:    z.string().trim().min(1, 'El número es obligatorio').regex(/^\d{1,5}$/, "Teléfono inválido (solo números, 2 a 5 dígitos)"),
   floor:     z.string().trim().optional(),
   apartment: z.string().trim().optional(),
   city:      z.string().trim().min(1, 'La ciudad es obligatoria'),
@@ -22,7 +22,7 @@ export const userRegisterSchema = z.object({
   firstName: z.string().trim().min(2, 'El nombre es obligatorio'),
   lastName:  z.string().trim().min(2, 'El apellido es obligatorio'),
   dni:       z.string().trim().regex(/^\d{7,8}$/, 'DNI inválido (7 u 8 dígitos)'),
-  phone:     z.string().trim().min(6, 'Teléfono inválido'),
+  phone:     z.string().trim().regex(/^\d{8,15}$/, 'Teléfono inválido (solo números, 8 a 15 dígitos)'),
   email:     z.string().trim().toLowerCase().email('Email inválido'),
   password:  z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
   address:   addressSchema,
