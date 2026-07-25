@@ -16,7 +16,7 @@ const whatsappUrl = (phone: string) => {
 const STATUS_CONFIG = {
   pending:        { label: 'Pendiente',      icon: 'bi-hourglass-split', className: 'text-[#F7EA79] bg-[#F7EA79]/10 border-[#F7EA79]/30' },
   rejected:       { label: 'Rechazado',      icon: 'bi-x-circle',        className: 'text-[#C9405A] bg-[#9B2335]/10 border-[#9B2335]/40' },
-  paid:           { label: 'Pagado',         icon: 'bi-credit-card',     className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
+  paid:           { label: 'Pagado',         icon: 'bi-cash-coin',       className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
   in_preparation: { label: 'En preparación', icon: 'bi-box-seam',        className: 'text-[#F0A868] bg-[#F0A868]/10 border-[#F0A868]/30' },
   delivered:      { label: 'Entregado',      icon: 'bi-bag-check',       className: 'text-[#0F2915] bg-[#5CD68A] border-[#5CD68A]' },
   canceled:       { label: 'Cancelado',      icon: 'bi-slash-circle',    className: 'text-white/50 bg-white/5 border-white/15' },
@@ -30,6 +30,7 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
   const { updateOrderStatus, loading } = UseAdmin()
 
   const [finalAmount, setFinalAmount] = useState('')
+  const [deliveryDate, setDeliveryDate] = useState('')
   const [rejecting, setRejecting] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -42,22 +43,41 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
 
   const shortId = order._id.slice(-6).toUpperCase()
 
+  // Fecha mínima del input: hoy (no se agenda una entrega pasada). 'en-CA' da yyyy-mm-dd.
+  const today = new Date().toLocaleDateString('en-CA')
+
+  // La fecha de entrega se guarda sin hora (medianoche UTC): se formatea en UTC
+  // para que no se corra un día según la zona horaria del navegador.
+  const deliveryDateLabel = order.deliveryDate
+    ? new Date(order.deliveryDate).toLocaleDateString('es-AR', {
+      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC',
+    })
+    : null
+
   const hasFinal = order.finalAmount !== null
   const total = hasFinal ? order.finalAmount! : order.approximateTotal
 
   // Acciones disponibles según el estado del pedido.
   const isPending = order.status === 'pending'
-  // Solo se entrega un pedido ya pagado: el estado "paid" lo pone Mercado Pago.
+  // El cobro es en el local: se registra a mano cuando el cliente paga en el mostrador.
+  const canCharge = order.status === 'in_preparation'
+  // Solo se entrega un pedido ya cobrado.
   const canDeliver = order.status === 'paid'
-  const isWaitingPayment = order.status === 'in_preparation'
-  const hasActions = isPending || canDeliver || isWaitingPayment
+  const hasActions = isPending || canCharge || canDeliver
 
   const handlePreparation = async () => {
+    // La fecha de entrega es obligatoria al aceptar: es lo que le avisamos al cliente.
+    if (!deliveryDate) {
+      setErrorMessage("Ingresá la fecha de entrega del pedido.")
+      return
+    }
+
     try {
       setErrorMessage(null)
       await updateOrderStatus(order._id, {
         status: 'in_preparation',
         finalAmount: finalAmount.trim() ? Number(finalAmount) : undefined,
+        deliveryDate,
       })
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message ?? "No pudimos actualizar el pedido. Intentá nuevamente.")
@@ -75,6 +95,15 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
     }
   }
 
+  const handleCharge = async () => {
+    try {
+      setErrorMessage(null)
+      await updateOrderStatus(order._id, { status: 'paid' })
+    } catch (error: any) {
+      setErrorMessage(error.response?.data?.message ?? "No pudimos actualizar el pedido. Intentá nuevamente.")
+    }
+  }
+
   const handleDelivered = async () => {
     try {
       setErrorMessage(null)
@@ -85,6 +114,9 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
   }
 
   const { user, deliveryAddress: address } = order
+
+  // Domicilio registrado por el cliente. Con la modalidad de retiro en el local no se
+  // usa para la entrega, pero se muestra como dato de contacto del pedido.
   const addressLine = [
     `${address.street} ${address.number}`,
     address.floor ? `Piso ${address.floor}` : null,
@@ -115,6 +147,10 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
           <span className="text-white text-lg md:text-xl font-bold tracking-tight truncate">{user.firstName} {user.lastName}</span>
         </div>
         <div className="flex flex-col gap-2.5 text-[#F2EDE6]/90 text-sm font-medium">
+          <span className="flex items-center gap-2">
+            <i className="bi bi-person-vcard text-[#9B2335] shrink-0" aria-hidden="true" />
+            DNI {user.dni ?? '—'}
+          </span>
           <span className="flex items-start gap-2 min-w-0">
             <i className="bi bi-envelope text-[#9B2335] shrink-0 mt-0.5" aria-hidden="true" />
             <span className="min-w-0 break-all">{user.email}</span>
@@ -133,6 +169,10 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
               <i className="bi bi-whatsapp text-sm" aria-hidden="true" />
               WhatsApp
             </a>
+          </div>
+          <div className="flex items-start gap-2 min-w-0 pt-2.5 border-t border-[#9B2335]/20">
+            <i className="bi bi-geo-alt text-[#9B2335] shrink-0 mt-0.5" aria-hidden="true" />
+            <span className="min-w-0">{addressLine} — {address.city}, {address.province}</span>
           </div>
         </div>
       </div>
@@ -161,12 +201,18 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
 
       <div className="mt-4 pt-4 border-t border-white/10">
         <div className="flex items-center gap-2 mb-1.5">
-          <i className="bi bi-geo-alt-fill text-[#9B2335] text-xs" aria-hidden="true" />
-          <span className="text-white/45 text-[11px] uppercase tracking-[0.15em] font-semibold">Entrega</span>
+          <i className="bi bi-shop text-[#9B2335] text-xs" aria-hidden="true" />
+          <span className="text-white/45 text-[11px] uppercase tracking-[0.15em] font-semibold">Modalidad</span>
         </div>
         <p className="text-[#F2EDE6]/90 text-sm md:text-base font-medium leading-relaxed pl-0.5">
-          {addressLine} — {address.city}, {address.province}
+          Pago y retiro en el local
         </p>
+        {deliveryDateLabel && (
+          <p className="flex items-center gap-2 text-[#F7EA79] text-sm md:text-base font-semibold mt-2 pl-0.5">
+            <i className="bi bi-calendar-event shrink-0" aria-hidden="true" />
+            <span className="first-letter:uppercase">Entrega: {deliveryDateLabel}</span>
+          </p>
+        )}
       </div>
 
       {order.notesUser && (
@@ -197,7 +243,7 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
           {isPending && !rejecting && (
             <div className="flex flex-col gap-3">
               <label className="text-white text-xs font-bold">
-                Monto final 
+                Monto final
               </label>
               <input
                 type="number"
@@ -207,6 +253,21 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
                 placeholder="Ingrese el monto final"
                 className="w-full bg-[#0A0A0A] border border-white/75 rounded-xl text-[#F2EDE6] text-sm px-4 py-3 outline-none focus:border-white transition-colors duration-200 placeholder:text-white/75"
               />
+
+              <label className="text-white text-xs font-bold">
+                Fecha de entrega
+              </label>
+              <input
+                type="date"
+                value={deliveryDate}
+                min={today}
+                onChange={(e) => setDeliveryDate(e.target.value)}
+                className="w-full bg-[#0A0A0A] border border-white/75 rounded-xl text-[#F2EDE6] text-sm px-4 py-3 outline-none focus:border-white transition-colors duration-200 [color-scheme:dark]"
+              />
+              <p className="text-white/45 text-[11px]">
+                Se la avisamos al cliente por mail: es el día en que pasa a pagar y retirar el pedido.
+              </p>
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
@@ -262,12 +323,23 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
             </div>
           )}
 
-          {isWaitingPayment && (
-            <div className="flex items-start gap-2.5 rounded-lg border border-[#F0A868]/25 bg-[#F0A868]/8 px-4 py-3">
-              <i className="bi bi-hourglass-split text-[#F0A868] text-sm shrink-0 mt-0.5" aria-hidden="true" />
-              <p className="text-white/70 text-xs leading-relaxed">
-                Esperando el pago del cliente. Cuando lo pague vas a poder marcarlo como entregado.
-              </p>
+          {canCharge && (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-start gap-2.5 rounded-lg border border-[#F0A868]/25 bg-[#F0A868]/8 px-4 py-3">
+                <i className="bi bi-cash-coin text-[#F0A868] text-sm shrink-0 mt-0.5" aria-hidden="true" />
+                <p className="text-white/70 text-xs leading-relaxed">
+                  Registrá el cobro cuando el cliente pague en el local. Después vas a poder marcarlo como entregado.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCharge}
+                disabled={loading.updateOrder}
+                className="flex items-center justify-center gap-2 w-full bg-[#5CD68A] text-[#0F2915] text-sm font-bold tracking-wide px-5 py-3 rounded-xl transition-all duration-200 hover:bg-[#7DE0A3] active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <i className="bi bi-cash-coin" aria-hidden="true" />
+                {loading.updateOrder ? "Registrando..." : "Registrar cobro en el local"}
+              </button>
             </div>
           )}
 

@@ -100,7 +100,7 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
             Editar mis datos
           </h2>
           <p className="text-[#7A6B63] text-sm mt-2 leading-relaxed">
-            Podés actualizar tu email, teléfono y domicilio de entrega.
+            Podés actualizar tu email, teléfono y domicilio.
           </p>
         </div>
 
@@ -168,7 +168,7 @@ const EditProfileModal = ({ profile, onClose }: EditProfileModalProps) => {
               <div className="h-px bg-[#E8DFD6] my-1" />
 
               <p className="text-[#7A6B63] text-xs uppercase tracking-[0.18em] font-medium ml-1">
-                Domicilio de entrega
+                Domicilio
               </p>
 
               <div className="grid grid-cols-3 gap-3">

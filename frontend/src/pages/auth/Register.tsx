@@ -56,7 +56,7 @@ const Register = () => {
 
                     <p className="text-[#C9BFB5]/70 text-base md:text-lg mt-6 max-w-2xl leading-relaxed">
                         Completá tus datos para registrarte. Con tu cuenta vas a poder armar el carrito,
-                        confirmar pedidos y seguir su estado hasta la entrega.
+                        confirmar pedidos y seguir su estado hasta que lo retirás por el local.
                     </p>
                 </div>
             </div>
@@ -180,7 +180,7 @@ const Register = () => {
                             <div>
                                 <div className="flex items-center gap-2 mb-5">
                                     <i className="bi bi-geo-alt text-[#9B2335] text-sm" aria-hidden="true" />
-                                    <span className="text-[#C9BFB5] text-xs tracking-[0.3em] uppercase font-mono">Domicilio de entrega</span>
+                                    <span className="text-[#C9BFB5] text-xs tracking-[0.3em] uppercase font-mono">Domicilio</span>
                                     <span className="flex-1 h-px bg-white/8 ml-2" />
                                 </div>
 

@@ -56,7 +56,7 @@ const MyOrders = () => {
           Tus pedidos
         </h1>
         <p className="text-white/70 text-sm md:text-base max-w-2xl mt-2">
-          Seguí el estado de cada pedido: pendiente, aceptado, en preparación y entregado.
+          Seguí el estado de cada pedido: pendiente, en preparación, pagado y entregado. El pago y el retiro son en el local.
         </p>
       </div>
 

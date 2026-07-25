@@ -83,7 +83,7 @@ const MyProfile = ({ profile }: MyProfileProps) => {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <i className="bi bi-geo-alt text-[#F7EA79] text-sm" aria-hidden="true" />
-            <span className="text-white/70 text-xs uppercase tracking-[0.18em] font-medium">Domicilio de entrega</span>
+            <span className="text-white/70 text-xs uppercase tracking-[0.18em] font-medium">Domicilio</span>
           </div>
           <div className="bg-[#121212] border border-[#F7EA79]/15 rounded-xl p-6 md:p-7 grid grid-cols-1 sm:grid-cols-2 gap-6 shadow-lg shadow-[#F7EA79]/5 transition-colors duration-300 hover:border-[#F7EA79]/30">
             <ProfileField icon="bi bi-house-door" label="Dirección" value={addressLine} />

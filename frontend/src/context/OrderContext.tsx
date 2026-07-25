@@ -1,6 +1,6 @@
 import { createContext, useState } from "react"
 import type { Order, OrdersLoading, CreateOrderInput } from "../types/order.types"
-import { getOrdersService, createOrderService, cancelOrderService, payOrderService, confirmPaymentService } from "../services/order.service"
+import { getOrdersService, createOrderService, cancelOrderService } from "../services/order.service"
 
 type OrderContextType = {
   orders: Order[]
@@ -9,8 +9,6 @@ type OrderContextType = {
   getOrders: () => Promise<void>
   createOrder: (data: CreateOrderInput) => Promise<Order>
   cancelOrder: (id: string) => Promise<void>
-  payOrder: (id: string) => Promise<string>
-  confirmPayment: (paymentId: string) => Promise<void>
   getOrdersByStatus: (status: string) => void
 }
 
@@ -25,8 +23,6 @@ export const OrderContextProvider = ({ children }: any) => {
     get: false,
     create: false,
     cancel: false,
-    pay: false,
-    confirm: false,
   })
 
   const getOrders = async () => {
@@ -71,41 +67,13 @@ export const OrderContextProvider = ({ children }: any) => {
     }
   }
 
-  const payOrder = async (id: string) => {
-    setLoading(prev => ({ ...prev, pay: true }))
-    try {
-      const res = await payOrderService(id)
-      // Devolvemos el init_point para que el componente redirija al checkout de MP.
-      return res.init_point
-    } catch (err) {
-      console.error(err)
-      throw err
-    } finally {
-      setLoading(prev => ({ ...prev, pay: false }))
-    }
-  }
-
-  const confirmPayment = async (paymentId: string) => {
-    setLoading(prev => ({ ...prev, confirm: true }))
-    try {
-      await confirmPaymentService(paymentId)
-      // Releemos los pedidos para que "Mis pedidos" ya muestre el estado "Pagado".
-      await getOrders()
-    } catch (err) {
-      console.error(err)
-      throw err
-    } finally {
-      setLoading(prev => ({ ...prev, confirm: false }))
-    }
-  }
-
   // Filtra los pedidos por estado. "" = todos. Guarda el resultado en ordersFiltered.
   const getOrdersByStatus = (status: string) => {
     setOrdersFiltered(status ? orders.filter(order => order.status === status) : orders)
   }
 
   return (
-    <OrderContext.Provider value={{ orders, ordersFiltered, loading, getOrders, createOrder, cancelOrder, payOrder, confirmPayment, getOrdersByStatus }}>
+    <OrderContext.Provider value={{ orders, ordersFiltered, loading, getOrders, createOrder, cancelOrder, getOrdersByStatus }}>
       {children}
     </OrderContext.Provider>
   )

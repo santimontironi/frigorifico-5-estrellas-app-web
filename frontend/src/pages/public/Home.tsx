@@ -100,7 +100,7 @@ const Home = () => {
 
           <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3 mt-14">
             <HeroFeatures icon="bi-snow" label="Frescura garantizada" />
-            <HeroFeatures icon="bi-truck" label="Envío a domicilio" />
+            <HeroFeatures icon="bi-shop" label="Pago y retiro en el local" />
             <HeroFeatures icon="bi-award" label="Cortes premium" />
             <HeroFeatures icon="bi-cash-coin" label="Precios mayoristas" />
           </div>

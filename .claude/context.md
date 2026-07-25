@@ -13,15 +13,25 @@ Fiambrería, Quesería, Envasados, Envasados al vacío y Varios.
 
 El flujo principal es: el usuario se registra o inicia sesión, navega el catálogo filtrado por
 categoría, agrega productos al carrito y confirma el pedido. El pedido queda en estado `pendiente`
-hasta que el admin lo revisa desde su panel. El admin puede aceptarlo (cargando el monto final
-real tras el pesaje) o rechazarlo. Si se acepta, el cliente recibe la notificación y puede pagar
-desde su panel de pedidos mediante **Mercado Pago Checkout Pro** (redirect). Una vez confirmado el
-pago por webhook de Mercado Pago, el pedido avanza a `pagado` y el admin lo ve reflejado en el
-panel para continuar con `en preparación → entregado`.
+hasta que el admin lo revisa desde su panel. El admin puede aceptarlo —cargando el monto final
+real tras el pesaje y la **fecha de entrega**, con lo que pasa a `en preparación`— o rechazarlo.
+La fecha de entrega es obligatoria al aceptar: se le informa al cliente por mail y la ve en su
+panel de pedidos.
+
+La modalidad vigente es **pago y retiro en el local**: no hay pagos online. El cliente pasa por el
+frigorífico a buscar su pedido y lo abona en el mostrador; el admin/empleado registra el cobro
+desde el panel (`pagado`) y luego lo marca como `entregado`. El domicilio del cliente se sigue
+pidiendo en el registro y se guarda como snapshot en el pedido, pero no se usa para la entrega:
+queda disponible para cuando se habilite el envío a domicilio.
+
+> La integración con **Mercado Pago Checkout Pro** (Preference + webhook + páginas de retorno)
+> estuvo implementada y se retiró a pedido del cliente. Si vuelve el pago online, hay que reponer
+> el SDK, el endpoint de pago, el webhook y las rutas `/pago/*` del frontend.
 
 El flujo de estados completo es:
-`pendiente → aceptado → pagado → en preparación → entregado`
+`pendiente → en preparación → pagado (cobro en el local) → entregado`
 `pendiente → rechazado`
+`pendiente → cancelado` (por el cliente)
 
 Como el precio de los productos **por kilo** es estimado hasta que se pesa, el total del pedido
 se considera aproximado. El precio de cada ítem se guarda como snapshot en el pedido para
