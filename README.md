@@ -1,8 +1,10 @@
 # 🥩 Frigorífico 5 Estrellas — Pedidos Online
 
-Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes navegan el catálogo, buscan productos, arman su carrito y confirman el pedido para que el administrador (o un empleado) lo revise, cargue el monto final tras el pesaje y lo pase a preparación. El cliente paga online mediante **Mercado Pago Checkout Pro** y sigue el estado del pedido desde su panel.
+Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes navegan el catálogo, buscan productos, arman su carrito y confirman el pedido para que el administrador (o un empleado) lo revise, cargue el monto final tras el pesaje y lo pase a preparación. La modalidad vigente es **pago y retiro en el local**: el cliente pasa a buscar su pedido, lo abona en el mostrador y sigue el estado desde su panel.
 
-> El circuito completo —catálogo, búsqueda, ofertas, carrito, panel de administración, pedidos y pagos con Mercado Pago— está implementado de punta a punta. Ver [Estado de implementación](#-estado-de-implementación).
+> El circuito completo —catálogo, búsqueda, ofertas, carrito, panel de administración y pedidos— está implementado de punta a punta. Ver [Estado de implementación](#-estado-de-implementación).
+>
+> **Nota sobre pagos online:** la integración con Mercado Pago Checkout Pro estuvo implementada y se retiró a pedido del cliente, que por el momento cobra únicamente en el local. Los estados del pedido siguen contemplando el cobro (`paid`), pero lo registra el frigorífico a mano desde el panel.
 
 ---
 
@@ -21,9 +23,10 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 - Alta de empleados desde el panel de admin, con vista inicial reducida (los empleados arrancan directo en la vista de pedidos)
 - Baja de clientes y empleados desde el panel de admin
 - Recuperación de contraseña por email y confirmación de cuenta por token
-- **Circuito de pedidos completo:** el cliente confirma la compra, el admin/empleado carga el monto final tras el pesaje y lo pasa a preparación, y el cliente paga
-- **Pago online con Mercado Pago Checkout Pro,** confirmado por webhook (con respaldo al volver del checkout para desarrollo)
-- **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, pago confirmado)
+- **Circuito de pedidos completo:** el cliente confirma la compra, el admin/empleado carga el monto final tras el pesaje **y la fecha de entrega** y lo pasa a preparación, registra el cobro cuando el cliente paga en el local y lo marca como entregado
+- **Fecha de entrega:** obligatoria al aceptar el pedido; se le informa al cliente por mail y la ve en su panel
+- **Pago y retiro en el local:** no hay pagos online; el cobro lo registra el admin/empleado desde el panel de pedidos
+- **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, cobro registrado)
 - Historial de pedidos del usuario con seguimiento de estado
 - Sesión persistente con JWT en cookie httpOnly
 - Validación de datos con schemas de Zod compartidos entre frontend y backend
@@ -52,7 +55,6 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 | Subida de archivos | Multer (memoryStorage) | 2.x |
 | Imágenes | Cloudinary | 2.x |
 | Email | Nodemailer | 9.x |
-| Pagos | SDK de Mercado Pago (Checkout Pro) | 3.x |
 
 ---
 
@@ -64,7 +66,7 @@ frigorifico-5-estrellas/
 │   ├── index.js               # Entry point
 │   ├── server.js              # Conexión a BD y app.listen()
 │   ├── app.js                 # Express: middlewares globales + rutas
-│   ├── config/                # cookie, db, mail (Nodemailer), cloudinary, mercadopago
+│   ├── config/                # cookie, db, mail (Nodemailer), cloudinary
 │   ├── models/                # User (roles user/admin/employee), Category, Product, Offer, Photo, OrderItem, Order
 │   ├── controllers/           # auth, user, admin, product, category, offer, photo, contact, order
 │   ├── repository/            # user, product, category, offer, photo, order
@@ -85,8 +87,8 @@ frigorifico-5-estrellas/
         │   ├── admin/          # AdminPanel (productos, categorías, ofertas, fotos, empleados, clientes, pedidos)
         │   ├── auth/           # Login, Register, Confirm, ChangePassword
         │   ├── user/           # UserPanel
-        │   └── public/         # Home, Cart, Contact, AboutUs, PaymentSuccess/Failure/Pending
-        ├── components/         # admin/*, products/*, category/*, cart/*, payment/*, user/*, ui/*
+        │   └── public/         # Home, Cart, Contact, AboutUs
+        ├── components/         # admin/*, products/*, category/*, cart/*, user/*, ui/*
         ├── services/           # api.ts (Axios) + servicios por dominio
         └── types/              # tipos TypeScript por dominio
 ```
@@ -132,11 +134,8 @@ MONGO_URL=mongodb://localhost:27017/frigorifico5estrellas
 JWT_SECRET=supersecretkey
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
-BACKEND_URL=                      # URL pública del back para el webhook de MP; vacío en desarrollo
 NODEMAILER_USER=correo@ejemplo.com
 NODEMAILER_PASS=password_de_correo
-MP_ACCESS_TOKEN=TEST-xxxxxxxxxxxxxxxxxxxx
-MP_WEBHOOK_SECRET=xxxxxxxxxxxxxxxxxxxx
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
@@ -148,7 +147,7 @@ CLOUDINARY_API_SECRET=
 VITE_BACKEND_URL=http://localhost:3001/api
 ```
 
-> La variable de Mongo es `MONGO_URL` (no `MONGO_URI`). La URL del frontend desde el backend es `FRONTEND_URL` (no `CLIENT_URL`). El cliente Axios usa `VITE_BACKEND_URL`. En producción, `VITE_BACKEND_URL=/api` para aprovechar el proxy de Vercel (evita el bloqueo de cookies cross-site en Safari/iPhone). `BACKEND_URL` solo se usa para el `notification_url` del webhook de Mercado Pago.
+> La variable de Mongo es `MONGO_URL` (no `MONGO_URI`). La URL del frontend desde el backend es `FRONTEND_URL` (no `CLIENT_URL`). El cliente Axios usa `VITE_BACKEND_URL`. En producción, `VITE_BACKEND_URL=/api` para aprovechar el proxy de Vercel (evita el bloqueo de cookies cross-site en Safari/iPhone). Al retirarse el pago online ya no se usan `BACKEND_URL`, `MP_ACCESS_TOKEN` ni `MP_WEBHOOK_SECRET`.
 
 ---
 
@@ -214,10 +213,7 @@ Base URL: `http://localhost:3001/api`
 | GET | `/orders` | user | Historial de pedidos del usuario |
 | PATCH | `/orders/:id/cancel` | user | Cancela un pedido propio (solo si está pendiente) |
 | GET | `/orders/all` | admin, employee | Lista todos los pedidos |
-| PATCH | `/orders/:id/status` | admin, employee | Cambia el estado del pedido (carga `finalAmount`, rechazo, etc.) |
-| POST | `/orders/:id/pay` | user | Crea la preferencia de Mercado Pago; devuelve `init_point` |
-| POST | `/orders/payment/confirm` | user | Confirma el pago al volver del checkout (respaldo del webhook) |
-| POST | `/orders/payment/webhook` | — | Webhook de Mercado Pago; marca el pedido como pagado |
+| PATCH | `/orders/:id/status` | admin, employee | Cambia el estado del pedido (carga `finalAmount` y `deliveryDate`, rechazo, cobro en el local, entrega) |
 | POST | `/contact` | — | Envía un mensaje desde el formulario de contacto |
 
 ---
@@ -238,15 +234,15 @@ Base URL: `http://localhost:3001/api`
 - Baja de clientes y empleados desde el panel de admin
 - Subida de imágenes a Cloudinary para productos, ofertas y fotos del carrusel
 - **Flujo de pedidos completo:** creación desde el carrito, cancelación, listado del usuario y gestión de estado por admin/empleado
-- **Pago con Mercado Pago Checkout Pro:** creación de preferencia, webhook de confirmación e idempotencia, con respaldo al volver del checkout (para desarrollo sin URL pública)
-- **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, pago confirmado)
+- **Pago y retiro en el local:** el admin/empleado registra el cobro desde el panel y después marca el pedido como entregado
+- **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, cobro registrado)
 - Historial de pedidos del usuario con seguimiento de estado y polling
 - Validación con Zod (schemas compartidos en `shared/`) en todos los endpoints que reciben datos
 
 ### Pendiente / en curso
 
-- Pruebas end-to-end del pago real de Mercado Pago en producción (con `BACKEND_URL` pública y webhook efectivo)
 - Ajustes finos de UX en el panel de pedidos
+- Pago online: se retiró la integración con Mercado Pago a pedido del cliente. Si más adelante vuelve, hay que reponer el SDK, la Preference, el webhook y las páginas de retorno del checkout
 
 ---
 
@@ -260,16 +256,17 @@ Usuario navega el catálogo sin login
         ↓
 Admin/empleado revisa el pedido desde su panel
   → Rechaza → status: "rejected"
-  → Acepta con monto final (tras el pesaje) → status: "in_preparation"
+  → Acepta con monto final (tras el pesaje) + fecha de entrega → status: "in_preparation"
         ↓
-Usuario ve el pedido en preparación y el monto real
-  → Hace clic en "Pagar" → Mercado Pago Checkout Pro
+Usuario recibe el mail con el monto real y la fecha de entrega
+  → Ese día pasa por el local a pagarlo y retirarlo
         ↓
-Webhook de MP (o confirmación del front al volver) → status: "paid"
+Admin/empleado registra el cobro en el mostrador → status: "paid"
         ↓
 Admin/empleado marca entregado → status: "delivered"
 
 El usuario puede cancelar su pedido solo mientras está "pending".
+No hay pagos online: el cobro es presencial y lo registra el frigorífico desde el panel.
 ```
 
 ---

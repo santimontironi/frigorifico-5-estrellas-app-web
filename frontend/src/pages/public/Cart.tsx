@@ -144,7 +144,7 @@ const Cart = () => {
                   <p className="flex items-center justify-center gap-1.5 text-[#ffffff]/90 font-bold text-[11px] mt-4">
                     <i className={`bi ${isUser ? 'bi-shield-check' : 'bi-lock'}`} aria-hidden="true" />
                     {isUser
-                      ? 'Coordinamos el pago y la entrega al confirmar'
+                      ? 'Pago y retiro en el local al estar listo tu pedido'
                       : 'Iniciá sesión como cliente para finalizar tu compra'}
                   </p>
                 </div>

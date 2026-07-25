@@ -19,7 +19,11 @@
 
 ## Descripción general
 
-Aplicación web de pedidos online para el frigorífico **5 Estrellas**. Los clientes se registran (con confirmación de cuenta por email), navegan el catálogo filtrado por categoría, buscan productos en tiempo real, agregan al carrito y confirman un pedido. El administrador (o un empleado) revisa cada pedido, carga el monto final real (tras el pesaje) y lo pasa a preparación o lo rechaza. Cuando el pedido está en preparación, el cliente paga online mediante **Mercado Pago Checkout Pro**. El pago se confirma vía webhook y, como respaldo (útil en desarrollo sin URL pública), también al volver del checkout con el `payment_id`.
+Aplicación web de pedidos online para el frigorífico **5 Estrellas**. Los clientes se registran (con confirmación de cuenta por email), navegan el catálogo filtrado por categoría, buscan productos en tiempo real, agregan al carrito y confirman un pedido. El administrador (o un empleado) revisa cada pedido, carga el monto final real (tras el pesaje) y lo pasa a preparación o lo rechaza.
+
+La modalidad de cobro vigente es **pago y retiro en el local**: no hay pagos online. Cuando el pedido está en preparación, el cliente pasa por el frigorífico, lo abona en el mostrador y el admin/empleado registra el cobro desde el panel (`paid`); después lo marca como `delivered`.
+
+> **Pagos online retirados.** La integración con **Mercado Pago Checkout Pro** (SDK, creación de Preference, webhook público idempotente, confirmación de respaldo desde el front y páginas `/pago/exito|error|pendiente`) estuvo implementada y se retiró a pedido del cliente, que por ahora cobra solo en el local. El estado `paid` se conserva, pero pasó de automático (webhook) a manual (admin/empleado). Para reponerlo hay que volver a instalar el SDK, recrear `mercadopago.config.js`, los métodos `createPayment`/`paymentWebhook`/`confirmPayment`, sus rutas, `setOrderPreference`/`markOrderAsPaid` en el repositorio, el campo `mercadoPagoPayment` del modelo, y las páginas de retorno del checkout.
 
 El sistema tiene **una sola autenticación unificada** con tres roles:
 - **`user`** (cliente) — registro público + confirmación por email.
@@ -54,7 +58,6 @@ Toda la sesión usa la misma cookie JWT; el rol viaja en el payload del token.
 | Subida de archivos | Multer (memoryStorage) | 2.x |
 | Imágenes | Cloudinary | 2.x |
 | Email | Nodemailer | 9.x |
-| Pagos | SDK de Mercado Pago (Node) | 3.x |
 | Dev server | Nodemon | 3.x |
 
 ---
@@ -72,8 +75,7 @@ frigorifico-5-estrellas/
 │   │   ├── cookie.js              # objeto cookieOptions (httpOnly, secure, sameSite, maxAge)
 │   │   ├── db.config.js           # función connectDB()
 │   │   ├── mail.config.js         # transporter de Nodemailer
-│   │   ├── cloudinary.config.js   # cliente de Cloudinary
-│   │   └── mercadopago.config.js  # cliente del SDK de Mercado Pago
+│   │   └── cloudinary.config.js   # cliente de Cloudinary
 │   ├── models/
 │   │   ├── user.model.js          # colección única con role: user | admin | employee
 │   │   ├── category.model.js
@@ -90,7 +92,7 @@ frigorifico-5-estrellas/
 │   │   ├── category.controller.js # createCategory, getAllCategories, deleteCategoryById
 │   │   ├── offer.controller.js    # createOffer, getAllOffers, deleteOffer
 │   │   ├── photo.controller.js    # createPhoto, getAllPhotos, deletePhoto
-│   │   └── order.controller.js    # createOrder, getUserOrders, cancelOrder, getAllOrders, updateOrderStatus, createPayment, confirmPayment, paymentWebhook
+│   │   └── order.controller.js    # createOrder, getUserOrders, cancelOrder, getAllOrders, updateOrderStatus
 │   ├── repository/
 │   │   ├── user.repository.js
 │   │   ├── product.repository.js
@@ -115,7 +117,7 @@ frigorifico-5-estrellas/
 │   │   ├── rateLimiters.js    # apiLimiter (general) + authLimiter (estricto para auth)
 │   │   └── multer.js          # uploadImage (memoryStorage) + uploadExcel — hacia Cloudinary / xlsx
 │   └── utils/
-│       └── order.mail.js      # sendOrderCreatedMail, sendOrderCanceledMail, sendOrderStatusChangedMail, sendOrderPaidMail
+│       └── order.mail.js      # sendOrderCreatedMail, sendOrderCanceledMail, sendOrderStatusChangedMail, sendOrderPaidMail (comprobante del cobro en el local)
 │
 ├── shared/                    # schemas de Zod compartidos back ↔ front (standalone, sin workspaces)
 │   ├── package.json           # "type": module + dep zod; node_modules propio
@@ -147,7 +149,7 @@ frigorifico-5-estrellas/
         │   ├── OfferContext.tsx      # ofertas
         │   ├── PhotoContext.tsx      # fotos del carrusel del home
         │   ├── CartContext.tsx       # carrito (memoria + localStorage)
-        │   └── OrderContext.tsx      # pedidos: crear, listar, cancelar, pagar, confirmar pago
+        │   └── OrderContext.tsx      # pedidos: crear, listar, cancelar
         ├── hooks/
         │   ├── UseAuth.tsx
         │   ├── UseAdmin.tsx
@@ -159,7 +161,7 @@ frigorifico-5-estrellas/
         │   ├── useCart.tsx
         │   └── useOrder.tsx
         ├── pages/
-        │   ├── public/       # Home, Cart, Contact, AboutUs, PaymentSuccess, PaymentFailure, PaymentPending
+        │   ├── public/       # Home, Cart, Contact, AboutUs
         │   ├── auth/         # Login, Register, Confirm, ChangePassword
         │   ├── user/         # UserPanel
         │   └── admin/        # AdminPanel
@@ -168,7 +170,6 @@ frigorifico-5-estrellas/
         │   ├── auth/         # VerifyAuth
         │   ├── cart/         # CheckoutModal
         │   ├── category/     # CategoryCard
-        │   ├── payment/      # PaymentResultLayout
         │   ├── products/     # ProductCard, ProductInCart, Features
         │   ├── user/
         │   └── ui/           # Header, FormSearch, OfferCard, OffersHome, Loader, ImageCarousel, etc.
@@ -313,12 +314,12 @@ frigorifico-5-estrellas/
 
   rejectionReason: { type: String, default: '' },
 
-  mercadoPagoPayment: {
-    preferenceId: { type: String, default: '' },
-    paymentId:    { type: String, default: '' },
-    status:       { type: String, default: '' }   // 'approved' | 'pending' | 'rejected'
-  },
+  // Fecha en la que el pedido queda listo para retirar. Obligatoria al aceptar
+  // (status "in_preparation") y se le informa al cliente por mail.
+  deliveryDate: { type: Date, default: null },
 
+  // Snapshot del domicilio del cliente. Con la modalidad de pago y retiro en el local
+  // no se usa para la entrega: queda para cuando se habilite el envío a domicilio.
   deliveryAddress: {
     street:    String,
     number:    String,
@@ -334,7 +335,7 @@ frigorifico-5-estrellas/
 }
 ```
 
-> No hay estado `accepted`: al aceptar, el admin pasa el pedido directo a `in_preparation` (cargando `finalAmount`). El pago se habilita en ese estado.
+> No hay estado `accepted`: al aceptar, el admin pasa el pedido directo a `in_preparation` (cargando `finalAmount`). Desde ese estado el admin/empleado registra el cobro presencial (`paid`) y luego la entrega (`delivered`).
 
 ---
 
@@ -433,10 +434,9 @@ app.use('/api', photoRouter)
 | GET | `/api/orders` | user | Historial de pedidos del usuario |
 | PATCH | `/api/orders/:id/cancel` | user | Cancelar un pedido propio (solo si está `pending`) |
 | GET | `/api/orders/all` | admin, employee | Listar todos los pedidos |
-| PATCH | `/api/orders/:id/status` | admin, employee | Cambiar estado del pedido (con `finalAmount`, `rejectionReason`, `notesAdmin`) |
-| POST | `/api/orders/:id/pay` | user | Crear Preference en MP; devuelve `{ init_point, preferenceId }` |
-| POST | `/api/orders/payment/confirm` | user | Confirmar el pago al volver del checkout (respaldo del webhook); body `{ paymentId }` |
-| POST | `/api/orders/payment/webhook` | — (pública) | Webhook de MP; consulta el pago y marca el pedido como `paid` |
+| PATCH | `/api/orders/:id/status` | admin, employee | Cambiar estado del pedido (con `finalAmount`, `deliveryDate`, `rejectionReason`, `notesAdmin`). Incluye el registro del cobro en el local (`paid`) |
+
+> No hay endpoints de pago online: el cobro presencial se registra por `PATCH /api/orders/:id/status` con `status: "paid"`.
 
 ---
 
@@ -492,7 +492,7 @@ La validación se centraliza en **schemas de Zod** compartidos entre backend y f
 | `category.schema.js` | `createCategorySchema` |
 | `offer.schemas.js` | `createOfferSchema` |
 | `photo.schema.js` | `photoSchema`, `getPhotosResponse`, `createPhotoResponse`, `deletePhotoResponse` |
-| `order.schema.js` | `createOrderSchema`, `updateOrderStatusSchema`, `orderSchema`, `orderAdminSchema`, y responses (`createOrderResponse`, `getOrdersResponse`, `payOrderResponse`, etc.) |
+| `order.schema.js` | `createOrderSchema`, `updateOrderStatusSchema`, `orderSchema`, `orderAdminSchema` (incluye los datos del cliente: nombre, DNI, email y teléfono), y responses (`createOrderResponse`, `getOrdersResponse`, etc.) |
 | `contact.schema.js` | `contactSchema` |
 
 ### Backend — validación de requests
@@ -571,19 +571,16 @@ interface AuthContextType {
 ```ts
 type OrderContextType = {
   orders: Order[]
-  loading: { get, create, cancel, pay, confirm: boolean }
-  getOrders:      () => Promise<void>
-  createOrder:    (data: CreateOrderInput) => Promise<Order>
-  cancelOrder:    (id: string) => Promise<void>
-  payOrder:       (id: string) => Promise<string>          // devuelve init_point de MP
-  confirmPayment: (paymentId: string) => Promise<void>
+  loading: { get, create, cancel: boolean }
+  getOrders:   () => Promise<void>
+  createOrder: (data: CreateOrderInput) => Promise<Order>
+  cancelOrder: (id: string) => Promise<void>
 }
 ```
 
 - `createOrder` hace *prepend* del pedido nuevo (mismo orden que el back: `createdAt` desc).
 - `cancelOrder` quita el pedido de la lista (el back excluye cancelados de los listados).
-- `payOrder` devuelve el `init_point` para redirigir al checkout de MP.
-- Las vistas `PaymentSuccess/Failure/Pending` manejan el retorno del checkout; `PaymentSuccess` llama a `confirmPayment` con el `payment_id` de la URL.
+- No hay acciones de pago: el cliente solo ve el estado del pedido. El cobro lo registra el admin/empleado por `updateOrderStatus` en `AdminContext`.
 
 ### `VerifyAuth.tsx`
 
@@ -613,45 +610,39 @@ Guarda rutas privadas. Si `loading.me` es `true` muestra loading. Si no hay `aut
 7. Admin/empleado ve el pedido en su panel (GET /api/orders/all)
       ↓
 8a. RECHAZA → PATCH /api/orders/:id/status { status: "rejected", rejectionReason } → status: "rejected"
-8b. ACEPTA + carga finalAmount → PATCH /api/orders/:id/status { status: "in_preparation", finalAmount } → status: "in_preparation"
+8b. ACEPTA + carga finalAmount y deliveryDate → PATCH /api/orders/:id/status { status: "in_preparation", finalAmount, deliveryDate } → status: "in_preparation"
+      → Mail al cliente con el monto final y la fecha de entrega
       ↓
-9. Cliente ve el pedido "en preparación" con el monto final; aparece el botón "Pagar"
+9. Cliente ve el pedido "en preparación" con el monto final, la fecha de entrega y el aviso de pago y retiro en el local
       ↓
-10. Click en "Pagar"
-      → POST /api/orders/:id/pay
-      → Backend crea Preference en MP con finalAmount (o approximateTotal si no hay peso confirmado)
-      → Devuelve init_point → el front redirige al checkout de MP
+10. En la fecha de entrega el cliente pasa por el frigorífico, retira su pedido y lo abona en el mostrador
       ↓
-11. Cliente paga en Mercado Pago
-      → Webhook: POST /api/orders/payment/webhook → consulta el pago y marca status: "paid"
-      → Respaldo: al volver, PaymentSuccess llama POST /api/orders/payment/confirm { paymentId }
-        (útil en desarrollo, donde el back local no recibe webhooks)
+11. Admin/empleado registra el cobro → PATCH /api/orders/:id/status { status: "paid" }
+      → Mail comprobante al cliente (sendOrderPaidMail)
       ↓
-12. Admin/empleado ve el pedido con status "paid"
-      ↓
-13. Admin/empleado marca entregado → PATCH /api/orders/:id/status { status: "delivered" }
+12. Admin/empleado marca entregado → PATCH /api/orders/:id/status { status: "delivered" }
 
 El cliente puede cancelar su pedido (PATCH /api/orders/:id/cancel) solo mientras está "pending".
 ```
 
-Cada transición dispara un email al cliente (creación, cancelación, cambio de estado, pago confirmado) vía `utils/order.mail.js`. Los mails son efectos secundarios: si fallan, no cortan el flujo del pedido.
+Cada transición dispara un email al cliente (creación, cancelación, cambio de estado, cobro registrado) vía `utils/order.mail.js`. Los mails son efectos secundarios: si fallan, no cortan el flujo del pedido.
 
 ---
 
 ## Reglas de negocio
 
-- **Precio por kilo es estimado.** El `approximateTotal` puede diferir del total real porque los cortes se pesan físicamente. El admin carga `finalAmount` al pasar el pedido a preparación; ese monto se cobra en MP.
-- **El pago usa `finalAmount` (o `approximateTotal` como respaldo).** La Preference de MP cobra el pedido como un único ítem con `finalAmount ?? approximateTotal`.
-- **El pago se habilita en `in_preparation`.** `createPayment` rechaza con `400` si el pedido no está en ese estado.
+- **Precio por kilo es estimado.** El `approximateTotal` puede diferir del total real porque los cortes se pesan físicamente. El admin carga `finalAmount` al pasar el pedido a preparación; ese es el monto que se cobra en el local.
+- **Pago y retiro en el local.** No hay pagos online: el cliente abona en el mostrador al retirar el pedido y el frigorífico registra el cobro desde el panel. El monto de referencia es `finalAmount ?? approximateTotal`.
+- **El cobro se registra desde `in_preparation`.** Un pedido `pending` no se puede marcar como pagado: primero hay que aceptarlo y cargar el monto final.
+- **La fecha de entrega es obligatoria al aceptar.** `updateOrderStatusSchema` lo valida con un `refine`: si `status` es `in_preparation` y no viene `deliveryDate`, responde `400` con el error en el campo. Se manda como `"yyyy-mm-dd"` y se coerce a `Date` (medianoche UTC); tanto el mail como el front la formatean con `timeZone: 'UTC'` para que no se corra un día.
 - **Transiciones de estado permitidas (admin/empleado):**
-  - `pending` → `in_preparation` (acepta, con `finalAmount`) | `rejected`
+  - `pending` → `in_preparation` (acepta, con `finalAmount` y `deliveryDate`) | `rejected`
+  - `in_preparation` → `paid` (registro del cobro en el local)
   - `paid` → `delivered`
-  - `paid` no lo pone el admin: lo pone el pago de Mercado Pago (webhook o confirmación del front).
+  - Solo se entrega un pedido ya cobrado.
 - **Cancelación por el cliente.** Solo mientras el pedido está `pending`; una vez tomado por el admin hay que coordinarlo aparte.
-- **Webhook público e idempotente.** `POST /api/orders/payment/webhook` no requiere JWT y siempre responde `200` (si devolviera error, MP reintentaría en bucle). Solo marca `paid` si el pago está `approved`. `markOrderAsPaid` devuelve `null` si el pedido ya estaba pagado, evitando reenviar el mail (deduplicación webhook ↔ confirmación del front).
-- **Confirmación por el front como respaldo.** El estado del pago siempre lo resuelve MP (`Payment.get`), nunca el front; el front solo aporta el `payment_id` de la URL de retorno.
 - **Snapshot de precios.** Al crear un Order se copia `name`, `price` y `unit` de cada Product en `OrderItem`. El historial no cambia si el admin modifica precios luego.
-- **Snapshot de domicilio.** `deliveryAddress` se copia del perfil del usuario al crear el pedido (dato de confianza resuelto por el back, no viene del body).
+- **Snapshot de domicilio.** `deliveryAddress` se copia del perfil del usuario al crear el pedido (dato de confianza resuelto por el back, no viene del body). Con la modalidad de retiro en el local no se usa para la entrega ni se muestra en el panel: se conserva para cuando se habilite el envío a domicilio.
 - **Importación de productos.** El Excel se sube con multer y se parsea con `xlsx`; si una categoría del archivo no existe, se crea automáticamente.
 - **Fotos del carrusel.** La imagen es obligatoria al subir (el controller rechaza con `400` si no llega archivo). Al eliminar, se borra de la BD y de Cloudinary. Las gestiona solo el admin; el carrusel del home las lee público y cae a un placeholder si no hay ninguna.
 - **Soft delete / baja lógica.** Productos, categorías y ofertas se eliminan (según el controller); clientes y empleados se dan de baja con `active: false`. Las fotos del carrusel son la excepción: se borran físicamente (incluida la imagen en Cloudinary).
@@ -669,11 +660,8 @@ MONGO_URL=mongodb://localhost:27017/frigorifico5estrellas
 JWT_SECRET=supersecretkey
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
-BACKEND_URL=                      # URL pública del back (para notification_url del webhook de MP); vacío en dev
 NODEMAILER_USER=correo@ejemplo.com
 NODEMAILER_PASS=password_de_correo
-MP_ACCESS_TOKEN=TEST-xxxxxxxxxxxxxxxxxxxx
-MP_WEBHOOK_SECRET=xxxxxxxxxxxxxxxxxxxx
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
@@ -687,7 +675,7 @@ VITE_BACKEND_URL=http://localhost:3001/api   # en dev; en prod se usa "/api" (pr
 > Notas:
 > - La URI de Mongo es `MONGO_URL` (no `MONGO_URI`); la URL del frontend desde el back es `FRONTEND_URL` (no `CLIENT_URL`).
 > - El cliente Axios usa `VITE_BACKEND_URL` (no `VITE_API_URL`).
-> - `BACKEND_URL` solo se usa para armar el `notification_url` del webhook de MP; en desarrollo (localhost) queda vacío y el pago se confirma con el respaldo del front.
+> - Al retirarse el pago online dejaron de usarse `BACKEND_URL` (era el `notification_url` del webhook), `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET`. Se pueden borrar del `.env`.
 
 ---
 
@@ -697,21 +685,21 @@ VITE_BACKEND_URL=http://localhost:3001/api   # en dev; en prod se usa "/api" (pr
 
 **Backend:**
 - Modelo `User` unificado con roles (`user`/`admin`/`employee`), `confirmed` y `active` (baja lógica).
-- Modelos: Category, Product (imagen Cloudinary), Offer (con imagen), Photo (fotos del carrusel), OrderItem, Order (estados completos + notas + snapshot MP).
+- Modelos: Category, Product (imagen Cloudinary), Offer (con imagen), Photo (fotos del carrusel), OrderItem, Order (estados completos + notas + snapshot de domicilio).
 - Auth completa: registro cliente con confirmación por email, alta de admin/empleado, login unificado, logout, `me`, `profile`, recuperación de contraseña.
 - CRUD de productos (edición con imagen), importación masiva vía Excel, CRUD de categorías, CRUD de ofertas.
 - Fotos del carrusel del home: subida (imagen obligatoria), listado público y borrado (BD + Cloudinary).
 - Gestión de empleados y clientes (listar + baja lógica).
-- Flujo de pedidos completo: crear, listar (usuario/admin), cancelar, cambiar estado.
-- Pagos con Mercado Pago: creación de Preference, webhook público idempotente y confirmación de respaldo desde el front; mails transaccionales por cada evento del pedido.
+- Flujo de pedidos completo: crear, listar (usuario/admin), cancelar, cambiar estado (incluido el registro del cobro en el local).
+- Mails transaccionales por cada evento del pedido (creado, cancelado, cambio de estado, comprobante del cobro).
 - Middlewares: `verifyAuth`, `verifyRole` (multi-rol), `validate` (Zod), `rateLimiters` (api + auth), `multer` (imagen + excel).
-- Config: cookie, db, mail (Nodemailer), cloudinary, mercadopago.
+- Config: cookie, db, mail (Nodemailer), cloudinary.
 - Validación con Zod: schemas compartidos en `shared/` aplicados en todos los endpoints con body.
 
 **Frontend:**
 - Todos los contextos implementados: Auth, Admin, User, Product, Category, Offer, Photo, Cart, Order.
 - Hooks consumidores por dominio.
-- Pages: Home (catálogo + búsqueda + ofertas + carrusel), Cart, Contact, AboutUs, Login, Register, Confirm, ChangePassword, UserPanel, AdminPanel, y vistas de resultado de pago (Success/Failure/Pending).
+- Pages: Home (catálogo + búsqueda + ofertas + carrusel), Cart, Contact, AboutUs, Login, Register, Confirm, ChangePassword, UserPanel, AdminPanel.
 - Panel admin con secciones: productos, importación, categorías, ofertas, fotos del carrusel, empleados, clientes, pedidos.
 - Rutas protegidas por rol con `VerifyAuth` (empleados con vista reducida enfocada en pedidos).
 - Carrito persistente en `localStorage` + checkout que crea el pedido.
@@ -720,5 +708,5 @@ VITE_BACKEND_URL=http://localhost:3001/api   # en dev; en prod se usa "/api" (pr
 
 ### Pendiente / en curso ❌
 
-- Pruebas end-to-end del pago real de Mercado Pago en producción (con `BACKEND_URL` pública y webhook efectivo).
 - Ajustes finos de UX en el panel de pedidos (filtros, polling de estado ya presentes).
+- Pago online: retirado a pedido del cliente (solo cobro en el local por ahora). Si vuelve, hay que reponer el SDK de Mercado Pago, la creación de Preference, el webhook, la confirmación de respaldo y las páginas `/pago/*`.

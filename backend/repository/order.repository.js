@@ -27,14 +27,14 @@ class OrderRepository {
     return await Order.find()
       .sort({ createdAt: -1 })
       .populate("items")
-      .populate({ path: "user", select: "firstName lastName email phone" });
+      .populate({ path: "user", select: "firstName lastName dni email phone" });
   }
 
   async updateOrder(id, data) {
     // Devuelve el pedido con el mismo formato que la vista admin (items + cliente).
     return await Order.findByIdAndUpdate(id, data, { returnDocument: "after" })
       .populate("items")
-      .populate({ path: "user", select: "firstName lastName email phone" });
+      .populate({ path: "user", select: "firstName lastName dni email phone" });
   }
 
   async cancelOrder(id) {
@@ -43,31 +43,6 @@ class OrderRepository {
       { status: "canceled" },
       { returnDocument: "after" },
     ).populate("items");
-  }
-
-  async setOrderPreference(id, preferenceId) {
-    return await Order.findByIdAndUpdate(
-      id,
-      { "mercadoPagoPayment.preferenceId": preferenceId },
-      { returnDocument: "after" },
-    );
-  }
-
-  // Marca el pedido como pagado solo si todavía no lo estaba: el webhook de MP y
-  // la confirmación al volver del checkout pueden llegar los dos por el mismo pago.
-  // Si ya estaba pagado devuelve null y el controller no repite el mail.
-  async markOrderAsPaid(id, paymentId) {
-    return await Order.findOneAndUpdate(
-      { _id: id, status: { $ne: "paid" } },
-      {
-        status: "paid",
-        "mercadoPagoPayment.paymentId": paymentId,
-        "mercadoPagoPayment.status": "approved",
-      },
-      { returnDocument: "after" },
-    )
-      .populate("items")
-      .populate({ path: "user", select: "firstName lastName email phone" });
   }
 }
 

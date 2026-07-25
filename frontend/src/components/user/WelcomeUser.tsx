@@ -25,7 +25,7 @@ const WelcomeUser = ({ name, setViewUser }: WelcomeUserProps) => {
           Hola{name ? `, ${name}` : ''}
         </h1>
         <p className="text-white/70 text-sm md:text-base max-w-2xl">
-          Bienvenido a tu cuenta del frigorífico. Desde acá seguís tus pedidos, revisás tus datos y gestionás tus pagos. Usá el menú lateral para moverte entre las secciones; abajo te contamos qué podés hacer en cada una.
+          Bienvenido a tu cuenta del frigorífico. Desde acá seguís tus pedidos y revisás tus datos. Usá el menú lateral para moverte entre las secciones; abajo te contamos qué podés hacer en cada una.
         </p>
       </div>
 
@@ -53,19 +53,19 @@ const WelcomeUser = ({ name, setViewUser }: WelcomeUserProps) => {
             <UserCard
               icon="bi bi-bag-check"
               title="Mis pedidos"
-              description="Seguí el estado de cada pedido: pendiente, aceptado, en preparación y entregado."
+              description="Seguí el estado de cada pedido: pendiente, en preparación, pagado y entregado."
               onClick={() => setViewUser('myOrders')}
             />
             <UserCard
               icon="bi bi-person"
               title="Mi perfil"
-              description="Consultá tus datos personales y tu domicilio de entrega registrados."
+              description="Consultá y actualizá tus datos personales y de contacto registrados."
               onClick={() => setViewUser('myProfile')}
             />
             <UserCard
-              icon="bi bi-credit-card"
-              title="Pagá online"
-              description="Cuando tu pedido está en preparación, pagalo con Mercado Pago desde Mis pedidos."
+              icon="bi bi-shop"
+              title="Pago y retiro en el local"
+              description="Por ahora no hacemos envíos: cuando tu pedido esté listo lo pagás y lo retirás en el frigorífico."
               onClick={() => setViewUser('myOrders')}
             />
           </div>

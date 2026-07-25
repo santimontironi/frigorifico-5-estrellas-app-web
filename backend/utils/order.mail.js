@@ -5,11 +5,27 @@ const formatPrice = (value) => `$${Number(value).toLocaleString("es-AR")}`;
 // Referencia legible del pedido: últimos 6 caracteres del _id.
 const shortId = (id) => id.toString().slice(-6).toUpperCase();
 
-// Dirección de entrega en una línea.
-const addressLine = (order) => {
-  const a = order.deliveryAddress;
-  return `${a.street} ${a.number}${a.floor ? `, Piso ${a.floor}` : ""}${a.apartment ? `, Depto ${a.apartment}` : ""} — ${a.city}, ${a.province}`;
-};
+// Fecha de entrega en formato largo. Se guarda como fecha sin hora (medianoche UTC),
+// así que se formatea en UTC para que no se corra un día por la zona horaria.
+const formatDeliveryDate = (date) =>
+  new Date(date).toLocaleDateString("es-AR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+
+// Bloque destacado con la fecha en la que el pedido queda listo para retirar.
+const deliveryDateBlock = (order) =>
+  order.deliveryDate
+    ? `<div style="background:#F7F4F1;border-left:4px solid #9B2335;border-radius:6px;padding:14px 16px;margin:20px 0;">
+        <p style="margin:0;font-size:15px;color:#1C1714;">
+          <strong>Fecha de entrega:</strong> ${formatDeliveryDate(order.deliveryDate)}
+        </p>
+        <p style="margin:6px 0 0;font-size:13px;color:#7A6B63;">Ese día podés pasar por el local a pagarlo y retirarlo.</p>
+      </div>`
+    : "";
 
 // Filas de la tabla de items a partir de los snapshots del pedido.
 const itemsRows = (items) =>
@@ -37,14 +53,28 @@ const itemsTable = (items) => `
     <tbody>${itemsRows(items)}</tbody>
   </table>`;
 
+// Domicilio del cliente en una línea. Con la modalidad de retiro en el local no es
+// una dirección de entrega: va en los avisos internos como dato del cliente.
+const addressLine = (order) => {
+  const a = order.deliveryAddress;
+  return `${a.street} ${a.number}${a.floor ? `, Piso ${a.floor}` : ""}${a.apartment ? `, Depto ${a.apartment}` : ""} — ${a.city}, ${a.province}`;
+};
+
 // Datos de contacto del cliente, para los avisos internos al frigorífico.
 const customerBlock = (user, order) => `
   <div style="background:#F7F4F1;border-radius:8px;padding:16px;font-size:14px;color:#1C1714;">
     <p style="margin:0 0 6px;"><strong>Cliente:</strong> ${user.firstName} ${user.lastName || ""}</p>
+    <p style="margin:0 0 6px;"><strong>DNI:</strong> ${user.dni || "—"}</p>
     <p style="margin:0 0 6px;"><strong>Email:</strong> ${user.email}</p>
     <p style="margin:0 0 6px;"><strong>Teléfono:</strong> ${user.phone || "—"}</p>
-    <p style="margin:0;"><strong>Entrega:</strong> ${addressLine(order)}</p>
+    <p style="margin:0;"><strong>Domicilio:</strong> ${addressLine(order)}</p>
   </div>`;
+
+// Aviso de la modalidad vigente: el cliente paga y retira en el local.
+const pickupNote = `
+  <p style="font-size:13px;color:#7A6B63;">
+    <strong>Pago y retiro en el local:</strong> cuando tu pedido esté listo lo abonás y lo retirás en el frigorífico. Por ahora no hacemos envíos a domicilio.
+  </p>`;
 
 // Mail de confirmación cuando el usuario crea un pedido (al cliente + al frigorífico).
 export async function sendOrderCreatedMail(user, order) {
@@ -56,12 +86,12 @@ export async function sendOrderCreatedMail(user, order) {
     html: `
       <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#1C1714;">
         <h2 style="color:#9B2335;">¡Gracias por tu pedido, ${user.firstName}!</h2>
-        <p>Recibimos tu pedido <strong>#${shortId(order._id)}</strong> y ya está <strong>pendiente de confirmación</strong>. Te vamos a avisar cuando lo aceptemos para coordinar el pago y la entrega.</p>
+        <p>Recibimos tu pedido <strong>#${shortId(order._id)}</strong> y ya está <strong>pendiente de confirmación</strong>. Te vamos a avisar cuando lo aceptemos y cuando esté listo para que pases a pagarlo y retirarlo.</p>
         ${itemsTable(order.items)}
         <p style="text-align:right;font-size:18px;"><strong>Total aproximado: ${formatPrice(order.approximateTotal)}</strong></p>
         <p style="color:#7A6B63;font-size:13px;">Los cortes por kilo se pesan al preparar el pedido, por eso el total es aproximado. El monto final lo confirmamos antes de que pagues.</p>
         <hr style="border:none;border-top:1px solid #eee;margin:20px 0;" />
-        <p style="font-size:13px;color:#7A6B63;"><strong>Entrega en:</strong> ${addressLine(order)}</p>
+        ${pickupNote}
       </div>`,
   });
 
@@ -111,38 +141,24 @@ export async function sendOrderCanceledMail(user, order) {
   });
 }
 
-// Mail cuando se aprueba el pago del pedido (al cliente + al frigorífico).
+// Comprobante para el cliente cuando el frigorífico registra el cobro en el local.
+// Solo va al cliente: el aviso interno no hace falta porque el cobro lo registra
+// el propio frigorífico desde el panel.
 export async function sendOrderPaidMail(user, order) {
   const amount = order.finalAmount ?? order.approximateTotal;
 
-  // 1) Al cliente
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: user.email,
-    subject: `Confirmamos el pago de tu pedido #${shortId(order._id)}`,
+    subject: `Registramos el pago de tu pedido #${shortId(order._id)}`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#1C1714;">
-        <h2 style="color:#9B2335;">¡Pago confirmado!</h2>
-        <p>Hola ${user.firstName}, recibimos el pago de tu pedido <strong>#${shortId(order._id)}</strong>. ¡Gracias! Ya coordinamos la entrega.</p>
+        <h2 style="color:#9B2335;">¡Pago registrado!</h2>
+        <p>Hola ${user.firstName}, registramos el pago de tu pedido <strong>#${shortId(order._id)}</strong> en el local. ¡Gracias!</p>
         ${itemsTable(order.items)}
         <p style="text-align:right;font-size:18px;"><strong>Total pagado: ${formatPrice(amount)}</strong></p>
         <hr style="border:none;border-top:1px solid #eee;margin:20px 0;" />
-        <p style="font-size:13px;color:#7A6B63;"><strong>Entrega en:</strong> ${addressLine(order)}</p>
-      </div>`,
-  });
-
-  // 2) Al frigorífico (aviso interno)
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER,
-    subject: `Pedido pagado #${shortId(order._id)} — ${user.firstName} ${user.lastName || ""}`,
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#1C1714;">
-        <h2 style="color:#9B2335;">Pedido pagado</h2>
-        <p>El cliente pagó el pedido <strong>#${shortId(order._id)}</strong>.</p>
-        ${customerBlock(user, order)}
-        ${itemsTable(order.items)}
-        <p style="text-align:right;font-size:18px;"><strong>Total pagado: ${formatPrice(amount)}</strong></p>
+        <p style="font-size:13px;color:#7A6B63;">Este mail es tu comprobante del pedido. Si todavía no lo retiraste, podés pasar a buscarlo por el frigorífico.</p>
       </div>`,
   });
 }
@@ -152,22 +168,18 @@ const STATUS_MAIL = {
   in_preparation: {
     subject: "está en preparación",
     heading: "Tu pedido está en preparación",
-    body: "Ya estamos preparando tu pedido. Cuando esté listo vas a poder pagarlo desde tu panel.",
+    body: "Ya estamos preparando tu pedido. Lo pagás y lo retirás en el local en la fecha de entrega.",
   },
   rejected: {
     subject: "fue rechazado",
     heading: "Tu pedido fue rechazado",
     body: "Lamentablemente no pudimos tomar tu pedido.",
   },
-  paid: {
-    subject: "fue pagado",
-    heading: "Confirmamos el pago de tu pedido",
-    body: "Recibimos el pago de tu pedido. ¡Gracias! Ya coordinamos la entrega.",
-  },
+  // "paid" no está acá: el cobro en el local tiene su propio mail (sendOrderPaidMail).
   delivered: {
     subject: "fue entregado",
     heading: "Tu pedido fue entregado",
-    body: "Tu pedido fue entregado. ¡Gracias por elegirnos!",
+    body: "Retiraste tu pedido. ¡Gracias por elegirnos!",
   },
 };
 
@@ -188,6 +200,7 @@ export async function sendOrderStatusChangedMail(user, order) {
         <p>Hola ${user.firstName}, tu pedido <strong>#${shortId(order._id)}</strong> ${info.subject}.</p>
         <p style="color:#7A6B63;">${info.body}</p>
         ${order.status === "rejected" && order.rejectionReason ? `<p style="color:#7A6B63;"><strong>Motivo:</strong> ${order.rejectionReason}</p>` : ""}
+        ${order.status === "in_preparation" ? deliveryDateBlock(order) : ""}
         ${order.status === "in_preparation" && hasFinal ? `<p style="text-align:right;font-size:18px;"><strong>Total final: ${formatPrice(order.finalAmount)}</strong></p>` : ""}
       </div>`,
   });

@@ -16,7 +16,5 @@ export type OrdersLoading = {
   get: boolean
   create: boolean
   cancel: boolean
-  pay: boolean
-  confirm: boolean
 }
 

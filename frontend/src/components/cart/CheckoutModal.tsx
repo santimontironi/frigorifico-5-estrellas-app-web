@@ -22,8 +22,7 @@ const CheckoutModal = ({ open, onClose }: CheckoutModalProps) => {
     try {
       setErrorResponse(null)
 
-      // Del carrito solo enviamos id y cantidad: el back arma los snapshots
-      // de precio y toma la dirección de entrega del usuario autenticado.
+      // Del carrito solo enviamos id y cantidad: el back arma los snapshots de precio.
       const orderItems = items.map((item) => ({
         product: item.product._id,
         quantity: item.quantity,
@@ -76,7 +75,7 @@ const CheckoutModal = ({ open, onClose }: CheckoutModalProps) => {
               ¡Pedido confirmado!
             </h2>
             <p className="text-[#7A6B63] text-sm mt-2 leading-relaxed">
-              Recibimos tu pedido. Vamos a coordinar el pago y la entrega a la brevedad.
+              Recibimos tu pedido. Te avisamos cuando esté listo para que pases a pagarlo y retirarlo por el local.
             </p>
 
             <div className="flex flex-col gap-3 mt-8">
@@ -106,7 +105,7 @@ const CheckoutModal = ({ open, onClose }: CheckoutModalProps) => {
                 Confirmar pedido
               </h2>
               <p className="text-[#7A6B63] text-sm mt-2 leading-relaxed">
-                Lo enviamos a la dirección registrada en tu cuenta. Podés dejar una nota para la entrega.
+                El pago y el retiro son en el local. Podés dejar una nota con lo que necesites aclarar.
               </p>
             </div>
 
@@ -117,7 +116,7 @@ const CheckoutModal = ({ open, onClose }: CheckoutModalProps) => {
               <div className="flex items-start gap-3 bg-[#9B2335]/5 rounded-xl px-4 py-3 mb-5">
                 <i className="bi bi-info-circle text-[#9B2335] text-base shrink-0 mt-0.5" aria-hidden="true" />
                 <p className="text-[#7A6B63] text-xs leading-relaxed">
-                  Si te mudaste o cambiaste de dirección, actualizá tus datos en <span className="font-semibold text-[#1C1714]">Mi perfil</span> antes de confirmar el pedido.
+                  Por ahora no hacemos envíos: cuando tu pedido esté listo te avisamos para que <span className="font-semibold text-[#1C1714]">lo pagues y lo retires en el local</span>.
                 </p>
               </div>
 
@@ -135,7 +134,7 @@ const CheckoutModal = ({ open, onClose }: CheckoutModalProps) => {
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   className="w-full bg-[#F7F4F1] rounded-xl text-[#1C1714] text-sm px-4 py-3.5 outline-none border-2 border-transparent focus:border-[#9B2335]/30 focus:bg-white transition-all duration-200 placeholder:text-[#B8A898]/60 resize-none"
-                  placeholder="Ej: tocar timbre, entregar por la tarde..."
+                  placeholder="Ej: paso a retirarlo por la tarde, cortar los bifes finos..."
                 />
               </div>
 

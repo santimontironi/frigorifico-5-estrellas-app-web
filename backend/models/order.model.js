@@ -16,12 +16,13 @@ const orderSchema = new mongoose.Schema({
 
   rejectionReason: { type: String, default: '' },
 
-  mercadoPagoPayment: {
-    preferenceId: { type: String, default: '' },
-    paymentId:    { type: String, default: '' },
-    status:       { type: String, default: '' }
-  },
+  // Fecha en la que el pedido queda listo para retirar. La carga el admin al
+  // aceptar el pedido (junto con el monto final) y se le avisa al cliente por mail.
+  deliveryDate: { type: Date, default: null },
 
+  // Snapshot del domicilio del cliente al momento del pedido. Hoy la modalidad es
+  // pago y retiro en el local, así que no se usa para la entrega: se conserva como
+  // dato del cliente para cuando se habilite el envío a domicilio.
   deliveryAddress: {
     street:    String,
     number:    String,

@@ -2,8 +2,6 @@ import orderRepository from "../repository/order.repository.js";
 import productRepository from "../repository/product.repository.js";
 import userRepository from "../repository/user.repository.js";
 import { sendOrderCreatedMail, sendOrderCanceledMail, sendOrderStatusChangedMail, sendOrderPaidMail } from "../utils/order.mail.js";
-import { Preference, Payment } from "mercadopago";
-import mercadopago from "../config/mercadopago.config.js";
 
 class OrderController {
   async createOrder(req, res) {
@@ -84,152 +82,6 @@ class OrderController {
     }
   }
 
-  async createPayment(req, res) {
-    try {
-      const userId = req.auth.id;
-      const { id } = req.params;
-
-      const order = await orderRepository.getOrderById(id);
-
-      if (!order)
-        return res.status(404).json({ message: "Pedido no encontrado" });
-
-      // Solo el dueño paga su pedido.
-      if (order.user.toString() !== userId)
-        return res.status(403).json({ message: "No podés pagar este pedido" });
-
-      // El pago se habilita cuando el pedido está en preparación.
-      if (order.status !== "in_preparation")
-        return res.status(400).json({ message: "Este pedido no está disponible para pago" });
-
-      // Si el admin ya confirmó el peso usamos el monto final; si no, el aproximado.
-      const amount = order.finalAmount ?? order.approximateTotal;
-
-      const user = await userRepository.findById(userId);
-      if (!user)
-        return res.status(404).json({ message: "Usuario no encontrado" });
-
-      // Cobramos el pedido como un único ítem con el monto final: para cortes por
-      // kg el peso real puede diferir de la suma de subtotales aproximados.
-      const preference = await new Preference(mercadopago).create({
-        body: {
-          items: [
-            {
-              id: order._id.toString(),
-              title: `Pedido #${order._id.toString().slice(-6).toUpperCase()}`,
-              quantity: 1,
-              unit_price: Number(amount),
-              currency_id: "ARS",
-            },
-          ],
-          payer: { email: user.email },
-          back_urls: {
-            success: `${process.env.FRONTEND_URL}/pago/exito`,
-            failure: `${process.env.FRONTEND_URL}/pago/error`,
-            pending: `${process.env.FRONTEND_URL}/pago/pendiente`,
-          },
-          auto_return: "approved",
-          // Referencia para reconocer el pedido cuando llega la notificación del pago.
-          external_reference: order._id.toString(),
-          // Solo si hay URL pública del back (en dev localhost no recibe webhooks).
-          ...(process.env.BACKEND_URL && {
-            notification_url: `${process.env.BACKEND_URL}/api/orders/payment/webhook`,
-          }),
-        },
-      });
-
-      await orderRepository.setOrderPreference(id, preference.id);
-
-      return res.status(200).json({
-        init_point: preference.init_point,
-        preferenceId: preference.id,
-      });
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
-  }
-
-  async paymentWebhook(req, res) {
-    try {
-      // MP puede notificar por query (?type=payment&data.id=..) o por body.
-      const paymentId = req.query["data.id"] || req.body?.data?.id || req.query.id;
-
-      if (paymentId) {
-        const payment = await new Payment(mercadopago).get({ id: paymentId });
-        const orderId = payment.external_reference;
-
-        // Solo marcamos pagado cuando el pago está aprobado.
-        if (payment.status === "approved" && orderId) {
-          const paidOrder = await orderRepository.markOrderAsPaid(orderId, String(paymentId));
-
-          // Si viene null el pedido ya estaba pagado (lo confirmó el front al volver
-          // del checkout): no repetimos el mail.
-          if (paidOrder) {
-            // Aviso de pago al cliente y al frigorífico (no corta el flujo del webhook).
-            try {
-              if (paidOrder.user) await sendOrderPaidMail(paidOrder.user, paidOrder);
-            } catch (mailError) {
-              console.error("No se pudo enviar el mail de pago:", mailError.message);
-            }
-          }
-        }
-      }
-
-      // Siempre 200: si devolvemos error, MP reintenta la notificación en bucle.
-      return res.sendStatus(200);
-    } catch (error) {
-      console.error("Error en webhook de Mercado Pago:", error.message);
-      return res.sendStatus(200);
-    }
-  }
-
-  // Confirmación del pago al volver del checkout de Mercado Pago.
-  // El webhook necesita que el back tenga URL pública; esta ruta la llama el
-  // front con el payment_id que MP deja en la URL de retorno, así el pedido
-  // queda en "paid" apenas el cliente vuelve (también en desarrollo).
-  async confirmPayment(req, res) {
-    try {
-      const userId = req.auth.id;
-      const { paymentId } = req.body;
-
-      if (!paymentId)
-        return res.status(400).json({ message: "Falta el identificador del pago" });
-
-      // El estado del pago lo resuelve Mercado Pago, no el front.
-      const payment = await new Payment(mercadopago).get({ id: paymentId });
-      const orderId = payment.external_reference;
-
-      if (!orderId)
-        return res.status(400).json({ message: "El pago no corresponde a ningún pedido" });
-
-      const order = await orderRepository.getOrderById(orderId);
-      if (!order) return res.status(404).json({ message: "Pedido no encontrado" });
-
-      // Solo el dueño del pedido puede confirmar su pago.
-      if (order.user.toString() !== userId)
-        return res.status(403).json({ message: "No podés confirmar este pago" });
-
-      if (payment.status !== "approved")
-        return res.status(400).json({ message: "El pago todavía no está aprobado" });
-
-      const paidOrder = await orderRepository.markOrderAsPaid(orderId, String(paymentId));
-
-      // null = ya lo había marcado el webhook: no repetimos el mail.
-      if (!paidOrder)
-        return res.status(200).json({ message: "El pago ya estaba confirmado" });
-
-      try {
-        if (paidOrder.user) await sendOrderPaidMail(paidOrder.user, paidOrder);
-      } catch (mailError) {
-        console.error("No se pudo enviar el mail de pago:", mailError.message);
-      }
-
-      return res.status(200).json({ message: "Pago confirmado correctamente" });
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
-  }
-
   async getAllOrders(req, res) {
     try {
       const orders = await orderRepository.getAllOrders();
@@ -242,17 +94,18 @@ class OrderController {
   async updateOrderStatus(req, res) {
     try {
       const { id } = req.params;
-      const { status, rejectionReason, finalAmount, notesAdmin } = req.body;
+      const { status, rejectionReason, finalAmount, deliveryDate, notesAdmin } = req.body;
 
       const order = await orderRepository.getOrderById(id);
       if (!order)
         return res.status(404).json({ message: "Pedido no encontrado" });
 
-      // Transiciones permitidas para el admin. "paid" no está: ese estado lo
-      // pone el pago de Mercado Pago, no una acción manual. Por eso solo se
-      // puede marcar como entregado un pedido que ya está pagado.
+      // Transiciones permitidas para el admin/empleado. El cobro es en el local:
+      // "paid" lo registra el frigorífico cuando el cliente paga en el mostrador,
+      // y solo se entrega un pedido ya cobrado.
       const allowedTransitions = {
         pending: ["in_preparation", "rejected"],
+        in_preparation: ["paid"],
         paid: ["delivered"],
       };
 
@@ -263,13 +116,20 @@ class OrderController {
       const data = { status };
       if (status === "rejected") data.rejectionReason = rejectionReason || "";
       if (finalAmount !== undefined) data.finalAmount = finalAmount;
+      // La fecha de entrega solo se carga al aceptar el pedido (el schema la exige ahí).
+      if (deliveryDate !== undefined) data.deliveryDate = deliveryDate;
       if (notesAdmin !== undefined) data.notesAdmin = notesAdmin;
 
       const updatedOrder = await orderRepository.updateOrder(id, data);
 
       // Aviso al cliente del cambio de estado (efecto secundario, no corta el flujo).
+      // El cobro tiene su propio mail con el detalle y el monto pagado.
       try {
-        await sendOrderStatusChangedMail(updatedOrder.user, updatedOrder);
+        if (status === "paid") {
+          await sendOrderPaidMail(updatedOrder.user, updatedOrder);
+        } else {
+          await sendOrderStatusChangedMail(updatedOrder.user, updatedOrder);
+        }
       } catch (mailError) {
         console.error("No se pudo enviar el mail de cambio de estado:", mailError.message);
       }

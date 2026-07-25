@@ -19,13 +19,20 @@ export const createOrderSchema = z.object({
   notesUser: z.string().trim().optional(),
 });
 
-// "paid" no está: ese estado lo pone el pago de Mercado Pago, no el admin.
+// El pago es en el local: "paid" lo registra el admin/empleado al cobrar.
 export const updateOrderStatusSchema = z.object({
-  status: z.enum(["in_preparation", "rejected", "delivered"]),
+  status: z.enum(["in_preparation", "rejected", "paid", "delivered"]),
   rejectionReason: z.string().trim().optional(),
   finalAmount: z.coerce.number().min(0, "El monto debe ser mayor o igual a 0").optional(),
+  // Fecha de entrega: el front la manda como "yyyy-mm-dd" y se coerce a Date.
+  deliveryDate: z.coerce.date({ message: "La fecha de entrega no es válida" }).optional(),
   notesAdmin: z.string().trim().optional(),
-});
+}).refine(
+  // Al aceptar el pedido la fecha de entrega es obligatoria: es el dato con el que
+  // el cliente sabe cuándo pasar a retirarlo.
+  (data) => data.status !== "in_preparation" || data.deliveryDate !== undefined,
+  { message: "La fecha de entrega es obligatoria al aceptar el pedido", path: ["deliveryDate"] },
+);
 
 export const orderItemSchema = z.object({
   _id: z.string(),
@@ -52,6 +59,8 @@ export const orderSchema = z.object({
     "canceled",
   ]),
   rejectionReason: z.string().optional(),
+  // Llega como ISO string; null mientras el pedido no fue aceptado.
+  deliveryDate: z.string().nullable().optional(),
   deliveryAddress: deliveryAddressSchema,
   notesUser: z.string().optional(),
   notesAdmin: z.string().optional(),
@@ -73,20 +82,13 @@ export const cancelOrderResponse = z.object({
   order: orderSchema,
 });
 
-export const payOrderResponse = z.object({
-  init_point: z.string(),
-  preferenceId: z.string(),
-});
-
-export const confirmPaymentResponse = z.object({
-  message: z.string(),
-});
-
 export const orderAdminSchema = orderSchema.extend({
   user: z.object({
     _id: z.string(),
     firstName: z.string(),
     lastName: z.string(),
+    // Opcional por defensa: si un cliente viejo no lo tiene, no rompe el listado.
+    dni: z.string().optional(),
     email: z.string(),
     phone: z.string(),
   }),

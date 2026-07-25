@@ -96,7 +96,7 @@ const AboutUs = () => {
             <InfoCard
               icon="bi bi-snow"
               title="Frescura garantizada"
-              description="Cadena de frío controlada desde la cámara hasta tu domicilio para que la carne llegue en su punto justo."
+              description="Cadena de frío controlada desde la cámara hasta el momento en que retirás tu pedido, para que la carne llegue en su punto justo."
             />
             <InfoCard
               icon="bi bi-patch-check"
@@ -109,9 +109,9 @@ const AboutUs = () => {
               description="Al trabajar directo del frigorífico, sin intermediarios, ofrecemos los mejores precios del mercado."
             />
             <InfoCard
-              icon="bi bi-truck"
-              title="Envío a domicilio"
-              description="Recibí tu pedido en casa. Coordinamos la entrega para que no tengas que salir a buscar tus cortes."
+              icon="bi bi-shop"
+              title="Pago y retiro en el local"
+              description="Encargá tu pedido por la web y pasá a buscarlo cuando esté listo: lo abonás al retirarlo, sin esperas en el mostrador."
             />
             <InfoCard
               icon="bi bi-people"

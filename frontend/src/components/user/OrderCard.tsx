@@ -10,7 +10,7 @@ const unitLabel = (unit: string) => (unit === 'kg' ? 'kg' : 'un')
 const STATUS_CONFIG = {
   pending:        { label: 'Pendiente',      icon: 'bi-hourglass-split', className: 'text-[#F7EA79] bg-[#F7EA79]/10 border-[#F7EA79]/30' },
   rejected:       { label: 'Rechazado',      icon: 'bi-x-circle',        className: 'text-[#C9405A] bg-[#9B2335]/10 border-[#9B2335]/40' },
-  paid:           { label: 'Pagado',         icon: 'bi-credit-card',     className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
+  paid:           { label: 'Pagado',         icon: 'bi-cash-coin',       className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
   in_preparation: { label: 'En preparación', icon: 'bi-box-seam',        className: 'text-[#F0A868] bg-[#F0A868]/10 border-[#F0A868]/30' },
   delivered:      { label: 'Entregado',      icon: 'bi-bag-check',       className: 'text-[#0F2915] bg-[#5CD68A] border-[#5CD68A]' },
   canceled:       { label: 'Cancelado',      icon: 'bi-slash-circle',    className: 'text-white/50 bg-white/5 border-white/15' },
@@ -21,7 +21,7 @@ interface OrderCardProps {
 }
 
 const OrderCard = ({ order }: OrderCardProps) => {
-  const { cancelOrder, payOrder, loading } = useOrder()
+  const { cancelOrder, loading } = useOrder()
 
   const [confirming, setConfirming] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -30,9 +30,6 @@ const OrderCard = ({ order }: OrderCardProps) => {
 
   // Solo se puede cancelar mientras está pendiente (misma regla que el back).
   const isCancelable = order.status === 'pending'
-
-  // Cuando el pedido pasa a preparación, el cliente puede pagarlo.
-  const isPayable = order.status === 'in_preparation'
 
   const handleCancel = async () => {
     try {
@@ -45,23 +42,20 @@ const OrderCard = ({ order }: OrderCardProps) => {
     }
   }
 
-  const handlePay = async () => {
-    try {
-      setErrorMessage(null)
-      const initPoint = await payOrder(order._id)
-      // Redirigimos al checkout de Mercado Pago.
-      window.location.href = initPoint
-    } catch (error: any) {
-      setErrorMessage(error.response?.data?.message ?? "No pudimos iniciar el pago. Intentá nuevamente.")
-    }
-  }
-
   const date = new Date(order.createdAt).toLocaleDateString('es-AR', {
     day: '2-digit', month: 'long', year: 'numeric',
   })
 
   // Los últimos 6 caracteres del _id como referencia legible del pedido.
   const shortId = order._id.slice(-6).toUpperCase()
+
+  // La fecha de entrega se guarda sin hora (medianoche UTC): se formatea en UTC
+  // para que no se corra un día según la zona horaria del navegador.
+  const deliveryDateLabel = order.deliveryDate
+    ? new Date(order.deliveryDate).toLocaleDateString('es-AR', {
+      weekday: 'long', day: '2-digit', month: 'long', timeZone: 'UTC',
+    })
+    : null
 
   // Si el frigorífico ya confirmó el peso, mostramos el total final; si no, el aproximado.
   const hasFinal = order.finalAmount !== null
@@ -132,11 +126,29 @@ const OrderCard = ({ order }: OrderCardProps) => {
         </p>
       )}
 
+      {order.status === 'in_preparation' && (
+        <div className="flex items-start gap-2.5 bg-[#F0A868]/8 border border-[#F0A868]/25 rounded-lg px-4 py-3 mt-4">
+          <i className="bi bi-shop text-[#F0A868] text-sm shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-white/70 text-xs leading-relaxed">
+            Estamos preparando tu pedido. El pago es <span className="text-white font-semibold">en el local</span> al momento de retirarlo.
+          </p>
+        </div>
+      )}
+
+      {deliveryDateLabel && (order.status === 'in_preparation' || order.status === 'paid') && (
+        <div className="flex items-center gap-2.5 bg-[#F7EA79]/8 border border-[#F7EA79]/25 rounded-lg px-4 py-3 mt-3">
+          <i className="bi bi-calendar-event text-[#F7EA79] text-sm shrink-0" aria-hidden="true" />
+          <p className="text-white/70 text-xs leading-relaxed">
+            Fecha de entrega: <span className="text-[#F7EA79] font-semibold first-letter:uppercase">{deliveryDateLabel}</span>
+          </p>
+        </div>
+      )}
+
       {order.status === 'paid' && (
         <div className="flex items-start gap-2.5 bg-[#5CD68A]/8 border border-[#5CD68A]/25 rounded-lg px-4 py-3 mt-4">
           <i className="bi bi-check-circle text-[#5CD68A] text-sm shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-white/70 text-xs leading-relaxed">
-            Pago confirmado. Estamos coordinando la entrega de tu pedido.
+            Pago registrado en el local. Ya podés retirar tu pedido.
           </p>
         </div>
       )}
@@ -147,26 +159,6 @@ const OrderCard = ({ order }: OrderCardProps) => {
           <p className="text-white/70 text-xs leading-relaxed">
             Pedido entregado. ¡Gracias por elegirnos!
           </p>
-        </div>
-      )}
-
-      {isPayable && (
-        <div className="pt-5 mt-4 border-t border-white/8">
-          {errorMessage && (
-            <div className="flex items-start gap-2.5 bg-[#9B2335]/10 border border-[#9B2335]/25 rounded-lg px-4 py-3 mb-4">
-              <i className="bi bi-exclamation-circle text-[#C9405A] text-sm shrink-0 mt-0.5" aria-hidden="true" />
-              <p className="text-white/70 text-xs leading-relaxed">{errorMessage}</p>
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={handlePay}
-            disabled={loading.pay}
-            className="flex items-center justify-center gap-2 w-full bg-[#2E7D32] text-[#F2EDE6] text-sm font-semibold tracking-wide px-5 py-3 rounded-xl transition-all duration-200 hover:bg-[#388E3C] hover:shadow-[0_0_24px_-4px_rgba(46,125,50,0.7)] active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <i className="bi bi-credit-card" aria-hidden="true" />
-            {loading.pay ? "Redirigiendo..." : "Comprar"}
-          </button>
         </div>
       )}
 
