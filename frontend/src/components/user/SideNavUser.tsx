@@ -46,7 +46,7 @@ const SideNavUser = ({ profile, viewUser, setViewUser, isOpen, onClose }: sideNa
       ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
     `}>
 
-      <div className="px-6 py-6 border-b border-white/8">
+      <div className="px-6 py-6 short:py-4 border-b border-white/8 shrink-0">
         <div className="flex items-center justify-between">
           <p className="text-[#F7EA79] text-xs font-semibold tracking-[0.15em] uppercase">Mi cuenta</p>
           <button
@@ -59,8 +59,8 @@ const SideNavUser = ({ profile, viewUser, setViewUser, isOpen, onClose }: sideNa
         </div>
 
         {/* Mismo lockup de marca que el Header del home */}
-        <div className="flex items-center gap-2.5 min-w-0 mt-4">
-          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-20 h-20 object-contain shrink-0" />
+        <div className="flex items-center gap-2.5 min-w-0 mt-4 short:mt-3">
+          <img src="/images/logo2.png" alt="Frigorífico 5 Estrellas" className="w-20 h-20 short:w-12 short:h-12 object-contain shrink-0" />
           <span className="font-mono font-bold uppercase leading-[1.15] tracking-[0.12em] text-white text-sm">
             Frigorífico<br /><span className="text-[#C9405A] lowercase [text-shadow:0_0_16px_rgba(201,64,90,0.5)]">5 Estrellas</span>
           </span>
@@ -68,7 +68,7 @@ const SideNavUser = ({ profile, viewUser, setViewUser, isOpen, onClose }: sideNa
       </div>
 
       {isUserProfile && (
-        <div className="px-6 py-5 border-b border-white/8 flex items-center gap-3">
+        <div className="px-6 py-5 short:py-3 border-b border-white/8 flex items-center gap-3 shrink-0">
           <div className="w-10 h-10 rounded-full bg-[#F7EA79]/15 border border-[#F7EA79]/30 flex items-center justify-center shrink-0">
             <span className="text-[#F7EA79] text-sm font-bold">{initials}</span>
           </div>
@@ -78,14 +78,16 @@ const SideNavUser = ({ profile, viewUser, setViewUser, isOpen, onClose }: sideNa
         </div>
       )}
 
-      <nav className="flex-1 px-3 py-5 flex flex-col gap-0.5">
+      {/* min-h-0 permite que el nav se encoja por debajo de su contenido dentro del
+          flex column; sin eso el sidebar desbordaba el 100vh del panel. */}
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-5 short:py-2 flex flex-col gap-0.5">
         {navItems.map((item) => {
           const isActive = viewUser === item.view
           return (
             <button
               key={item.view}
               onClick={() => handleNavClick(item.view)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer text-left
+              className={`w-full flex items-center gap-3 px-4 py-3 short:py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer text-left shrink-0
                 ${isActive
                   ? 'bg-[#F7EA79] text-[#0A0A0A] shadow-lg shadow-[#F7EA79]/15'
                   : 'text-white/50 hover:text-white hover:bg-white/6'
@@ -98,7 +100,7 @@ const SideNavUser = ({ profile, viewUser, setViewUser, isOpen, onClose }: sideNa
         })}
       </nav>
 
-      <div className="px-3 pb-5 border-t border-white/8 pt-3 flex flex-col gap-0.5">
+      <div className="px-3 pb-5 short:pb-3 border-t border-white/8 pt-3 flex flex-col gap-0.5 shrink-0">
         <GoBack href="/" />
         <button
           onClick={handleLogout}

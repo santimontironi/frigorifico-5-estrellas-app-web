@@ -34,7 +34,7 @@ const AdminPanel = () => {
     }
 
     return (
-        <div className="flex h-screen panel-bg">
+        <div className="flex h-screen overflow-hidden panel-bg">
 
             {sidebarOpen && (
                 <div

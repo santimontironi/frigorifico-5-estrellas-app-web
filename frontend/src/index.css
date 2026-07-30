@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Pantallas de poca altura (notebooks de 1366x768: ~635px de viewport útil).
+   El sidebar de los paneles compacta su branding y su lista para entrar
+   completo en 100vh; si no, desbordaba el contenedor raíz y aparecía un
+   segundo scroll (el del body) más una franja de fondo debajo del sidebar. */
+@custom-variant short (@media (max-height: 820px));
+
 html{
     scroll-behavior: smooth;
     background-color: #0A0A0A;
