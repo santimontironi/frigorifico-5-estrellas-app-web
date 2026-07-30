@@ -1,6 +1,8 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { useReactToPrint } from "react-to-print"
 import type { OrderAdmin } from "../../../types/order.types"
 import UseAdmin from "../../../hooks/UseAdmin"
+import Comanda from "./Comanda"
 
 const formatPrice = (value: number) => `$${value.toLocaleString('es-AR')}`
 
@@ -14,12 +16,12 @@ const whatsappUrl = (phone: string) => {
 
 // Config visual por estado: etiqueta, ícono y colores del badge.
 const STATUS_CONFIG = {
-  pending:        { label: 'Pendiente',      icon: 'bi-hourglass-split', className: 'text-[#F7EA79] bg-[#F7EA79]/10 border-[#F7EA79]/30' },
-  rejected:       { label: 'Rechazado',      icon: 'bi-x-circle',        className: 'text-[#C9405A] bg-[#9B2335]/10 border-[#9B2335]/40' },
-  paid:           { label: 'Pagado',         icon: 'bi-cash-coin',       className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
-  in_preparation: { label: 'En preparación', icon: 'bi-box-seam',        className: 'text-[#F0A868] bg-[#F0A868]/10 border-[#F0A868]/30' },
-  delivered:      { label: 'Entregado',      icon: 'bi-bag-check',       className: 'text-[#0F2915] bg-[#5CD68A] border-[#5CD68A]' },
-  canceled:       { label: 'Cancelado',      icon: 'bi-slash-circle',    className: 'text-white/50 bg-white/5 border-white/15' },
+  pending: { label: 'Pendiente', icon: 'bi-hourglass-split', className: 'text-[#F7EA79] bg-[#F7EA79]/10 border-[#F7EA79]/30' },
+  rejected: { label: 'Rechazado', icon: 'bi-x-circle', className: 'text-[#C9405A] bg-[#9B2335]/10 border-[#9B2335]/40' },
+  paid: { label: 'Pagado', icon: 'bi-cash-coin', className: 'text-[#5CD68A] bg-[#5CD68A]/10 border-[#5CD68A]/30' },
+  in_preparation: { label: 'En preparación', icon: 'bi-box-seam', className: 'text-[#F0A868] bg-[#F0A868]/10 border-[#F0A868]/30' },
+  delivered: { label: 'Entregado', icon: 'bi-bag-check', className: 'text-[#0F2915] bg-[#5CD68A] border-[#5CD68A]' },
+  canceled: { label: 'Cancelado', icon: 'bi-slash-circle', className: 'text-white/50 bg-white/5 border-white/15' },
 }
 
 interface OrderCardAdminProps {
@@ -31,9 +33,24 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
 
   const [finalAmount, setFinalAmount] = useState('')
   const [deliveryDate, setDeliveryDate] = useState('')
+  const [notesForButcher, setNotesForButcher] = useState('')
+  const [notesForUser, setNotesForUser] = useState('')
   const [rejecting, setRejecting] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Comanda para la impresora térmica: se renderiza fuera de pantalla y react-to-print
+  // clona el nodo a un iframe propio, así no hay que esconder el resto del panel.
+  const comandaRef = useRef<HTMLDivElement>(null)
+
+  const printComanda = useReactToPrint({
+    contentRef: comandaRef,
+    documentTitle: `comanda-${order._id.slice(-6).toUpperCase()}`,
+    // 72mm es el PrintWidth configurado en el driver de la térmica: si acá se declara
+    // otro ancho, el navegador escala el contenido y los cortes salen corridos. El alto
+    // va en auto porque el rollo no tiene página fija.
+    pageStyle: '@page { size: 72mm auto; margin: 0 } @media print { body { margin: 0 } }',
+  })
 
   const statusConfig = STATUS_CONFIG[order.status]
 
@@ -78,6 +95,8 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
         status: 'in_preparation',
         finalAmount: finalAmount.trim() ? Number(finalAmount) : undefined,
         deliveryDate,
+        adminNotesForButcher: notesForButcher.trim() || undefined,
+        adminNotesForUser: notesForUser.trim() || undefined,
       })
     } catch (error: any) {
       setErrorMessage(error.response?.data?.message ?? "No pudimos actualizar el pedido. Intentá nuevamente.")
@@ -135,10 +154,23 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
           <p className="text-white/40 text-xs mt-1.5">{date}</p>
         </div>
 
-        <span className={`flex items-center gap-1.5 shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full border ${statusConfig.className}`}>
-          <i className={`bi ${statusConfig.icon}`} aria-hidden="true" />
-          {statusConfig.label}
-        </span>
+        <div className="flex flex-col items-end gap-2.5 shrink-0">
+          <span className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${statusConfig.className}`}>
+            <i className={`bi ${statusConfig.icon}`} aria-hidden="true" />
+            {statusConfig.label}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => printComanda()}
+            aria-label={`Imprimir comanda del pedido ${shortId}`}
+            className="flex items-center gap-1.5 bg-white/8 border border-white/20 text-[#F2EDE6] text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200 hover:bg-white/15 hover:border-white/35 active:scale-[0.97] cursor-pointer"
+          >
+            <i className="bi bi-printer" aria-hidden="true" />
+            Comanda
+          </button>
+
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 my-4 rounded-xl border border-[#9B2335]/30 bg-[#9B2335]/10 px-4 sm:px-5 py-4">
@@ -262,10 +294,38 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
                 value={deliveryDate}
                 min={today}
                 onChange={(e) => setDeliveryDate(e.target.value)}
-                className="w-full bg-[#0A0A0A] border border-white/75 rounded-xl text-[#F2EDE6] text-sm px-4 py-3 outline-none focus:border-white transition-colors duration-200 [color-scheme:dark]"
+                className="w-full bg-[#0A0A0A] border border-white/75 rounded-xl text-[#F2EDE6] text-sm px-4 py-3 outline-none focus:border-white transition-colors duration-200 scheme:dark"
               />
               <p className="text-white/45 text-[11px]">
                 Se la avisamos al cliente por mail: es el día en que pasa a pagar y retirar el pedido.
+              </p>
+
+              <label className="text-white text-xs font-bold">
+                Indicaciones para el carnicero
+              </label>
+              <textarea
+                value={notesForButcher}
+                onChange={(e) => setNotesForButcher(e.target.value)}
+                rows={2}
+                placeholder="Ej: cortar el bife fino, separar el hueso..."
+                className="w-full bg-[#0A0A0A] border border-white/75 rounded-xl text-[#F2EDE6] text-sm px-4 py-3 outline-none focus:border-white transition-colors duration-200 placeholder:text-white/75 resize-none"
+              />
+              <p className="text-white/45 text-[11px]">
+                Opcional. Se imprimen en la comanda, no las ve el cliente.
+              </p>
+
+              <label className="text-white text-xs font-bold">
+                Mensaje para el cliente
+              </label>
+              <textarea
+                value={notesForUser}
+                onChange={(e) => setNotesForUser(e.target.value)}
+                rows={2}
+                placeholder="Ej: el vacío te lo dejamos en dos piezas..."
+                className="w-full bg-[#0A0A0A] border border-white/75 rounded-xl text-[#F2EDE6] text-sm px-4 py-3 outline-none focus:border-white transition-colors duration-200 placeholder:text-white/75 resize-none"
+              />
+              <p className="text-white/45 text-[11px]">
+                Opcional. Se lo enviamos por mail junto con el aviso de que el pedido está en preparación.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -356,6 +416,15 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
           )}
         </div>
       )}
+
+      {/* La comanda vive fuera de pantalla: el posicionamiento va en este wrapper y no
+          en el nodo referenciado, porque react-to-print clona ese nodo con sus clases
+          y un -left-[9999px] heredado empujaría el contenido fuera del papel. */}
+      <div className="fixed left-[-9999px] top-0 pointer-events-none" aria-hidden="true">
+        <div ref={comandaRef}>
+          <Comanda order={order} notesForButcher={notesForButcher} deliveryDate={deliveryDate} />
+        </div>
+      </div>
     </div>
   )
 }

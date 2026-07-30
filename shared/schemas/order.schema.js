@@ -26,7 +26,10 @@ export const updateOrderStatusSchema = z.object({
   finalAmount: z.coerce.number().min(0, "El monto debe ser mayor o igual a 0").optional(),
   // Fecha de entrega: el front la manda como "yyyy-mm-dd" y se coerce a Date.
   deliveryDate: z.coerce.date({ message: "La fecha de entrega no es válida" }).optional(),
-  notesAdmin: z.string().trim().optional(),
+  // Indicaciones internas: se imprimen en la comanda del carnicero.
+  adminNotesForButcher: z.string().trim().optional(),
+  // Mensaje para el cliente: se le manda en el mail de "en preparación".
+  adminNotesForUser: z.string().trim().optional(),
 }).refine(
   // Al aceptar el pedido la fecha de entrega es obligatoria: es el dato con el que
   // el cliente sabe cuándo pasar a retirarlo.
@@ -63,7 +66,8 @@ export const orderSchema = z.object({
   deliveryDate: z.string().nullable().optional(),
   deliveryAddress: deliveryAddressSchema,
   notesUser: z.string().optional(),
-  notesAdmin: z.string().optional(),
+  adminNotesForButcher: z.string().optional(),
+  adminNotesForUser: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

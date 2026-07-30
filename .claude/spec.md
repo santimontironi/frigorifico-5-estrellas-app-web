@@ -329,8 +329,9 @@ frigorifico-5-estrellas/
     province:  String
   },
 
-  notesUser:  { type: String, default: '' },   // nota que deja el cliente al comprar
-  notesAdmin: { type: String, default: '' },   // nota del admin al gestionar el pedido
+  notesUser:            { type: String, default: '' },  // nota que deja el cliente al comprar
+  adminNotesForButcher: { type: String, default: '' },  // indicaciones internas: se imprimen en la comanda
+  adminNotesForUser:    { type: String, default: '' },  // mensaje al cliente: va en el mail de "en preparación"
   // timestamps: true
 }
 ```
@@ -434,7 +435,7 @@ app.use('/api', photoRouter)
 | GET | `/api/orders` | user | Historial de pedidos del usuario |
 | PATCH | `/api/orders/:id/cancel` | user | Cancelar un pedido propio (solo si está `pending`) |
 | GET | `/api/orders/all` | admin, employee | Listar todos los pedidos |
-| PATCH | `/api/orders/:id/status` | admin, employee | Cambiar estado del pedido (con `finalAmount`, `deliveryDate`, `rejectionReason`, `notesAdmin`). Incluye el registro del cobro en el local (`paid`) |
+| PATCH | `/api/orders/:id/status` | admin, employee | Cambiar estado del pedido (con `finalAmount`, `deliveryDate`, `rejectionReason`, `adminNotesForButcher`, `adminNotesForUser`). Incluye el registro del cobro en el local (`paid`) |
 
 > No hay endpoints de pago online: el cobro presencial se registra por `PATCH /api/orders/:id/status` con `status: "paid"`.
 
