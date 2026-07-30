@@ -94,7 +94,7 @@ class OrderController {
   async updateOrderStatus(req, res) {
     try {
       const { id } = req.params;
-      const { status, rejectionReason, finalAmount, deliveryDate, notesAdmin } = req.body;
+      const { status, rejectionReason, finalAmount, deliveryDate, adminNotesForButcher, adminNotesForUser } = req.body;
 
       const order = await orderRepository.getOrderById(id);
       if (!order)
@@ -118,7 +118,10 @@ class OrderController {
       if (finalAmount !== undefined) data.finalAmount = finalAmount;
       // La fecha de entrega solo se carga al aceptar el pedido (el schema la exige ahí).
       if (deliveryDate !== undefined) data.deliveryDate = deliveryDate;
-      if (notesAdmin !== undefined) data.notesAdmin = notesAdmin;
+      // Las dos notas del admin se cargan al aceptar: una se imprime en la comanda
+      // y la otra viaja en el mail de "en preparación".
+      if (adminNotesForButcher !== undefined) data.adminNotesForButcher = adminNotesForButcher;
+      if (adminNotesForUser !== undefined) data.adminNotesForUser = adminNotesForUser;
 
       const updatedOrder = await orderRepository.updateOrder(id, data);
 

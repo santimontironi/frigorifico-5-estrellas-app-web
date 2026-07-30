@@ -32,8 +32,14 @@ const orderSchema = new mongoose.Schema({
     province:  String
   },
 
-  notesUser:     { type: String, default: '' },
-  notesAdmin:    { type: String, default: '' }
+  notesUser: { type: String, default: '' },
+
+  // Indicaciones internas para quien arma el pedido: se imprimen en la comanda
+  // térmica y nunca salen al cliente.
+  adminNotesForButcher: { type: String, default: '' },
+
+  // Mensaje del admin dirigido al cliente: viaja en el mail de "en preparación".
+  adminNotesForUser: { type: String, default: '' }
 },{
   timestamps: true
 })

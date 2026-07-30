@@ -27,6 +27,17 @@ const deliveryDateBlock = (order) =>
       </div>`
     : "";
 
+// Mensaje que el admin escribe para el cliente al aceptar el pedido. Es la única
+// de las dos notas del admin que sale al cliente: adminNotesForButcher es interna
+// y solo se imprime en la comanda.
+const adminNoteForUserBlock = (order) =>
+  order.adminNotesForUser
+    ? `<div style="background:#FFFDF5;border-left:4px solid #C8A951;border-radius:6px;padding:14px 16px;margin:20px 0;">
+        <p style="margin:0 0 6px;font-size:13px;color:#7A6B63;text-transform:uppercase;letter-spacing:0.08em;">Mensaje del frigorífico</p>
+        <p style="margin:0;font-size:15px;color:#1C1714;">${order.adminNotesForUser}</p>
+      </div>`
+    : "";
+
 // Filas de la tabla de items a partir de los snapshots del pedido.
 const itemsRows = (items) =>
   items
@@ -201,6 +212,7 @@ export async function sendOrderStatusChangedMail(user, order) {
         <p style="color:#7A6B63;">${info.body}</p>
         ${order.status === "rejected" && order.rejectionReason ? `<p style="color:#7A6B63;"><strong>Motivo:</strong> ${order.rejectionReason}</p>` : ""}
         ${order.status === "in_preparation" ? deliveryDateBlock(order) : ""}
+        ${order.status === "in_preparation" ? adminNoteForUserBlock(order) : ""}
         ${order.status === "in_preparation" && hasFinal ? `<p style="text-align:right;font-size:18px;"><strong>Total final: ${formatPrice(order.finalAmount)}</strong></p>` : ""}
       </div>`,
   });
