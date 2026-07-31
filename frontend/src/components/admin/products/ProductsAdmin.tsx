@@ -3,6 +3,7 @@ import UseProducts from "../../../hooks/useProducts"
 import Loader from "../../ui/Loader"
 import EditProductModal from "./EditProductModal"
 import AddProductModal from "./AddProductModal"
+import DeleteProductModal from "./DeleteProductModal"
 import ProductAdminCard from "./ProductAdminCard"
 import type { Product } from "../../../types/product.types"
 import FormSearch from "../../ui/FormSearch"
@@ -11,6 +12,7 @@ const ProductsAdmin = () => {
   const { products, getProducts, loading, searchProducts, productsFiltered } = UseProducts()
 
   const [editing, setEditing] = useState<Product | null>(null)
+  const [deleting, setDeleting] = useState<Product | null>(null)
   const [addOpen, setAddOpen] = useState(false)
   const [query, setQuery] = useState<string>('')
 
@@ -86,6 +88,7 @@ const ProductsAdmin = () => {
                 key={product._id}
                 product={product}
                 onEdit={setEditing}
+                onDelete={setDeleting}
               />
             ))}
           </div>
@@ -98,6 +101,10 @@ const ProductsAdmin = () => {
 
       {editing && (
         <EditProductModal product={editing} onClose={() => setEditing(null)} />
+      )}
+
+      {deleting && (
+        <DeleteProductModal product={deleting} onClose={() => setDeleting(null)} />
       )}
     </section>
   )
