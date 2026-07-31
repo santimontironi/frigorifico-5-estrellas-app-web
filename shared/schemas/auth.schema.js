@@ -4,7 +4,7 @@ import { z } from 'zod'
 // Los campos opcionales (floor/apartment) coinciden con el modelo de Mongoose.
 export const addressSchema = z.object({
   street:    z.string().trim().min(1, 'La calle es obligatoria'),
-  number:    z.string().trim().min(1, 'El número es obligatorio').regex(/^\d{1,5}$/, "Teléfono inválido (solo números, 2 a 5 dígitos)"),
+  number:    z.string().trim().min(1, 'El número es obligatorio').regex(/^\d{1,5}$/, "Número inválido (solo números, 1 a 5 dígitos)"),
   floor:     z.string().trim().optional(),
   apartment: z.string().trim().optional(),
   city:      z.string().trim().min(1, 'La ciudad es obligatoria'),
