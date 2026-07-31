@@ -21,11 +21,12 @@ class ProductRepository {
   }
 
   async deleteProductById(id) {
+    // populate de category para que la respuesta tenga { _id, name } y matchee el schema
     const product = await Product.findByIdAndUpdate(
       id,
       { active: false },
       { returnDocument: 'after' },
-    );
+    ).populate({ path: "category", select: "name" });
     return product;
   }
 
