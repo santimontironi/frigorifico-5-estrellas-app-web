@@ -3,6 +3,7 @@ import { useReactToPrint } from "react-to-print"
 import type { OrderAdmin } from "../../../types/order.types"
 import UseAdmin from "../../../hooks/UseAdmin"
 import Comanda from "./Comanda"
+import { formatDeliveryDate } from "../../../utils/date"
 
 const formatPrice = (value: number) => `$${value.toLocaleString('es-AR')}`
 
@@ -63,13 +64,8 @@ const OrderCardAdmin = ({ order }: OrderCardAdminProps) => {
   // Fecha mínima del input: hoy (no se agenda una entrega pasada). 'en-CA' da yyyy-mm-dd.
   const today = new Date().toLocaleDateString('en-CA')
 
-  // La fecha de entrega se guarda sin hora (medianoche UTC): se formatea en UTC
-  // para que no se corra un día según la zona horaria del navegador.
-  const deliveryDateLabel = order.deliveryDate
-    ? new Date(order.deliveryDate).toLocaleDateString('es-AR', {
-      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC',
-    })
-    : null
+  // Mismo formateo que la comanda, así el papel y el panel nunca discrepan.
+  const deliveryDateLabel = formatDeliveryDate(order.deliveryDate)
 
   const hasFinal = order.finalAmount !== null
   const total = hasFinal ? order.finalAmount! : order.approximateTotal

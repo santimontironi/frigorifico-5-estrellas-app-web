@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { Order } from "../../types/order.types"
 import useOrder from "../../hooks/useOrder"
+import { formatDeliveryDate } from "../../utils/date"
 
 const formatPrice = (value: number) => `$${value.toLocaleString('es-AR')}`
 
@@ -49,13 +50,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
   // Los últimos 6 caracteres del _id como referencia legible del pedido.
   const shortId = order._id.slice(-6).toUpperCase()
 
-  // La fecha de entrega se guarda sin hora (medianoche UTC): se formatea en UTC
-  // para que no se corra un día según la zona horaria del navegador.
-  const deliveryDateLabel = order.deliveryDate
-    ? new Date(order.deliveryDate).toLocaleDateString('es-AR', {
-      weekday: 'long', day: '2-digit', month: 'long', timeZone: 'UTC',
-    })
-    : null
+  // Mismo formateo que el panel y la comanda, sin el año.
+  const deliveryDateLabel = formatDeliveryDate(order.deliveryDate, { withYear: false })
 
   // Si el frigorífico ya confirmó el peso, mostramos el total final; si no, el aproximado.
   const hasFinal = order.finalAmount !== null

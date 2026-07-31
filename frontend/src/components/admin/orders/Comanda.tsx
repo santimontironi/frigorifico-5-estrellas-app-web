@@ -1,4 +1,5 @@
 import type { OrderAdmin } from "../../../types/order.types"
+import { formatDeliveryDate } from "../../../utils/date"
 
 const unitLabel = (unit: string) => (unit === 'kg' ? 'kg' : 'un')
 
@@ -25,14 +26,9 @@ const Comanda = ({ order, notesForButcher, deliveryDate }: ComandaProps) => {
   const notes = notesForButcher?.trim() || order.adminNotesForButcher
   const delivery = deliveryDate || order.deliveryDate
 
-  // Las dos formas de la fecha son medianoche UTC ("yyyy-mm-dd" del input y el ISO que
-  // guarda Mongo), así que se formatean en UTC para que no se corra un día según la
-  // zona horaria del navegador.
-  const deliveryDateLabel = delivery
-    ? new Date(delivery).toLocaleDateString('es-AR', {
-      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC',
-    })
-    : null
+  // El formateo lee el día y el mes tal cual vienen (ver utils/date): así el papel
+  // no puede salir con el día y el mes invertidos respecto de lo cargado en el panel.
+  const deliveryDateLabel = formatDeliveryDate(delivery)
 
   const orderDate = new Date(order.createdAt).toLocaleString('es-AR', {
     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
