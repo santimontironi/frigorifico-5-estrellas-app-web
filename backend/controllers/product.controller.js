@@ -33,6 +33,27 @@ class ProductController {
     }
   }
 
+  async createProduct(req, res) {
+    try {
+      const data = { ...req.body };
+
+      // La imagen es opcional: si multer recibió un archivo se sube a Cloudinary
+      // y se guarda la URL; si no, el producto queda con image en null.
+      if (req.file) {
+        data.image = await uploadImageToCloudinary(req.file.buffer);
+      }
+
+      const newProduct = await productRepository.createProduct(data);
+
+      return res.status(201).json({
+        message: "Producto creado correctamente",
+        product: newProduct,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
   async deleteProductById(req, res) {
     try {
       const { id } = req.params;

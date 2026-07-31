@@ -14,6 +14,12 @@ class ProductRepository {
     return products.filter((p) => p.category !== null);
   }
 
+  async createProduct(data) {
+    const product = await Product.create(data);
+    // populate de category para que la respuesta tenga { _id, name } y matchee el schema
+    return product.populate({ path: "category", select: "name" });
+  }
+
   async deleteProductById(id) {
     const product = await Product.findByIdAndUpdate(
       id,

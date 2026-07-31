@@ -4,11 +4,13 @@ import { uploadExcel, uploadImage } from "../middlewares/multer.js";
 import verifyAuth from "../middlewares/verifyAuth.js";
 import verifyRole from "../middlewares/verifyRole.js";
 import { validate } from "../middlewares/validate.js";
-import { updateProductSchema } from "../../shared/index.js";
+import { createProductSchema, updateProductSchema } from "../../shared/index.js";
 
 export const router = Router();
 
 router.get("/products", productController.getAllProducts);
+
+router.post("/products", verifyAuth, verifyRole("admin"), uploadImage.single("image"), validate(createProductSchema), productController.createProduct);
 
 router.post( "/products/import", verifyAuth, verifyRole("admin"), uploadExcel.single("file"), productController.importFromExcel );
 
