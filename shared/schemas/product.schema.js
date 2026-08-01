@@ -58,6 +58,8 @@ export const updateProductResponseSchema = z.object({
 // POST /api/products/import
 export const importProductsResponseSchema = z.object({
     message: z.string(),
-    inserted: z.number(),
+    inserted: z.number(),  // productos nuevos creados
+    updated: z.number(),   // productos existentes a los que se les actualizó el precio
+    unchanged: z.number(), // productos que ya estaban idénticos y no se tocaron
     errors: z.array(z.string()),
 })

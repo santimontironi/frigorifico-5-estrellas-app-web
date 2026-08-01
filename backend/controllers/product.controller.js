@@ -4,6 +4,12 @@ import Category from "../models/category.model.js"; // modelo de categoría en M
 import productRepository from "../repository/product.repository.js";
 import cloudinary from "../config/cloudinary.config.js";
 
+// Escapa los caracteres especiales de una cadena para poder usarla dentro de un $regex
+// sin que paréntesis, puntos o asteriscos del nombre rompan la búsqueda.
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 // Sube un Buffer de imagen a Cloudinary usando un stream y devuelve la URL segura.
 // El Buffer viene de multer (memoryStorage), no se escribe nada en disco.
 function uploadImageToCloudinary(buffer) {
@@ -115,6 +121,8 @@ class ProductController {
 
   // Recibe un archivo Excel y carga los productos en la base de datos.
   // Columnas requeridas: name, unit (kg | unit), category, price.
+  // Un producto se considera "el mismo" si coinciden nombre (sin importar mayúsculas) y categoría:
+  // en ese caso solo se le actualiza el precio, y si el precio también coincide no se toca nada.
   async importFromExcel(req, res) {
     if (!req.file) {
       // multer no encontró ningún archivo en el request
@@ -134,7 +142,7 @@ class ProductController {
     }
 
     const errors = []; // filas que fallaron la validación
-    const toInsert = []; // documentos listos para insertar en MongoDB
+    const toUpsert = []; // filas válidas listas para crear o actualizar en MongoDB
 
     for (let i = 0; i < rows.length; i++) {
       //este for recorre todas las filas del excel
@@ -172,26 +180,48 @@ class ProductController {
 
       // Si la categoría no existe en la DB se crea automáticamente
       let category = await Category.findOne({
-        name: { $regex: `^${categoryName}$`, $options: "i" },
+        name: { $regex: `^${escapeRegex(categoryName)}$`, $options: "i" },
       }); // búsqueda case-insensitive
       if (!category) {
         category = await Category.create({ name: categoryName }); // crea la categoría si no existe
       }
 
-      toInsert.push({ name, unit, category: category._id, price }); // agrega el documento al lote
+      toUpsert.push({ name, unit, category: category._id, price }); // agrega la fila al lote
     }
 
-    if (toInsert.length === 0) {
+    if (toUpsert.length === 0) {
       // todas las filas fallaron la validación
       return res.status(400).json({ message: errors });
     }
 
-    // Inserción masiva en una sola operación
-    const inserted = await Product.insertMany(toInsert); // inserta todos los documentos válidos de una vez
+    // Una operación por fila: crea el producto si no existe, y si ya existe solo le pisa el precio.
+    // Si el precio guardado es igual al del Excel, Mongo no escribe nada y la fila queda sin cambios.
+    const operations = toUpsert.map(({ name, unit, category, price }) => ({
+      updateOne: {
+        filter: {
+          name: { $regex: `^${escapeRegex(name)}$`, $options: "i" }, // mismo nombre sin importar mayúsculas
+          category, // dentro de la misma categoría
+        },
+        update: {
+          $set: { price, active: true }, // lo único que cambia de un producto ya existente
+          $setOnInsert: { name, unit }, // solo se aplica cuando hay que crearlo
+        },
+        upsert: true,
+      },
+    }));
+
+    // Escritura masiva en una sola ida a la base
+    const result = await Product.bulkWrite(operations);
+
+    const inserted = result.upsertedCount; // productos que no existían y se crearon
+    const updated = result.modifiedCount; // productos existentes a los que se les cambió el precio
+    const unchanged = result.matchedCount - result.modifiedCount; // ya estaban idénticos
 
     return res.status(201).json({
-      message: `Se importaron ${inserted.length} producto(s)`, // mensaje de éxito con cantidad
-      inserted: inserted.length, // total de productos insertados
+      message: `Se crearon ${inserted} producto(s), se actualizó el precio de ${updated} y ${unchanged} ya estaban igual`,
+      inserted, // productos nuevos
+      updated, // productos con precio actualizado
+      unchanged, // productos que quedaron intactos
       errors, // filas que tuvieron errores (puede estar vacío)
     });
   }
