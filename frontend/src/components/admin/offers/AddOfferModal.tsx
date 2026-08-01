@@ -30,6 +30,7 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
     defaultValues: {
       product: "",
       newPrice: undefined,
+      minQuantity: 1,
     },
   })
   const selectedProductId = watch("product")
@@ -44,6 +45,7 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
       const formData = new FormData()
       formData.append("product", data.product)
       formData.append("newPrice", String(data.newPrice))
+      formData.append("minQuantity", String(data.minQuantity))
       if (imageFile) formData.append("image", imageFile)
 
       await createOffer(formData)
@@ -119,7 +121,7 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
                 <option value="" disabled>Elegí un producto</option>
                 {products.map((product) => (
                   <option key={product._id} value={product._id}>
-                    {product.name}
+                    {product.name} - ${product.price}
                   </option>
                 ))}
               </select>
@@ -145,6 +147,27 @@ const AddOfferModal = ({ open, onClose }: AddOfferModalProps) => {
 
               {errors.newPrice && (
                 <span className="text-[#9B2335] text-xs ml-1">{errors.newPrice.message}</span>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[#7A6B63] text-xs font-medium ml-1">
+                Cantidad mínima {selectedProduct && `(${selectedProduct.unit === "kg" ? "kg" : "unidades"})`}
+              </label>
+              <input
+                type="number"
+                step={selectedProduct?.unit === "kg" ? "0.5" : "1"}
+                min="1"
+                {...register("minQuantity")}
+                className="w-full bg-[#F7F4F1] rounded-xl text-[#1C1714] text-sm px-4 py-3.5 outline-none border-2 border-transparent focus:border-[#9B2335]/30 focus:bg-white transition-all duration-200 placeholder:text-[#B8A898]/60"
+                placeholder="1"
+              />
+              <span className="text-[#7A6B63] text-xs ml-1">
+                A partir de esta cantidad se aplica el precio de oferta.
+              </span>
+
+              {errors.minQuantity && (
+                <span className="text-[#9B2335] text-xs ml-1">{errors.minQuantity.message}</span>
               )}
             </div>
 
