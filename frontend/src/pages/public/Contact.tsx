@@ -78,12 +78,12 @@ const Contact = () => {
                             <ContactItem
                                 icon="bi bi-telephone"
                                 label="Teléfono"
-                                value="+54 9 000 000 0000"
+                                value="+54 9 341 362-8297"
                             />
                             <ContactItem
                                 icon="bi bi-envelope"
                                 label="Email"
-                                value="contacto@frigorifico5estrellas.com"
+                                value="abastecedor5estrellas@gmail.com"
                             />
                             <ContactItem
                                 icon="bi bi-geo-alt"
