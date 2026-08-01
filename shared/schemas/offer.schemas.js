@@ -18,6 +18,7 @@ export const offerSchema = z.object({
   image: z.string().trim().optional(),
   product: offerProductSchema,
   newPrice: z.number().min(0, "El precio debe ser mayor o igual a 0"),
+  minQuantity: z.number().min(1, "La cantidad mínima debe ser mayor o igual a 1"),
   active: z.boolean().optional(),
   createdAt: z.string(),
 });
@@ -26,6 +27,7 @@ export const offerSchemaWithoutProduct = z.object({
   _id: z.string(),
   image: z.string().trim().optional(),
   newPrice: z.number().min(0, "El precio debe ser mayor o igual a 0"),
+  minQuantity: z.number().min(1, "La cantidad mínima debe ser mayor o igual a 1"),
   active: z.boolean().optional(),
   createdAt: z.string(),
 })
@@ -33,6 +35,7 @@ export const offerSchemaWithoutProduct = z.object({
 export const createOfferSchema = z.object({
   image: z.string().optional().nullable(), // la imagen es opcional
   product: z.string().trim().min(1, "El producto es obligatorio"),
+  minQuantity: z.coerce.number().min(1, "La cantidad mínima debe ser mayor o igual a 1"),
   newPrice: z.coerce.number().min(0, "El precio debe ser mayor o igual a 0"),
 });
 
@@ -47,6 +50,7 @@ export const createOfferResponse = z.object({
     image: z.string().optional(),
     product: z.string(),
     newPrice: z.number(),
+    minQuantity: z.number(),
     active: z.boolean().optional(),
     createdAt: z.string(),
   }),

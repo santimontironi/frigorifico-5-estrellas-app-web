@@ -12,7 +12,7 @@ interface OfferCardProps {
 const OfferCard = ({ offer, deletable = false, cart = false }: OfferCardProps) => {
   const { deleteOffer } = useOffer()
 
-  const { product, newPrice, image } = offer
+  const { product, newPrice, image, minQuantity } = offer
 
   const { addToCart } = useCart()
 
@@ -121,12 +121,17 @@ const OfferCard = ({ offer, deletable = false, cart = false }: OfferCardProps) =
               /{unitLabel}
             </span>
           </div>
+
+          <p className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/8 bg-white/[0.04] px-3 py-2 text-[#C9BFB5] text-xs md:text-sm">
+            <i className="bi bi-basket2 text-[#F7EA79]/80" aria-hidden="true" />
+            Comprando desde <strong className="text-[#F2EDE6] font-semibold">{minQuantity} {unitLabel}</strong>
+          </p>
         </div>
 
         {cart && (
           <button
             type="button"
-            onClick={() => addToCart({...product, price: newPrice}, 1)}
+            onClick={() => addToCart({...product, price: newPrice}, minQuantity)}
             className="mt-6 flex items-center justify-center gap-2 w-full rounded-xl bg-[#872F31] text-[#F2EDE6] text-sm md:text-base font-semibold tracking-wide py-3.5 cursor-pointer transition-all duration-200 hover:bg-[#9B2335] hover:shadow-[0_0_28px_-4px_rgba(155,35,53,0.75)] active:scale-[0.98]"
           >
             <i className="bi bi-cart-plus text-lg transition-transform duration-200 group-hover:scale-110" aria-hidden="true" />

@@ -18,7 +18,7 @@ function uploadImageToCloudinary(buffer) {
 class OfferController {
     async createOffer(req, res) {
         try {
-            const { product, newPrice } = req.body;
+            const { product, newPrice, minQuantity } = req.body;
 
             // El id que llega por body puede no corresponder a ningún producto real.
             const productFound = await productRepository.getProductById(product);
@@ -34,7 +34,7 @@ class OfferController {
                     .status(400)
                     .json({ message: "Este producto ya tiene una oferta activa" });
 
-            const data = { product, newPrice };
+            const data = { product, newPrice, minQuantity };
 
             // La imagen se sube DESPUÉS de validar: si algo falla antes,
             // no queda una imagen huérfana en Cloudinary.
