@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Proyecto: **Frigorífico 5 Estrellas** — app web de pedidos online para un frigorífico. Actualmente **en desarrollo activo**.
+Proyecto: **Frigorífico 5 Estrellas** — app web de pedidos online para un frigorífico. **En producción** desde 2026-08-13, desplegado en https://www.frigorifico5estrellas.com/ (URL confirmada por Santiago).
 
 **Stack confirmado (package.json, 2026-07-12):**
 - Frontend: React 19, TypeScript ~6.0, Tailwind CSS 4, Vite 8, React Router DOM 7, Axios 1.x, react-hook-form + @hookform/resolvers, SweetAlert2, Bootstrap Icons, react-loader-spinner
@@ -24,7 +24,7 @@ Proyecto: **Frigorífico 5 Estrellas** — app web de pedidos online para un fri
 
 **Decisiones de documentación tomadas:**
 - README en español (idioma del proyecto)
-- Título del README debe indicar explícitamente "En desarrollo" / 🚧 — pedido explícito del usuario (2026-07-12), mantener en futuras actualizaciones mientras el proyecto no esté productivo
+- (Obsoleto desde 2026-08-13) Título indicaba "En desarrollo" / 🚧 — ya no aplica, el proyecto pasó a producción. El README ahora tiene una sección "## 🌐 Producción" con el link en vivo (https://www.frigorifico5estrellas.com/), ubicada cerca del inicio, después de la intro y antes de "✨ Características principales"
 - Sección de API solo incluye endpoints ya montados en `app.js` (verificar imports ahí, no solo la existencia del archivo de rutas — `order.routes.js` existe pero no está importado)
 - Estado de implementación con dos listas (Listo / Pendiente) en vez de prosa
 - Flujo de negocio como diagrama ASCII, marcando con ⏳ los pasos aún no conectados

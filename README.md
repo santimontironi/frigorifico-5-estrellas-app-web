@@ -8,22 +8,37 @@ Aplicación web de pedidos para el frigorífico **5 Estrellas**. Los clientes na
 
 ---
 
+## 🌐 Producción
+
+El proyecto está **desplegado y en producción**. Podés verlo funcionando en:
+
+**🔗 [www.frigorifico5estrellas.com](https://www.frigorifico5estrellas.com/)**
+
+---
+
 ## ✨ Características principales
 
 - Catálogo de productos con carga paginada ("ver más") y **búsqueda en tiempo real** por nombre
 - Filtro por categoría (Achuras, Carne vacuna, Cerdo, Pollo, Fiambrería, Quesería, Envasados y más)
 - Precios por kilo o por unidad
 - Sistema de ofertas: el admin marca un producto con precio promocional y se muestra destacado en el home
+- **Compra mínima por oferta (`minQuantity`):** el cliente ve "Comprando desde X kg/unidad" y esa cantidad se precarga al agregar la oferta al carrito
 - Carrito de compras persistente en `localStorage`, agregable desde el catálogo y desde las ofertas
 - Panel de administración con secciones para productos, categorías, ofertas, **fotos del carrusel**, empleados, clientes y **pedidos**
 - Importación masiva de productos desde un archivo Excel (crea categorías automáticamente si no existen)
 - Carga de imágenes de productos y ofertas a Cloudinary
 - **Fotos del carrusel del home gestionadas desde el panel:** el admin sube y elimina las imágenes que se muestran en el carrusel de la página de inicio
 - Autenticación con tres roles (`user`, `admin`, `employee`) y rutas protegidas por rol en el frontend
-- Alta de empleados desde el panel de admin, con vista inicial reducida (los empleados arrancan directo en la vista de pedidos)
+- Alta de empleados desde el panel de admin; el rol `employee` tiene el panel restringido a **Pedidos** y **Ver administradores**, con el resto de las secciones bloqueadas
 - Baja de clientes y empleados desde el panel de admin
+- Edición de perfil del usuario (email, teléfono y domicilio completo); si cambia el email se cierra la sesión y debe reconfirmar la cuenta
 - Recuperación de contraseña por email y confirmación de cuenta por token
+- Formulario de contacto que envía un email real al negocio
 - **Circuito de pedidos completo:** el cliente confirma la compra, el admin/empleado carga el monto final tras el pesaje **y la fecha de entrega** y lo pasa a preparación, registra el cobro cuando el cliente paga en el local y lo marca como entregado
+- **Rechazo de pedidos:** el admin/empleado puede rechazar un pedido pendiente indicando un motivo
+- **Cancelación de pedido por el usuario** mientras está pendiente, con email de confirmación
+- **Notas internas del pedido:** nota para el carnicero (se imprime en la comanda) y mensaje del admin al cliente (se envía por mail), separadas de las notas del propio cliente
+- **Impresión de comanda:** ticket térmico (72mm) con datos del cliente, fecha de entrega e items, para imprimir desde el panel de pedidos
 - **Fecha de entrega:** obligatoria al aceptar el pedido; se le informa al cliente por mail y la ve en su panel
 - **Pago y retiro en el local:** no hay pagos online; el cobro lo registra el admin/empleado desde el panel de pedidos
 - **Emails transaccionales** en cada evento del pedido (creado, cancelado, cambio de estado, cobro registrado)
