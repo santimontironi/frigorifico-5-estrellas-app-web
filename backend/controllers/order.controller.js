@@ -1,6 +1,7 @@
 import orderRepository from "../repository/order.repository.js";
 import productRepository from "../repository/product.repository.js";
 import userRepository from "../repository/user.repository.js";
+import offerRepository from "../repository/offer.repository.js";
 import { sendOrderCreatedMail, sendOrderCanceledMail, sendOrderStatusChangedMail, sendOrderPaidMail } from "../utils/order.mail.js";
 
 class OrderController {
@@ -23,13 +24,17 @@ class OrderController {
 
         if (!product) return res.status(404).json({ message: `Producto no encontrado: ${item.product}` });
 
+        // Si hay oferta activa y la cantidad llega al mínimo, se cobra el precio de oferta.
+        const offer = await offerRepository.findActiveOfferByProduct(product._id);
+        const price = offer && item.quantity >= offer.minQuantity ? offer.newPrice : product.price;
+
         orderItemsData.push({
           product: product._id,
           nameSnapshot: product.name,
-          priceSnapshot: product.price,
+          priceSnapshot: price,
           unitSnapshot: product.unit,
           quantity: item.quantity,
-          subtotal: product.price * item.quantity,
+          subtotal: price * item.quantity,
         });
       }
 
