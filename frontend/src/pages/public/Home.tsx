@@ -87,7 +87,7 @@ const Home = () => {
           </h1>
 
           <p className="text-[#C9BFB5]/70 text-base md:text-lg mt-6 max-w-xl mx-auto leading-relaxed">
-            Cortes seleccionados, frescura garantizada y los mejores precios mayoristas. Elegí tus productos, sumalos al carrito y recibilos en casa.
+            Cortes seleccionados, frescura garantizada y los mejores precios mayoristas. Elegí tus productos, sumalos al carrito y realizá el pago y retiro de tu pedido en el local.
           </p>
 
           <a
