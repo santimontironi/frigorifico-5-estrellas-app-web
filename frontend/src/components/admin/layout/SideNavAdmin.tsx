@@ -71,7 +71,7 @@ const SideNavAdmin = ({ viewAdmin, setViewAdmin, isOpen, onClose }: Props) => {
         {navItems.map((item) => {
           const isActive = viewAdmin === item.view
           
-          const isLocked = isEmployee && item.view !== 'orders' && item.view !== 'employees'
+          const isLocked = isEmployee && item.view !== 'orders' && item.view !== 'customers' 
           return (
             <button
               key={item.view}
