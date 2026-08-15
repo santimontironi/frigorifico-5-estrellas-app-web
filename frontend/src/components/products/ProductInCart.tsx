@@ -32,7 +32,7 @@ const ProductInCart = ({ item }: ProductInCartProps) => {
           {product.name}
         </h3>
         <p className="text-[#C9BFB5]/60 text-xs font-mono mt-1">
-          {formatPrice(product.price)} <span className="text-[#C9BFB5]/40">/ {unitLabel(product.unit)}</span>
+          {formatPrice(Math.round(subtotal / quantity))} <span className="text-[#C9BFB5]/40">/ {unitLabel(product.unit)}</span>
           <span className="mx-2 text-[#C9BFB5]/25">·</span>
           {product.category.name}
         </p>
