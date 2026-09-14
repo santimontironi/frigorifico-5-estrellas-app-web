@@ -1,4 +1,6 @@
 import categoryRepository from '../repository/category.repository.js'
+import productRepository from '../repository/product.repository.js'
+import { deleteCloudinaryImage } from '../utils/cloudinary.util.js'
 
 class CategoryController {
 
@@ -41,6 +43,9 @@ class CategoryController {
             if(!categoryToDelete) return res.status(404).json({ message: 'Categoría no encontrada' })
 
             await categoryRepository.deleteCategoryById(id)
+
+            const productsInCategory = await productRepository.getProductsByCategory(id)
+            productsInCategory.forEach((product) => deleteCloudinaryImage(product.image))
 
             return res.status(200).json({ message: 'Categoría eliminada correctamente', category: categoryToDelete })
         }

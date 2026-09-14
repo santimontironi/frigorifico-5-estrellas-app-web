@@ -3,6 +3,7 @@ import Product from "../models/product.model.js"; // modelo de producto en Mongo
 import Category from "../models/category.model.js"; // modelo de categoría en MongoDB
 import productRepository from "../repository/product.repository.js";
 import cloudinary from "../config/cloudinary.config.js";
+import { deleteCloudinaryImage } from "../utils/cloudinary.util.js";
 
 // Escapa los caracteres especiales de una cadena para poder usarla dentro de un $regex
 // sin que paréntesis, puntos o asteriscos del nombre rompan la búsqueda.
@@ -67,6 +68,8 @@ class ProductController {
 
       if (!deletedProduct)
         return res.status(404).json({ message: "Producto no encontrado" });
+
+      deleteCloudinaryImage(deletedProduct.image);
 
       return res.status(200).json({
         message: "Producto eliminado correctamente",

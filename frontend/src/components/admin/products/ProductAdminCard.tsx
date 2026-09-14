@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { Product } from "../../../types/product.types"
 
 interface Props {
@@ -7,18 +8,27 @@ interface Props {
 }
 
 const ProductAdminCard = ({ product, onEdit, onDelete }: Props) => {
+  const [imageFailed, setImageFailed] = useState(false)
+  const showImage = Boolean(product.image) && !imageFailed
+
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl bg-[#0F0507] border border-white/8 transition-all duration-300 hover:border-[#9B2335]/60">
-      <div className="relative h-36 overflow-hidden bg-linear-to-br from-[#3A1119] via-[#1C0A0E] to-[#0A0A0A]">
-        {product.image ? (
+      <div className="relative h-36 overflow-hidden bg-[#9B2335]">
+        {showImage ? (
           <img
-            src={product.image}
+            src={product.image!}
             alt={product.name}
+            onError={() => setImageFailed(true)}
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <i className="bi bi-image text-white/15 text-4xl" aria-hidden="true" />
+            <img
+              src="/images/logo2.png"
+              alt=""
+              aria-hidden="true"
+              className="w-16 h-16 object-contain opacity-90"
+            />
           </div>
         )}
 

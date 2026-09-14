@@ -30,6 +30,10 @@ class ProductRepository {
     return product;
   }
 
+  async getProductsByCategory(categoryId) {
+    return await Product.find({ category: categoryId });
+  }
+
   async getProductById(id) {
     const product = await Product.findOne({ _id: id, active: true }).populate({
       path: "category",
