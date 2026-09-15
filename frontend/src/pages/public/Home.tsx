@@ -17,7 +17,7 @@ const PAGE_SIZE = 12
 const Home = () => {
   const { products, productsFiltered, searchProducts, getProducts, loading } = UseProducts()
 
-  const { photos } = usePhoto()
+  const { photos, getPhotos } = usePhoto()
 
   const { addToCart } = useCart()
   const { offers } = useOffer()
@@ -25,6 +25,11 @@ const Home = () => {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [query, setQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+
+  useEffect(() => {
+    getPhotos()
+  }, [])
+
 
   useEffect(() => {
     getProducts()
